@@ -474,6 +474,19 @@
     #admin .content{height:calc(100dvh - 82px);overflow:auto;padding:16px}
   }
 </style>
+<style id="mobile-chrome-fix">
+  @media(max-width:760px){
+    /* The host app/browser already owns the device status area. Keep the demo header single-layered. */
+    .phone{grid-template-rows:58px minmax(0,1fr)}
+    .phone>.status{display:none}
+    .phonehead{height:58px;min-height:58px;grid-template-columns:48px minmax(0,1fr) 48px;overflow:hidden}
+    .phonehead>div{min-width:0;overflow:hidden;padding:0 4px}
+    .phonehead button{width:48px;height:58px;padding:0;display:grid;place-items:center;line-height:1}
+    .phonehead button:last-child{font-size:20px;line-height:1}
+    .phonehead small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .phonehead b{font-size:17px;line-height:1.2;white-space:nowrap}
+  }
+</style>
 <script id="quality-demo-controller">
 (() => {
   const names = ['项目报备', '施工前检查', '施工流程', '施工结束'];
