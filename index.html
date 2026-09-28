@@ -601,8 +601,9 @@
     .pview[data-view="form"] .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:28px!important;width:100%;min-width:0}
     .pview[data-view="form"] .two .fieldItem{min-width:0;width:100%}
     .pview[data-view="form"] .two input{min-width:0!important;max-width:100%!important;width:100%!important}
-    .pview[data-view="form"] .monthFields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:36px!important}
-    .pview[data-view="form"] input[type="date"],.pview[data-view="form"] input[type="month"]{display:block;min-inline-size:0!important;inline-size:100%!important;max-inline-size:100%!important;overflow:hidden;text-overflow:clip;font-size:16px!important;padding-inline:10px!important}
+    .pview[data-view="form"] .monthFields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:12px!important}
+    .pview[data-view="form"] input[type="date"],.pview[data-view="form"] input[type="month"]{display:block;min-inline-size:0!important;inline-size:100%!important;max-inline-size:100%!important;overflow:hidden;text-overflow:clip;font-size:16px!important;padding-inline:10px!important;text-align:center!important}
+    .pview[data-view="form"] input[type="date"]{inline-size:calc(100% - 42px)!important;max-inline-size:calc(100% - 42px)!important}
     .pview[data-view="form"] .upload{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"icon content" "icon action";column-gap:12px;row-gap:5px;align-items:center;min-height:104px;padding:14px}
     .pview[data-view="form"] .upload>span{grid-area:icon;align-self:center}
     .pview[data-view="form"] .upload>div{grid-area:content;min-width:0}
