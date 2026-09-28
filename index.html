@@ -228,6 +228,23 @@
       confirm.onclick=()=>{if(confirm.disabled)return;cleanup();attachmentConfirmed[kind]=true;checkState={training:kind==='training',manual:kind==='manual'};bindForm(stage);toast(`${title}已完成阅读并确认`)};
     };
 
+    const legacyShowAttachment=showAttachment;
+    showAttachment=function(kind,stage){
+      legacyShowAttachment(kind,stage);
+      const confirm=$('#attachmentConfirm'),actions=confirm?.parentElement;
+      if(!confirm||!actions)return;
+      const syncConfirm=()=>{
+        const countdown=$('#readingCountdown');
+        const remaining=countdown?.querySelector('strong')?.textContent;
+        const waiting=Boolean(remaining&&remaining!=='0s');
+        const label=waiting?`确认（${remaining}）`:'确认';
+        if(confirm.disabled!==waiting)confirm.disabled=waiting;
+        if(confirm.textContent!==label)confirm.textContent=label;
+      };
+      syncConfirm();
+      new MutationObserver(syncConfirm).observe(actions,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['disabled']});
+    };
+
     const consentBindForm=bindForm;
     bindForm=function(stage){
       consentBindForm(stage);
@@ -488,69 +505,78 @@
   }
 </style>
 <style id="mobile-readable-type">
-  @media(max-width:760px){
     /* Readable field type for older site teams; layout and content remain unchanged. */
-    .phonehead small{font-size:12px}
-    .phonehead b{font-size:19px}
-    .pview h2{font-size:25px!important}
-    .pview h3{font-size:16px!important}
-    .pview p{font-size:13px!important}
-    .pview b{font-size:16px!important}
-    .pview small{font-size:12px!important}
-    .pview dt{font-size:13px!important}
-    .pview dd{font-size:17px!important}
-    .pview button{font-size:14px}
-    .pview .welcome h2{font-size:25px!important}
-    .pview .welcome p{font-size:13px!important}
-    .pview .pkpis b{font-size:23px!important}
-    .pview .pkpis span{font-size:12px!important}
-    .pview .section header button{font-size:12px!important}
-    .pview .todo>span{font-size:12px!important}
-    .pview .todo>span small{font-size:11px!important}
-    .pview .todo em{font-size:11px!important}
-    .pview .projectCard>b{font-size:19px!important}
-    .pview .projectCard>small{font-size:16px!important}
-    .pview .projectCard footer{font-size:16px!important}
-    .pview .tag,.pview .projectHero>span{font-size:12px!important}
-    .pview .projectHero h2{font-size:25px!important}
-    .pview .projectHero>small{font-size:16px!important}
-    .pview .stageList h3{font-size:16px!important}
-    .pview .stageRow b{font-size:19px!important}
-    .pview .stageRow small{font-size:14px!important}
-    .pview .stageRow em{font-size:20px!important}
-    .pview .primary{font-size:14px!important}
-    .pview .stageTimeline button>b{font-size:13px!important}
-    .pview .stageTimeline button small{font-size:12px!important}
-    .pview .formTop>span,.pview .formTop>small{font-size:12px!important}
-    .pview .formCard h3{font-size:16px!important}
-    .pview .formCard header p{font-size:12px!important}
-    .pview .fieldItem b{font-size:14px!important}
-    .pview .fieldItem small{font-size:12px!important}
-    .pview .fieldItem input,.pview .fieldItem select,.pview .fieldItem textarea{font-size:14px!important}
-    .pview .check b{font-size:14px!important}
-    .pview .check small{font-size:12px!important}
-    .pview .temp b{font-size:13px!important}
-    .pview .temp small{font-size:12px!important}
-    .pview .upload b{font-size:13px!important}
-    .pview .upload small,.pview .upload em{font-size:12px!important}
-    .pview .alert b{font-size:14px!important}
-    .pview .alert small{font-size:12px!important}
-    .pview .formActions button{font-size:14px!important}
-    .pview .attachmentLink b{font-size:13px!important}
-    .pview .attachmentLink small{font-size:12px!important}
-    .pview .attachmentPaper h2{font-size:23px!important}
-    .pview .attachmentPaper p{font-size:13px!important}
-    .pview .attachmentPoints b{font-size:13px!important}
-    .pview .attachmentPoints span{font-size:12px!important}
-    .pview .draftPageHead h2{font-size:24px!important}
-    .pview .draftPageHead p,.pview .draftPageHead small{font-size:13px!important}
-    .pview .draftPageBody .draftItem b{font-size:15px!important}
-    .pview .draftPageBody .draftItem small,.pview .draftPageBody .draftItem em{font-size:12px!important}
-    .pview .contactRow b,.pview .companyRow b{font-size:17px!important}
-    .pview .contactSectionTitle,.pview .wecomTabbar b{font-size:12px!important}
-    .pview .launcherApp b{font-size:16px!important}
-    .pview .launcherApp small{font-size:12px!important}
-  }
+    .phonehead small{font-size:13px}
+    .phonehead b{font-size:20px}
+    .pview h2{font-size:27px!important}
+    .pview h3{font-size:18px!important}
+    .pview p{font-size:15px!important}
+    .pview b{font-size:17px!important}
+    .pview small{font-size:14px!important}
+    .pview dt{font-size:14px!important}
+    .pview dd{font-size:18px!important}
+    .pview button{font-size:16px}
+    .pview .welcome h2{font-size:27px!important}
+    .pview .welcome p{font-size:15px!important}
+    .pview .pkpis b{font-size:25px!important}
+    .pview .pkpis span{font-size:14px!important}
+    .pview .section header button{font-size:14px!important}
+    .pview .todo>span{font-size:14px!important}
+    .pview .todo>span small{font-size:13px!important}
+    .pview .todo em{font-size:13px!important}
+    .pview .projectCard>b{font-size:21px!important}
+    .pview .projectCard>small{font-size:17px!important;line-height:1.45}
+    .pview .projectCard footer{font-size:18px!important}
+    .pview .tag,.pview .projectHero>span{font-size:13px!important}
+    .pview .projectHero h2{font-size:27px!important}
+    .pview .projectHero>small{font-size:17px!important}
+    .pview .stageList h3{font-size:18px!important}
+    .pview .stageRow b{font-size:20px!important}
+    .pview .stageRow small{font-size:15px!important}
+    .pview .stageRow em{font-size:22px!important}
+    .pview .primary{font-size:16px!important}
+    .pview .stageTimeline button>b{font-size:15px!important}
+    .pview .stageTimeline button small{font-size:14px!important}
+    .pview .formTop>span,.pview .formTop>small{font-size:14px!important}
+    .pview .formCard h3{font-size:18px!important}
+    .pview .formCard header p{font-size:14px!important}
+    .pview .fieldItem b{font-size:16px!important}
+    .pview .fieldItem small{font-size:14px!important}
+    .pview .fieldItem input,.pview .fieldItem select,.pview .fieldItem textarea{font-size:16px!important}
+    .pview .check b{font-size:16px!important}
+    .pview .check small{font-size:14px!important}
+    .pview .temp b{font-size:15px!important}
+    .pview .temp small{font-size:14px!important}
+    .pview .upload b{font-size:15px!important}
+    .pview .upload small,.pview .upload em{font-size:14px!important}
+    .pview .alert b{font-size:16px!important}
+    .pview .alert small{font-size:14px!important}
+    .pview .formActions button{font-size:16px!important}
+    .pview .attachmentLink b{font-size:15px!important}
+    .pview .attachmentLink small{font-size:14px!important}
+    .pview .attachmentPaper h2{font-size:25px!important}
+    .pview .attachmentPaper p{font-size:15px!important}
+    .pview .attachmentPoints b{font-size:15px!important}
+    .pview .attachmentPoints span{font-size:14px!important}
+    .pview .draftPageHead h2{font-size:26px!important}
+    .pview .draftPageHead p,.pview .draftPageHead small{font-size:15px!important}
+    .pview .draftPageBody .draftItem b{font-size:17px!important}
+    .pview .draftPageBody .draftItem small,.pview .draftPageBody .draftItem em{font-size:14px!important}
+    .pview .contactRow b,.pview .companyRow b{font-size:19px!important}
+    .pview .contactSectionTitle,.pview .wecomTabbar b{font-size:14px!important}
+    .pview .launcherApp b{font-size:18px!important}
+    .pview .launcherApp small{font-size:14px!important}
+    .pview .readingDocument .paperLabel{font-size:14px!important}
+    .pview .readingDocument h3{font-size:18px!important}
+    .pview .readingDocument p,.pview .readingDocument li{font-size:16px!important;line-height:1.85}
+    .pview .readingEnd{font-size:15px!important}
+    .pview .attachmentActions.reading button{font-size:18px!important;min-height:52px}
+    .homeProjectSearch{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:10px;margin-bottom:10px}
+    .homeProjectSearch>span{font-size:16px!important;font-weight:700;white-space:nowrap}
+    .homeProjectSearch input{width:100%;min-width:0;height:46px;border:1px solid #cbd8e3;border-radius:7px;padding:0 10px;font-size:18px!important;background:#fff}
+    .homeProjectSearch button{height:46px;border:1px solid #cbd8e3;border-radius:7px;background:#fff;color:#075ebb;padding:0 10px;font-size:16px!important;font-weight:700}
+    .homeSearchEmpty{display:none;background:#fff;border-radius:10px;padding:20px;text-align:center;color:var(--muted);font-size:16px!important}
+    #readingCountdown{display:none!important}
 </style>
 <script id="quality-demo-controller">
 (() => {
@@ -702,7 +728,7 @@
   try{const savedDrafts=JSON.parse(localStorage.getItem('milliken-drafts-v1')||'[]');if(Array.isArray(savedDrafts))draftItems=savedDrafts}catch{}
   function renderContacts(){mobileContacts.innerHTML='<div class="wecomContacts"><div class="contactGroup"><div class="contactRow orange"><span>♟</span><b>新的朋友</b></div><div class="contactRow orange"><span>●</span><b>仅聊天的朋友</b></div><div class="contactRow green"><span>♧</span><b>群聊</b></div><div class="contactRow blue"><span>◆</span><b>标签</b></div><div class="contactRow blue"><span>◈</span><b>公众号</b></div><div class="contactRow blue"><span>W</span><b>服务号</b></div><div class="contactRow blue"><span>◌</span><b>企业微信联系人</b></div></div><div class="contactSectionTitle">我的企业</div><button class="companyRow" id="openCompany"><span>⌂</span><b>美利肯公司</b><em>›</em></button><div class="contactRow"><span>⌂</span><b>企业微信通知</b></div><div class="contactRow"><span>⌂</span><b>致趣科技有限公司上海分公司</b></div><div class="contactRow"><span>⌂</span><b>致趣西安分公司</b></div><nav class="wecomTabbar"><button><span>◌</span><b>微信</b></button><button class="active"><span>♟</span><b>通讯录</b></button><button><span>◈</span><b>发现</b></button><button><span>♙</span><b>我</b></button></nav></div>'; $one('#openCompany').onclick=()=>view('launcher');}
   function renderLauncher(){mobileLauncher.innerHTML='<div class="wecomLauncher"><div class="companyTools"><button class="companyTool message"><span class="companyToolIcon">●</span><b>消息</b><em>›</em></button><button class="companyTool directory"><span class="companyToolIcon">▦</span><b>企业通讯录</b><em>›</em></button><button class="companyTool network"><span class="companyToolIcon">∞</span><b>上下游通讯录</b><em>›</em></button><button class="companyTool me"><span class="companyToolIcon">♙</span><b>我</b><em>›</em></button></div><div class="launcherSection"><small class="companyIndex">M</small><button class="launcherApp secondary"><span>M</span><div><b>美利肯素材中心</b><small>材料、样本与品牌资源</small></div><em>›</em></button><button class="launcherApp primaryApp" id="openQualityCenter"><span>M</span><div><b>安装质量中心</b><small>项目记录与安装质量管理</small></div><em>›</em></button></div></div>'; $one('#openQualityCenter').onclick=()=>view('home');}
-  const card=p=>'<button class="projectCard" data-mobile-project="'+p.id+'"><span class="tag">'+p.status+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.region)+'</small><div class="bar"><i style="width:'+p.stage*25+'%"></i></div><footer><span>'+names[p.stage-1]+'</span><em>'+esc(p.owner)+'</em></footer></button>';
+  const card=p=>'<button class="projectCard" data-mobile-project="'+p.id+'"><span class="tag">'+p.status+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.region)+' · 周期 '+esc(p.time)+'</small><div class="bar"><i style="width:'+p.stage*25+'%"></i></div><footer><span>'+names[p.stage-1]+'</span><em>'+esc(p.owner)+'</em></footer></button>';
   function bindCards(host){host.querySelectorAll('[data-mobile-project]').forEach(b=>b.onclick=()=>{mobileProject=findProject(b.dataset.mobileProject);showMobileDetail()})}
   function saveDraftToBox(){
     const stage=Math.max(1,names.indexOf($('#phoneTitle').textContent)+1);
@@ -732,10 +758,15 @@
     $one('#mobileTodo').onclick=()=>{mobileProject=data[0];bindForm(3)};
     $one('#mobileAll').onclick=()=>{mobileFilter='全部';renderMobileList();view('projects')};
     mobileHome.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList();view('projects')});bindCards(mobileHome);
+    const recent=mobileHome.querySelectorAll('.section')[1],cards=[...recent.querySelectorAll('[data-mobile-project]')];
+    const search=document.createElement('label');search.className='homeProjectSearch';search.innerHTML='<span>查询项目</span><input id="homeProjectQuery" aria-label="搜索项目名称或周期" placeholder="输入项目名称或周期"><button type="button" id="homeProjectClear">清除</button>';
+    const empty=document.createElement('div');empty.className='homeSearchEmpty';empty.textContent='没有匹配的项目';recent.querySelector('header').after(search);recent.append(empty);
+    const drawHomeSearch=()=>{const query=$one('#homeProjectQuery').value.trim();let visible=0;cards.forEach(card=>{const project=findProject(card.dataset.mobileProject),match=!query||project.name.includes(query)||project.time.includes(query);card.style.display=match?'':'none';if(match)visible++});empty.style.display=visible?'none':'block'};
+    $one('#homeProjectQuery').oninput=drawHomeSearch;$one('#homeProjectClear').onclick=()=>{$one('#homeProjectQuery').value='';drawHomeSearch()};
   }
   function renderMobileList(){
-    mobileList.innerHTML='<label class="fieldItem"><input id="mobileQuery" aria-label="搜索项目名称" placeholder="搜索项目名称" value="'+esc(mobileQuery)+'"></label><div class="mobile-filter">'+['全部','进行中','已完工'].map(label=>'<button data-mobile-filter="'+label+'" class="'+(mobileFilter===label?'active':'')+'">'+label+'</button>').join('')+'</div><section id="mobileCards"></section>';
-    const draw=()=>{const result=data.filter(p=>(mobileFilter==='全部'||p.status===mobileFilter)&&p.name.includes(mobileQuery));$one('#mobileCards').innerHTML=result.map(card).join('')||'<div class="emptyState">没有符合条件的项目</div>';bindCards($one('#mobileCards'))};
+    mobileList.innerHTML='<label class="fieldItem"><input id="mobileQuery" aria-label="搜索项目名称或周期" placeholder="搜索项目名称或周期，例如 2027.03" value="'+esc(mobileQuery)+'"></label><div class="mobile-filter">'+['全部','进行中','已完工'].map(label=>'<button data-mobile-filter="'+label+'" class="'+(mobileFilter===label?'active':'')+'">'+label+'</button>').join('')+'</div><section id="mobileCards"></section>';
+    const draw=()=>{const result=data.filter(p=>(mobileFilter==='全部'||p.status===mobileFilter)&&(p.name.includes(mobileQuery)||p.time.includes(mobileQuery)));$one('#mobileCards').innerHTML=result.map(card).join('')||'<div class="emptyState">没有符合条件的项目</div>';bindCards($one('#mobileCards'))};
     $one('#mobileQuery').oninput=e=>{mobileQuery=e.target.value;draw()};
     mobileList.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList()});draw();
   }
