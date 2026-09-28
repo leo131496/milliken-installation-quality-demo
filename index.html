@@ -861,6 +861,10 @@
       };
       input.addEventListener('input',syncValue);
       input.addEventListener('change',syncValue);
+      input.addEventListener('click',()=>{
+        // Older iOS browsers open their picker through the native input tap.
+        try{input.showPicker?.()}catch{}
+      });
       syncValue();
     });
     host.querySelectorAll('.upload').forEach(button=>{
