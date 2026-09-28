@@ -578,6 +578,8 @@
     .pview .risknote{font-size:16px!important;line-height:1.65;padding:14px 16px}
     .pview .risknote label{display:flex!important;align-items:center;gap:10px;font-size:16px!important;line-height:1.6;margin-top:12px!important}
     .pview .risknote input{width:24px;height:24px;flex:0 0 auto;margin:0}
+    .pview .evidenceRule{font-size:15px!important;line-height:1.75;padding:15px 16px;margin-top:14px}
+    .pview .evidenceRule b{font-size:17px!important;margin-bottom:7px}
     .pview[data-view="form"]{padding:16px 14px 104px;background:#f4f6f5}
     .pview[data-view="form"] .formTop{padding:15px 14px;margin-bottom:14px;border-radius:12px;box-shadow:0 2px 8px rgba(36,64,77,.05)}
     .pview[data-view="form"] .stageTimeline{gap:5px;margin-bottom:2px}
@@ -590,9 +592,18 @@
     .pview[data-view="form"] .fieldItem>span{margin-bottom:8px;gap:8px;line-height:1.45;flex-wrap:wrap}
     .pview[data-view="form"] .fieldItem input,.pview[data-view="form"] .fieldItem select{height:50px;padding:0 13px;border-radius:9px}
     .pview[data-view="form"] .fieldItem textarea{min-height:96px;padding:12px 13px;border-radius:9px}
-    .pview[data-view="form"] .two{gap:12px}
-    .pview[data-view="form"] .segment{height:50px;border-radius:9px}
-    .pview[data-view="form"] .segment button{font-size:17px!important}
+    .pview[data-view="form"] .two{column-gap:14px}
+    .pview[data-view="form"] .upload{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"icon content" "icon action";column-gap:12px;row-gap:5px;align-items:center;min-height:104px;padding:14px}
+    .pview[data-view="form"] .upload>span{grid-area:icon;align-self:center}
+    .pview[data-view="form"] .upload>div{grid-area:content;min-width:0}
+    .pview[data-view="form"] .upload>em{grid-area:action;justify-self:start;white-space:nowrap}
+    .pview[data-view="form"] .unitField{display:flex;width:100%}
+    .pview[data-view="form"] .unitField input{height:50px!important;border-radius:9px 0 0 9px!important}
+    .pview[data-view="form"] .unitField span{width:72px;min-width:72px;height:50px;border-radius:0 9px 9px 0;font-size:16px!important}
+    .pview[data-view="form"] .unitFixed{height:50px;border-radius:9px;padding:0 13px;font-size:16px!important}
+    .pview[data-view="form"] .segment{height:50px;border:0;border-radius:0;overflow:visible;gap:12px}
+    .pview[data-view="form"] .segment button{font-size:17px!important;border:1px solid #d3dfdc;border-radius:9px;background:#fff}
+    .pview[data-view="form"] .segment button.active{border-color:#075ebb!important;box-shadow:inset 0 0 0 1px #075ebb;background:#e7f0ff!important}
     .pview[data-view="form"] .formActions{gap:12px;padding:12px 14px;background:rgba(255,255,255,.97)}
     .pview[data-view="form"] .formActions button{height:52px;border-radius:10px}
     .homeProjectSearch{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:10px;margin-bottom:10px}
@@ -765,7 +776,7 @@
   const draftRow=item=>'<button class="draftItem" data-draft-id="'+esc(item.id)+'"><span>▤</span><div><b>'+esc(item.project)+'</b><small>'+esc(item.stageName)+' · 保存于 '+esc(item.savedAt)+'</small></div><em>继续填写 ›</em></button>';
   function openDraft(item){mobileProject=findProject(item.projectId);if(mobileProject)bindForm(item.stage)}
   function renderDrafts(){
-    mobileDrafts.innerHTML='<section class="draftPage"><header class="draftPageHead"><div><small>现场工作台</small><h2>草稿箱</h2><p>保存但尚未提交的阶段记录</p></div><span>'+draftItems.length+' 条</span></header><div class="draftPageBody">'+(draftItems.length?draftItems.map(draftRow).join(''):'<div class="draftEmpty draftPageEmpty"><b>暂无草稿</b><span>在阶段填报页点击“保存草稿”，内容会集中保存在这里。</span></div>')+'</div></section>';
+    mobileDrafts.innerHTML='<section class="draftPage"><div class="draftPageBody">'+(draftItems.length?draftItems.map(draftRow).join(''):'<div class="draftEmpty draftPageEmpty"><b>暂无草稿</b><span>在阶段填报页点击“保存草稿”，内容会集中保存在这里。</span></div>')+'</div></section>';
     mobileDrafts.querySelectorAll('[data-draft-id]').forEach(button=>button.onclick=()=>{const item=draftItems.find(draft=>draft.id===button.dataset.draftId);if(item)openDraft(item)});
   }
   function ensureDraftBox(){
@@ -783,13 +794,13 @@
     $one('#mobileAll').onclick=()=>{mobileFilter='全部';renderMobileList();view('projects')};
     mobileHome.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList();view('projects')});bindCards(mobileHome);
     const recent=mobileHome.querySelectorAll('.section')[1],cards=[...recent.querySelectorAll('[data-mobile-project]')];
-    const search=document.createElement('label');search.className='homeProjectSearch';search.innerHTML='<span>查询项目</span><input id="homeProjectQuery" aria-label="搜索项目名称或周期" placeholder="输入项目名称或周期"><button type="button" id="homeProjectClear">清除</button>';
+    const search=document.createElement('label');search.className='homeProjectSearch';search.innerHTML='<span>查询项目</span><input id="homeProjectQuery" aria-label="搜索项目名称" placeholder="输入项目名称"><button type="button" id="homeProjectClear">清除</button>';
     const empty=document.createElement('div');empty.className='homeSearchEmpty';empty.textContent='没有匹配的项目';mobileHome.querySelector('.welcome').after(search);recent.append(empty);
     const drawHomeSearch=()=>{const query=$one('#homeProjectQuery').value.trim();let visible=0;cards.forEach(card=>{const project=findProject(card.dataset.mobileProject),match=!query||project.name.includes(query)||project.time.includes(query);card.style.display=match?'':'none';if(match)visible++});empty.style.display=visible?'none':'block'};
     $one('#homeProjectQuery').oninput=drawHomeSearch;$one('#homeProjectClear').onclick=()=>{$one('#homeProjectQuery').value='';drawHomeSearch()};
   }
   function renderMobileList(){
-    mobileList.innerHTML='<label class="fieldItem"><input id="mobileQuery" aria-label="搜索项目名称或周期" placeholder="搜索项目名称或周期，例如 2027.03" value="'+esc(mobileQuery)+'"></label><div class="mobile-filter">'+['全部','进行中','已完工'].map(label=>'<button data-mobile-filter="'+label+'" class="'+(mobileFilter===label?'active':'')+'">'+label+'</button>').join('')+'</div><section id="mobileCards"></section>';
+    mobileList.innerHTML='<label class="fieldItem"><input id="mobileQuery" aria-label="搜索项目名称" placeholder="搜索项目名称，例如苏州研发中心" value="'+esc(mobileQuery)+'"></label><div class="mobile-filter">'+['全部','进行中','已完工'].map(label=>'<button data-mobile-filter="'+label+'" class="'+(mobileFilter===label?'active':'')+'">'+label+'</button>').join('')+'</div><section id="mobileCards"></section>';
     const draw=()=>{const result=data.filter(p=>(mobileFilter==='全部'||p.status===mobileFilter)&&(p.name.includes(mobileQuery)||p.time.includes(mobileQuery)));$one('#mobileCards').innerHTML=result.map(card).join('')||'<div class="emptyState">没有符合条件的项目</div>';bindCards($one('#mobileCards'))};
     $one('#mobileQuery').oninput=e=>{mobileQuery=e.target.value;draw()};
     mobileList.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList()});draw();
