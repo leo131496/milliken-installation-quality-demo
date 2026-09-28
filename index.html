@@ -599,10 +599,19 @@
     .pview[data-view="form"] .two{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:20px}
     .pview[data-view="form"] .two .fieldItem{min-width:0}
     .pview[data-view="form"] .two input{min-width:0;width:100%}
+    .pview[data-view="form"] .two:has(input[type="month"]){column-gap:28px}
     .pview[data-view="form"] .upload{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"icon content" "icon action";column-gap:12px;row-gap:5px;align-items:center;min-height:104px;padding:14px}
     .pview[data-view="form"] .upload>span{grid-area:icon;align-self:center}
     .pview[data-view="form"] .upload>div{grid-area:content;min-width:0}
     .pview[data-view="form"] .upload>em{grid-area:action;justify-self:start;white-space:nowrap}
+    .pview[data-view="form"] .stage3-upload{display:grid!important;grid-template-columns:42px minmax(0,1fr)!important;grid-template-areas:"icon copy" "icon action" "icon preview" "icon meta" "context context"!important;column-gap:12px!important;row-gap:9px!important;align-items:center;min-height:210px!important;padding:16px!important}
+    .pview[data-view="form"] .stage3-upload>span{grid-area:icon!important;align-self:start;margin-top:2px}
+    .pview[data-view="form"] .stage3-upload>div:not(.stage3-meta):not(.uploadPreview){grid-area:copy!important;min-width:0}
+    .pview[data-view="form"] .stage3-upload>em{grid-area:action!important;justify-self:start;white-space:nowrap}
+    .pview[data-view="form"] .stage3-upload>.uploadPreview{grid-area:preview!important;min-width:0;min-height:0;max-width:100%}
+    .pview[data-view="form"] .stage3-upload>.stage3-meta{grid-area:meta!important;display:grid!important;grid-template-columns:1fr 1fr;gap:5px 10px;width:100%;margin:0;padding-top:8px;border-top:1px solid #dce9e6;min-width:0;font-size:14px!important;line-height:1.5}
+    .pview[data-view="form"] .stage3-upload>.stage3-meta span:last-child{grid-column:1 / -1}
+    .pview[data-view="form"] .stage3-upload>.stage3-context-action{grid-area:context!important;justify-self:start;margin:0;white-space:nowrap;font-size:16px!important;padding:9px 12px}
     .pview[data-view="form"] .unitField{display:flex;width:100%}
     .pview[data-view="form"] .unitField input{height:50px!important;border-radius:9px 0 0 9px!important}
     .pview[data-view="form"] .unitField span{width:72px;min-width:72px;height:50px;border-radius:0 9px 9px 0;font-size:16px!important}
