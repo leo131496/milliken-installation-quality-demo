@@ -596,7 +596,9 @@
     .pview[data-view="form"] .fieldItem>span{margin-bottom:8px;gap:8px;line-height:1.45;flex-wrap:wrap}
     .pview[data-view="form"] .fieldItem input,.pview[data-view="form"] .fieldItem select{height:50px;padding:0 13px;border-radius:9px}
     .pview[data-view="form"] .fieldItem textarea{min-height:96px;padding:12px 13px;border-radius:9px}
-    .pview[data-view="form"] .two{column-gap:14px}
+    .pview[data-view="form"] .two{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:20px}
+    .pview[data-view="form"] .two .fieldItem{min-width:0}
+    .pview[data-view="form"] .two input{min-width:0;width:100%}
     .pview[data-view="form"] .upload{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"icon content" "icon action";column-gap:12px;row-gap:5px;align-items:center;min-height:104px;padding:14px}
     .pview[data-view="form"] .upload>span{grid-area:icon;align-self:center}
     .pview[data-view="form"] .upload>div{grid-area:content;min-width:0}
