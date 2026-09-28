@@ -571,6 +571,13 @@
     .pview .readingDocument p,.pview .readingDocument li{font-size:16px!important;line-height:1.85}
     .pview .readingEnd{font-size:15px!important}
     .pview .attachmentActions.reading button{font-size:18px!important;min-height:52px}
+    .pview .todo{min-height:116px;padding:16px 13px;gap:10px}
+    .pview .todo b{font-size:20px!important;line-height:1.45}
+    .pview .todo div small{font-size:17px!important;line-height:1.45;margin-top:7px}
+    .pview .todo em{font-size:16px!important;line-height:1.45;margin-top:7px}
+    .pview .risknote{font-size:16px!important;line-height:1.65;padding:14px 16px}
+    .pview .risknote label{display:flex!important;align-items:center;gap:10px;font-size:16px!important;line-height:1.6;margin-top:12px!important}
+    .pview .risknote input{width:24px;height:24px;flex:0 0 auto;margin:0}
     .homeProjectSearch{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:10px;margin-bottom:10px}
     .homeProjectSearch>span{font-size:16px!important;font-weight:700;white-space:nowrap}
     .homeProjectSearch input{width:100%;min-width:0;height:46px;border:1px solid #cbd8e3;border-radius:7px;padding:0 10px;font-size:18px!important;background:#fff}
@@ -760,7 +767,7 @@
     mobileHome.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList();view('projects')});bindCards(mobileHome);
     const recent=mobileHome.querySelectorAll('.section')[1],cards=[...recent.querySelectorAll('[data-mobile-project]')];
     const search=document.createElement('label');search.className='homeProjectSearch';search.innerHTML='<span>查询项目</span><input id="homeProjectQuery" aria-label="搜索项目名称或周期" placeholder="输入项目名称或周期"><button type="button" id="homeProjectClear">清除</button>';
-    const empty=document.createElement('div');empty.className='homeSearchEmpty';empty.textContent='没有匹配的项目';recent.querySelector('header').after(search);recent.append(empty);
+    const empty=document.createElement('div');empty.className='homeSearchEmpty';empty.textContent='没有匹配的项目';mobileHome.querySelector('.welcome').after(search);recent.append(empty);
     const drawHomeSearch=()=>{const query=$one('#homeProjectQuery').value.trim();let visible=0;cards.forEach(card=>{const project=findProject(card.dataset.mobileProject),match=!query||project.name.includes(query)||project.time.includes(query);card.style.display=match?'':'none';if(match)visible++});empty.style.display=visible?'none':'block'};
     $one('#homeProjectQuery').oninput=drawHomeSearch;$one('#homeProjectClear').onclick=()=>{$one('#homeProjectQuery').value='';drawHomeSearch()};
   }
