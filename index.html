@@ -602,15 +602,16 @@
     .pview[data-view="form"] .two .fieldItem{min-width:0;width:100%}
     .pview[data-view="form"] .two input{min-width:0!important;max-width:100%!important;width:100%!important}
     .pview[data-view="form"] .monthFields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:12px!important}
-    .pview[data-view="form"] .nativeDateField{display:flex;align-items:center;box-sizing:border-box;width:100%;max-width:100%;min-width:0;height:50px;overflow:hidden;border:1px solid #d3dfdc;border-radius:9px;background:#fff}
+    .pview[data-view="form"] .nativeDateField{position:relative;display:flex;align-items:center;box-sizing:border-box;width:100%;max-width:100%;min-width:0;height:50px;overflow:hidden;border:1px solid #d3dfdc;border-radius:9px;background:#fff}
     .pview[data-view="form"]{--field-unit-width:72px}
     .pview[data-view="form"] .monthFields .fieldItem>span{justify-content:center;text-align:center}
     .pview[data-view="form"] .nativeDateField:focus-within{outline:2px solid #075ebb;outline-offset:2px}
-    .pview[data-view="form"] .nativeDateField.dateField{width:calc(100% - var(--field-unit-width));max-width:calc(100% - var(--field-unit-width))}
+    .pview[data-view="form"] .nativeDateField.dateField{width:100%;max-width:100%}
     .pview[data-view="form"] .nativeDateField input[type="date"],.pview[data-view="form"] .nativeDateField input[type="month"]{display:block;box-sizing:border-box;min-width:0!important;max-width:100%!important;width:100%!important;height:48px!important;min-height:48px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden;text-overflow:clip;font-size:16px!important;padding:0 8px!important;text-align:center!important}
-    .pview[data-view="form"] .nativeDateField input{-webkit-appearance:none;appearance:none;min-inline-size:0!important;color:var(--ink)}
-    .pview[data-view="form"] .nativeDateField input::-webkit-date-and-time-value{min-width:0;text-align:center;margin:0}
-    .pview[data-view="form"] .nativeDateField input::-webkit-datetime-edit{min-width:0;padding:0;text-align:center}
+    /* Keep the native picker interactive; render its value outside the iOS shadow control. */
+    .pview[data-view="form"] .nativeDateField input{-webkit-appearance:none;appearance:none;min-inline-size:0!important;position:absolute;inset:0;opacity:0;z-index:1;cursor:pointer}
+    .pview[data-view="form"] .nativeDateValue{display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;width:100%;height:100%;padding:0 13px;line-height:24px;font-size:16px;color:var(--ink);pointer-events:none;white-space:nowrap}
+    .pview[data-view="form"] .monthField .nativeDateValue{justify-content:center;padding:0 8px;text-align:center}
     .pview[data-view="form"] .upload{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"icon content" "icon action";column-gap:12px;row-gap:5px;align-items:center;min-height:104px;padding:14px}
     .pview[data-view="form"] .upload>span{grid-area:icon;align-self:center}
     .pview[data-view="form"] .upload>div{grid-area:content;min-width:0}
@@ -849,6 +850,19 @@
     if(timeline)timeline.innerHTML='<div class="stageTimeline" role="tablist" aria-label="项目阶段时间轴">'+names.map((name,i)=>'<button role="tab" aria-selected="'+(stage===i+1)+'" class="'+(stage===i+1?'active':'')+'" data-record-stage="'+(i+1)+'" '+(i+1>p.stage?'disabled':'')+'><span class="stageNo">'+String(i+1).padStart(2,'0')+'</span><b>'+name+'</b><small>'+stageState(p,i+1)+'</small></button>').join('')+'</div>';
     host.querySelectorAll('[data-record-stage]').forEach(b=>b.onclick=()=>bindForm(Number(b.dataset.recordStage)));
     if(stage===1){const input=host.querySelector('input');if(input)input.value=p.name}
+    host.querySelectorAll('.nativeDateField').forEach(field=>{
+      const input=field.querySelector('input');
+      const value=document.createElement('span');
+      value.className='nativeDateValue';value.setAttribute('aria-hidden','true');
+      field.append(value);
+      const syncValue=()=>{
+        const parts=input.value.split('-');
+        value.textContent=input.value ? parts[0]+'年'+Number(parts[1])+'月'+(input.type==='date'?Number(parts[2])+'日':'') : (input.type==='date'?'请选择日期':'请选择月份');
+      };
+      input.addEventListener('input',syncValue);
+      input.addEventListener('change',syncValue);
+      syncValue();
+    });
     host.querySelectorAll('.upload').forEach(button=>{
       if(button.dataset.previewBound)return;
       button.dataset.previewBound='1';
