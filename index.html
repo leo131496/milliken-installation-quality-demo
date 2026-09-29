@@ -256,6 +256,7 @@
       bindGroundOther(host);
       bindFileUploads(host);
       if(stage===3){renderAgreementConsent(host);enhanceStageThreeEvidence(host)}
+      if(stage===4){enhanceStageFourDetails(host)}
       const submit=$('#submitStage');
       if(submit){const oldSubmit=submit.onclick;submit.onclick=()=>{if(stage===2&&host.querySelector('#groundOtherNote')&&!host.querySelector('#groundOtherNote').value.trim()){toast('请补充地面状态备注');return}if((stage===3||stage===4)&&!(checkState.training||checkState.manual)){toast('请阅读并确认培训材料或安装手册中的任意一项');return}oldSubmit()}}
     };
@@ -281,6 +282,25 @@
       const detail=upload.querySelector('small');
       if(title)title.textContent='上传中心定位及辅助线照片';
       if(detail)detail.textContent='至少 1 张，需同时拍到定位点与两条垂直基准线';
+    }
+
+    function enhanceStageFourDetails(host){
+      const completionCard=$$('.formCard',host).find(item=>item.querySelector('h3')?.textContent.includes('实际完成情况'));
+      const areaField=$$('.fieldItem',completionCard||host).find(item=>item.querySelector('b')?.textContent.includes('实际完成面积'));
+      const areaLabel=areaField?.querySelector(':scope > span');
+      if(areaLabel&&!areaLabel.querySelector('.fieldHint')){
+        const hint=document.createElement('small');
+        hint.className='fieldHint';
+        hint.textContent='报备 10,000 m²';
+        areaLabel.append(hint);
+      }
+      const glueCard=$$('.formCard',host).find(item=>item.querySelector('h3')?.textContent.includes('胶水实际用量'));
+      const header=glueCard?.querySelector('header');
+      if(header&&!header.querySelector('p')){
+        const note=document.createElement('p');
+        note.textContent='记录美利肯胶水实际用量，单位为 kg。';
+        header.querySelector('div')?.append(note);
+      }
     }
 
     async function loadStageThreeContext(upload,action){
@@ -595,6 +615,7 @@
     .pview[data-view="form"] .fields{gap:16px}
     .pview[data-view="form"] .fieldItem>span{margin-bottom:8px;gap:8px;line-height:1.45;flex-wrap:wrap}
     .pview[data-view="form"] .fieldItem input,.pview[data-view="form"] .fieldItem select{height:50px;padding:0 13px;border-radius:9px}
+    .pview[data-view="form"] .fieldItem>span .fieldHint{margin:0 0 0 10px;color:#788a8f;font-size:16px!important;font-weight:400;line-height:1.45;white-space:nowrap}
     .pview[data-view="form"] .fieldItem textarea{min-height:96px;padding:12px 13px;border-radius:9px}
     .pview[data-view="form"] .fields,.pview[data-view="form"] .fieldItem{min-width:0;width:100%}
     .pview[data-view="form"] .fieldItem>input:not([type="checkbox"]),.pview[data-view="form"] .fieldItem>select,.pview[data-view="form"] .fieldItem>textarea{display:block;box-sizing:border-box;min-width:0!important;max-width:100%!important;width:100%!important}
