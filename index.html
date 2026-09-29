@@ -121,6 +121,10 @@
       if(save&&!save.dataset.draftBound){save.dataset.draftBound='1';save.onclick=()=>window.saveDraftToBox?.()}
       const submit=$('#submitStage');
       if(submit&&$('#phoneTitle').textContent==='施工结束'&&submit.textContent!=='提交完工')submit.textContent='提交完工';
+      if(submit&&$('#phoneTitle').textContent==='项目报备'&&!submit.dataset.auditFree){
+        submit.dataset.auditFree='1';
+        submit.onclick=()=>{toast('项目报备已提交，已进入下一阶段');view('detail')};
+      }
     }
     new MutationObserver(wireDraftControls).observe($('#formView'),{childList:true,subtree:true});
     setInterval(wireDraftControls,250);
@@ -659,6 +663,7 @@
     .homeProjectSearch input{width:100%;min-width:0;height:46px;border:1px solid #cbd8e3;border-radius:7px;padding:0 10px;font-size:18px!important;background:#fff}
     .homeProjectSearch button{height:46px;border:1px solid #cbd8e3;border-radius:7px;background:#fff;color:#075ebb;padding:0 10px;font-size:16px!important;font-weight:700}
     .homeSearchEmpty{display:none;background:#fff;border-radius:10px;padding:20px;text-align:center;color:var(--muted);font-size:16px!important}
+    .todoEmpty{background:#fff;border-radius:10px;padding:18px;color:var(--muted);font-size:16px;text-align:center}
     #readingCountdown{display:none!important}
 </style>
 <script id="quality-demo-controller">
@@ -847,6 +852,19 @@
     const drawHomeSearch=()=>{const query=$one('#homeProjectQuery').value.trim();let visible=0;cards.forEach(card=>{const project=findProject(card.dataset.mobileProject),match=!query||project.name.includes(query)||project.time.includes(query);card.style.display=match?'':'none';if(match)visible++});empty.style.display=visible?'none':'block'};
     $one('#homeProjectQuery').oninput=drawHomeSearch;$one('#homeProjectClear').onclick=()=>{$one('#homeProjectQuery').value='';drawHomeSearch()};
   }
+  const legacyRenderMobileHome=renderMobileHome;
+  const todoTitle=p=>p.risk.includes('胶粘剂')?'补充胶粘剂透明状态照片':p.risk.includes('地面')?'补充地面状态照片':p.risk.includes('温度')?'补充安装温度记录':p.risk;
+  renderMobileHome=function(){
+    legacyRenderMobileHome();
+    const taskSection=mobileHome.querySelectorAll('.section')[0];
+    if(!taskSection)return;
+    const tasks=data.filter(p=>p.status==='进行中'&&p.risk);
+    taskSection.querySelector('header').innerHTML='<h3>待补充任务</h3><small>仅显示需要现场补录的质量事项</small>';
+    taskSection.querySelectorAll('.todo').forEach(item=>item.remove());
+    taskSection.insertAdjacentHTML('beforeend',tasks.length?tasks.map(p=>'<button class="todo" data-todo-project="'+p.id+'"><span>'+names[p.stage-1]+'</span><div><b>'+esc(todoTitle(p))+'</b><small>'+esc(p.name)+'</small><em>进入阶段填写</em></div><i>›</i></button>').join(''):'<div class="todoEmpty">当前没有待补充任务</div>');
+    taskSection.querySelectorAll('[data-todo-project]').forEach(item=>item.onclick=()=>{mobileProject=findProject(item.dataset.todoProject);bindForm(mobileProject.stage)});
+  };
+  document.querySelectorAll('.principles div').forEach(item=>{if(item.textContent.includes('审核放行')){item.querySelector('b').textContent='阶段推进';item.querySelector('span').textContent='报备完成后直接进入下一阶段'}});
   function renderMobileList(){
     mobileList.innerHTML='<label class="fieldItem"><input id="mobileQuery" aria-label="搜索项目名称" placeholder="搜索项目名称，例如苏州研发中心" value="'+esc(mobileQuery)+'"></label><div class="mobile-filter">'+['全部','进行中','已完工'].map(label=>'<button data-mobile-filter="'+label+'" class="'+(mobileFilter===label?'active':'')+'">'+label+'</button>').join('')+'</div><section id="mobileCards"></section>';
     const draw=()=>{const result=data.filter(p=>(mobileFilter==='全部'||p.status===mobileFilter)&&(p.name.includes(mobileQuery)||p.time.includes(mobileQuery)));$one('#mobileCards').innerHTML=result.map(card).join('')||'<div class="emptyState">没有符合条件的项目</div>';bindCards($one('#mobileCards'))};
