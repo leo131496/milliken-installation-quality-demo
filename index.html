@@ -123,7 +123,7 @@
       if(submit&&$('#phoneTitle').textContent==='施工结束'&&submit.textContent!=='提交完工')submit.textContent='提交完工';
       if(submit&&$('#phoneTitle').textContent==='项目报备'&&!submit.dataset.auditFree){
         submit.dataset.auditFree='1';
-        submit.onclick=()=>{toast('项目报备已提交，已进入下一阶段');view('detail')};
+        submit.onclick=()=>{if(mobileProject&&mobileProject.stage===1)mobileProject.stage=2;renderMobileHome();showMobileDetail();toast('项目报备已提交，已进入下一阶段')};
       }
     }
     new MutationObserver(wireDraftControls).observe($('#formView'),{childList:true,subtree:true});
