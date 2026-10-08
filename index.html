@@ -699,7 +699,7 @@
   const historyPage = $one('[data-pageview="transfers"]');
   const dashboard = $one('[data-pageview="dashboard"]');
   const body = $one('#drawerBody'), footer = $one('#drawerFooter'), mask = $one('#drawerMask');
-  let adminPage='projects', historyProject=data[2], mobileProject=data[0], mobileFilter='全部', mobileQuery='';
+  let adminPage='projects', historyProject=data[2], mobileProject=data[0], mobileFilter='全部', mobileQuery='', formMode='existing';
   $one('#formView').addEventListener('click',event=>{const button=event.target.closest('#submitStage');if(!button||$one('#phoneTitle').textContent!=='项目报备')return;event.preventDefault();event.stopImmediatePropagation();if(mobileProject&&mobileProject.stage===1)mobileProject.stage=2;renderMobileHome();showMobileDetail();toast('项目报备已提交，已进入下一阶段')},true);
   let filters={query:'',stage:'',region:'',status:''}, pageNumber=1, pageSize=10;
   document.documentElement.dataset.release='20260924-handover-v3';
@@ -814,7 +814,7 @@
   function renderContacts(){mobileContacts.innerHTML='<div class="wecomContacts"><div class="contactGroup"><div class="contactRow orange"><span>♟</span><b>新的朋友</b></div><div class="contactRow orange"><span>●</span><b>仅聊天的朋友</b></div><div class="contactRow green"><span>♧</span><b>群聊</b></div><div class="contactRow blue"><span>◆</span><b>标签</b></div><div class="contactRow blue"><span>◈</span><b>公众号</b></div><div class="contactRow blue"><span>W</span><b>服务号</b></div><div class="contactRow blue"><span>◌</span><b>企业微信联系人</b></div></div><div class="contactSectionTitle">我的企业</div><button class="companyRow" id="openCompany"><span>⌂</span><b>美利肯公司</b><em>›</em></button><div class="contactRow"><span>⌂</span><b>企业微信通知</b></div><div class="contactRow"><span>⌂</span><b>致趣科技有限公司上海分公司</b></div><div class="contactRow"><span>⌂</span><b>致趣西安分公司</b></div><nav class="wecomTabbar"><button><span>◌</span><b>微信</b></button><button class="active"><span>♟</span><b>通讯录</b></button><button><span>◈</span><b>发现</b></button><button><span>♙</span><b>我</b></button></nav></div>'; $one('#openCompany').onclick=()=>view('launcher');}
   function renderLauncher(){mobileLauncher.innerHTML='<div class="wecomLauncher"><div class="companyTools"><button class="companyTool message"><span class="companyToolIcon">●</span><b>消息</b><em>›</em></button><button class="companyTool directory"><span class="companyToolIcon">▦</span><b>企业通讯录</b><em>›</em></button><button class="companyTool network"><span class="companyToolIcon">∞</span><b>上下游通讯录</b><em>›</em></button><button class="companyTool me"><span class="companyToolIcon">♙</span><b>我</b><em>›</em></button></div><div class="launcherSection"><small class="companyIndex">M</small><button class="launcherApp secondary"><span>M</span><div><b>美利肯素材中心</b><small>材料、样本与品牌资源</small></div><em>›</em></button><button class="launcherApp primaryApp" id="openQualityCenter"><span>M</span><div><b>安装质量中心</b><small>项目记录与安装质量管理</small></div><em>›</em></button></div></div>'; $one('#openQualityCenter').onclick=()=>view('home');}
   const card=p=>'<button class="projectCard" data-mobile-project="'+p.id+'"><span class="tag">'+p.status+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.region)+' · 周期 '+esc(p.time)+'</small><div class="bar"><i style="width:'+p.stage*25+'%"></i></div><footer><span>'+names[p.stage-1]+'</span><em>'+esc(p.owner)+'</em></footer></button>';
-  function bindCards(host){host.querySelectorAll('[data-mobile-project]').forEach(b=>b.onclick=()=>{mobileProject=findProject(b.dataset.mobileProject);showMobileDetail()})}
+  function bindCards(host){host.querySelectorAll('[data-mobile-project]').forEach(b=>b.onclick=()=>{formMode='existing';mobileProject=findProject(b.dataset.mobileProject);showMobileDetail()})}
   function saveDraftToBox(){
     const stage=Math.max(1,names.indexOf($('#phoneTitle').textContent)+1);
     const project=mobileProject||data[0];
@@ -824,7 +824,7 @@
   }
   window.saveDraftToBox=saveDraftToBox;
   const draftRow=item=>'<button class="draftItem" data-draft-id="'+esc(item.id)+'"><span>▤</span><div><b>'+esc(item.project)+'</b><small>'+esc(item.stageName)+' · 保存于 '+esc(item.savedAt)+'</small></div><em>继续填写 ›</em></button>';
-  function openDraft(item){mobileProject=findProject(item.projectId);if(mobileProject)bindForm(item.stage)}
+  function openDraft(item){formMode='existing';mobileProject=findProject(item.projectId);if(mobileProject)bindForm(item.stage)}
   function renderDrafts(){
     mobileDrafts.innerHTML='<section class="draftPage"><div class="draftPageBody">'+(draftItems.length?draftItems.map(draftRow).join(''):'<div class="draftEmpty draftPageEmpty"><b>暂无草稿</b><span>在阶段填报页点击“保存草稿”，内容会集中保存在这里。</span></div>')+'</div></section>';
     mobileDrafts.querySelectorAll('[data-draft-id]').forEach(button=>button.onclick=()=>{const item=draftItems.find(draft=>draft.id===button.dataset.draftId);if(item)openDraft(item)});
@@ -853,13 +853,14 @@
   const todoTitle=p=>p.risk.includes('胶粘剂')?'补充胶粘剂透明状态照片':p.risk.includes('地面')?'补充地面状态照片':p.risk.includes('温度')?'补充安装温度记录':p.risk;
   renderMobileHome=function(){
     legacyRenderMobileHome();
+    $one('#mobileNew').onclick=()=>{formMode='new';mobileProject=data[1];bindForm(1)};
     const taskSection=mobileHome.querySelectorAll('.section')[0];
     if(!taskSection)return;
     const tasks=data.filter(p=>p.status==='进行中'&&p.risk);
     taskSection.querySelector('header').innerHTML='<h3>待补充任务</h3><small>仅显示需要现场补录的质量事项</small>';
     taskSection.querySelectorAll('.todo').forEach(item=>item.remove());
     taskSection.insertAdjacentHTML('beforeend',tasks.length?tasks.map(p=>'<button class="todo" data-todo-project="'+p.id+'"><span>'+names[p.stage-1]+'</span><div><b>'+esc(todoTitle(p))+'</b><small>'+esc(p.name)+'</small><em>进入阶段填写</em></div><i>›</i></button>').join(''):'<div class="todoEmpty">当前没有待补充任务</div>');
-    taskSection.querySelectorAll('[data-todo-project]').forEach(item=>item.onclick=()=>{mobileProject=findProject(item.dataset.todoProject);bindForm(mobileProject.stage)});
+    taskSection.querySelectorAll('[data-todo-project]').forEach(item=>item.onclick=()=>{formMode='existing';mobileProject=findProject(item.dataset.todoProject);bindForm(mobileProject.stage)});
   };
   document.querySelectorAll('.principles div').forEach(item=>{if(item.textContent.includes('审核放行')){item.querySelector('b').textContent='阶段推进';item.querySelector('span').textContent='报备完成后直接进入下一阶段'}});
   function renderMobileList(){
@@ -871,7 +872,7 @@
   function showMobileDetail(){
     const p=mobileProject;
     mobileDetail.innerHTML='<section class="projectHero"><span>'+p.status+'</span><h2>'+esc(p.name)+'</h2><small>'+esc(p.region)+'</small><dl><div><dt>报备面积</dt><dd>'+p.area+' m²</dd></div><div><dt>计划周期</dt><dd>'+p.time+'</dd></div><div><dt>安装人数</dt><dd>'+p.count+' 人</dd></div></dl></section><section class="stageList"><h3>安装阶段时间轴</h3>'+names.map((name,i)=>'<button type="button" class="stageRow '+(i+1===p.stage?'current':'')+'" data-record-stage="'+(i+1)+'" '+(i+1>p.stage?'disabled':'')+'><span class="stageNo">'+String(i+1).padStart(2,'0')+'</span><div><b>'+name+'</b></div><span class="recordState">'+stageState(p,i+1)+'</span><em>›</em></button>').join('')+'</section>';
-    mobileDetail.onclick=event=>{const button=event.target.closest('[data-record-stage]');if(!button||button.disabled)return;const next=Number(button.dataset.recordStage);if(next<=p.stage)bindForm(next)};
+    mobileDetail.onclick=event=>{const button=event.target.closest('[data-record-stage]');if(!button||button.disabled)return;const next=Number(button.dataset.recordStage);if(next<=p.stage){formMode='existing';bindForm(next)}};
     view('detail');
   }
   const fieldForm=bindForm;
@@ -885,7 +886,15 @@
     const timeline=host.querySelector('.formTop');
     if(timeline)timeline.innerHTML='<div class="stageTimeline" role="tablist" aria-label="项目阶段时间轴">'+names.map((name,i)=>'<button role="tab" aria-selected="'+(stage===i+1)+'" class="'+(stage===i+1?'active':'')+'" data-record-stage="'+(i+1)+'" '+(i+1>p.stage?'disabled':'')+'><span class="stageNo">'+String(i+1).padStart(2,'0')+'</span><b>'+name+'</b><small>'+stageState(p,i+1)+'</small></button>').join('')+'</div>';
     host.querySelectorAll('[data-record-stage]').forEach(b=>b.onclick=()=>bindForm(Number(b.dataset.recordStage)));
-    if(stage===1){const input=host.querySelector('input');if(input)input.value=p.name}
+    if(stage===1){
+      if(formMode==='new'){
+        host.querySelectorAll('input:not([type="checkbox"]):not([type="file"])').forEach(input=>{input.value='';input.dispatchEvent(new Event('input',{bubbles:true}))});
+        host.querySelectorAll('select').forEach(select=>{select.selectedIndex=-1;select.dispatchEvent(new Event('change',{bubbles:true}))});
+      }else{
+        const input=host.querySelector('input');
+        if(input)input.value=p.name;
+      }
+    }
     host.querySelectorAll('.nativeDateField').forEach(field=>{
       const input=field.querySelector('input');
       const value=document.createElement('span');
