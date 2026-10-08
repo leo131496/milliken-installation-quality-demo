@@ -181,7 +181,7 @@
       const segment=$('#phoneTitle').textContent==='项目报备'?formViewHost.querySelector('.segment'):null;
       if(segment){
         const buttons=[...segment.querySelectorAll('button')];
-        const selectedIndex=typeof longTermState==='boolean'?(longTermState?0:1):0;
+        const selectedIndex=typeof longTermState==='boolean'?(longTermState?0:1):-1;
         buttons.forEach((button,index)=>{
           const selected=index===selectedIndex;
           button.className=selected?'active':'';
