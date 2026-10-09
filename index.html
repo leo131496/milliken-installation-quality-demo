@@ -717,6 +717,15 @@
       data.forEach(p => {if(typeof saved.owners[p.id] === 'string')p.owner=saved.owners[p.id]});
     }
   } catch {}
+  const MOBILE_STATE_KEY='milliken-mobile-state-v2';
+  let mobileProjects=[];
+  try {
+    const savedMobile=JSON.parse(localStorage.getItem(MOBILE_STATE_KEY)||'[]');
+    if(Array.isArray(savedMobile))mobileProjects=savedMobile;
+  } catch {}
+  const findMobileProject=id=>mobileProjects.find(p=>p.id===id);
+  const persistMobileProjects=()=>{try{localStorage.setItem(MOBILE_STATE_KEY,JSON.stringify(mobileProjects))}catch{}};
+  const blankMobileProject=()=>({id:'empty-session',name:'',region:'',owner:'王建国',stage:1,status:'进行中',time:'',area:'',team:'',count:0,risk:'',report:{name:'',province:'',city:'',area:'',start:'',end:'',team:'',count:'',longTerm:null}});
   const stageState = (p,stage) => stage > p.stage ? '未开始' : stage < p.stage || p.status==='已完工' ? '已完成' : '进行中';
   const $one = selector => document.querySelector(selector);
   const findProject = id => data.find(p => p.id===id);
@@ -725,7 +734,7 @@
   const historyPage = $one('[data-pageview="transfers"]');
   const dashboard = $one('[data-pageview="dashboard"]');
   const body = $one('#drawerBody'), footer = $one('#drawerFooter'), mask = $one('#drawerMask');
-  let adminPage='projects', historyProject=data[2], mobileProject=data[0], mobileFilter='全部', mobileQuery='', formMode='existing';
+  let adminPage='projects', historyProject=data[2], mobileProject=mobileProjects[0]||blankMobileProject(), mobileFilter='全部', mobileQuery='', formMode='existing';
   const reportFields={name:'项目 / 客户名称',province:'省 / 直辖市',city:'城市',area:'项目面积',start:'开始月份',end:'结束月份',team:'选择安装团队',count:'本项目计划安装人数'};
   function reportFor(project){
     if(project.report)return project.report;
@@ -741,7 +750,7 @@
   }
   function startNewReport(){
     formMode='new';
-    mobileProject={id:'new-'+Date.now(),name:'',region:'',owner:'王建国',stage:1,status:'进行中',time:'',area:'',team:'',count:0,risk:'',report:{name:'',province:'',city:'',area:'',start:'',end:'',team:'',count:'',longTerm:null}};
+    mobileProject={...blankMobileProject(),id:'new-'+Date.now()};
     bindForm(1);
   }
   $one('#formView').addEventListener('click',event=>{
@@ -756,11 +765,12 @@
     if(report.end<report.start){toast('结束月份不能早于开始月份');return}
     const regionByProvince={上海市:'华东',江苏省:'华东',浙江省:'华东',北京市:'华北',广东省:'华南',四川省:'西南'};
     Object.assign(mobileProject,{name:report.name.trim(),region:(regionByProvince[report.province]||report.province)+' / '+report.city.replace(/市$/,''),area:Number(report.area).toLocaleString('en-US'),time:report.start.replace('-','.')+'–'+report.end.replace('-','.'),team:report.longTerm?report.team:'',count:Number(report.count)});
-    if(formMode==='new')data.unshift(mobileProject);
+    if(formMode==='new'&&!findMobileProject(mobileProject.id))mobileProjects.unshift(mobileProject);
     formMode='existing';
     if(mobileProject.stage===1)mobileProject.stage=2;
+    persistMobileProjects();
     draftItems=draftItems.filter(item=>item.id!==mobileProject.id+'-1');
-    try{localStorage.setItem('milliken-drafts-v1',JSON.stringify(draftItems))}catch{}
+    try{localStorage.setItem('milliken-drafts-v2',JSON.stringify(draftItems))}catch{}
     renderMobileHome();renderMobileList();showMobileDetail();toast('项目报备已提交，已进入下一阶段');
   },true);
   let filters={query:'',stage:'',region:'',status:''}, pageNumber=1, pageSize=10;
@@ -872,22 +882,23 @@
   const phoneBody=$one('.phonebody');mobileContacts.className='pview';mobileContacts.dataset.view='contacts';phoneBody.insertBefore(mobileContacts,mobileHome);
   const mobileLauncher=document.createElement('div');mobileLauncher.className='pview';mobileLauncher.dataset.view='launcher';phoneBody.insertBefore(mobileLauncher,mobileHome);
   phoneBody.insertBefore(mobileDrafts,mobileHome);
-  try{const savedDrafts=JSON.parse(localStorage.getItem('milliken-drafts-v1')||'[]');if(Array.isArray(savedDrafts))draftItems=savedDrafts}catch{}
+  try{const savedDrafts=JSON.parse(localStorage.getItem('milliken-drafts-v2')||'[]');if(Array.isArray(savedDrafts))draftItems=savedDrafts}catch{}
   function renderContacts(){mobileContacts.innerHTML='<div class="wecomContacts"><div class="contactGroup"><div class="contactRow orange"><span>♟</span><b>新的朋友</b></div><div class="contactRow orange"><span>●</span><b>仅聊天的朋友</b></div><div class="contactRow green"><span>♧</span><b>群聊</b></div><div class="contactRow blue"><span>◆</span><b>标签</b></div><div class="contactRow blue"><span>◈</span><b>公众号</b></div><div class="contactRow blue"><span>W</span><b>服务号</b></div><div class="contactRow blue"><span>◌</span><b>企业微信联系人</b></div></div><div class="contactSectionTitle">我的企业</div><button class="companyRow" id="openCompany"><span>⌂</span><b>美利肯公司</b><em>›</em></button><div class="contactRow"><span>⌂</span><b>企业微信通知</b></div><div class="contactRow"><span>⌂</span><b>致趣科技有限公司上海分公司</b></div><div class="contactRow"><span>⌂</span><b>致趣西安分公司</b></div><nav class="wecomTabbar"><button><span>◌</span><b>微信</b></button><button class="active"><span>♟</span><b>通讯录</b></button><button><span>◈</span><b>发现</b></button><button><span>♙</span><b>我</b></button></nav></div>'; $one('#openCompany').onclick=()=>view('launcher');}
   function renderLauncher(){mobileLauncher.innerHTML='<div class="wecomLauncher"><div class="companyTools"><button class="companyTool message"><span class="companyToolIcon">●</span><b>消息</b><em>›</em></button><button class="companyTool directory"><span class="companyToolIcon">▦</span><b>企业通讯录</b><em>›</em></button><button class="companyTool network"><span class="companyToolIcon">∞</span><b>上下游通讯录</b><em>›</em></button><button class="companyTool me"><span class="companyToolIcon">♙</span><b>我</b><em>›</em></button></div><div class="launcherSection"><small class="companyIndex">M</small><button class="launcherApp secondary"><span>M</span><div><b>美利肯素材中心</b><small>材料、样本与品牌资源</small></div><em>›</em></button><button class="launcherApp primaryApp" id="openQualityCenter"><span>M</span><div><b>安装质量中心</b><small>项目记录与安装质量管理</small></div><em>›</em></button></div></div>'; $one('#openQualityCenter').onclick=()=>view('home');}
-  const card=p=>'<button class="projectCard" data-mobile-project="'+p.id+'"><span class="tag">'+p.status+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.region)+' · 周期 '+esc(p.time)+'</small><div class="bar"><i style="width:'+p.stage*25+'%"></i></div><footer><span>'+names[p.stage-1]+'</span><em>'+esc(p.owner)+'</em></footer></button>';
-  function bindCards(host){host.querySelectorAll('[data-mobile-project]').forEach(b=>b.onclick=()=>{formMode='existing';mobileProject=findProject(b.dataset.mobileProject);showMobileDetail()})}
+  const card=p=>'<button class="projectCard" data-mobile-project="'+p.id+'"><span class="tag">'+esc(p.status||'草稿')+'</span><b>'+esc(p.name||'未命名项目')+'</b><small>'+esc(p.region||'待填写区域')+(p.time?' · 周期 '+esc(p.time):' · 待补充周期')+'</small><div class="bar"><i style="width:'+p.stage*25+'%"></i></div><footer><span>'+names[p.stage-1]+'</span><em>'+esc(p.owner||'王建国')+'</em></footer></button>';
+  function bindCards(host){host.querySelectorAll('[data-mobile-project]').forEach(b=>b.onclick=()=>{formMode='existing';mobileProject=findMobileProject(b.dataset.mobileProject);if(mobileProject)showMobileDetail()})}
   function saveDraftToBox(){
     const stage=Math.max(1,names.indexOf($('#phoneTitle').textContent)+1);
-    const project=mobileProject||data[0];
+    const project=mobileProject;
+    if(!project)return;
     if(stage===1)captureReport();
     draftItems=[{id:project.id+'-'+stage,projectId:project.id,project:project.report?.name||project.name||'未命名项目',stage,stageName:names[stage-1],savedAt:'刚刚',isNew:formMode==='new',report:project.report,projectSnapshot:formMode==='new'?project:undefined},...draftItems.filter(item=>item.id!==project.id+'-'+stage)];
-    try{localStorage.setItem('milliken-drafts-v1',JSON.stringify(draftItems))}catch{}
+    try{localStorage.setItem('milliken-drafts-v2',JSON.stringify(draftItems))}catch{}
     renderMobileHome();renderDrafts();view('drafts');toast('已保存至草稿箱');
   }
   window.saveDraftToBox=saveDraftToBox;
   const draftRow=item=>'<button class="draftItem" data-draft-id="'+esc(item.id)+'"><span>▤</span><div><b>'+esc(item.project)+'</b><small>'+esc(item.stageName)+' · 保存于 '+esc(item.savedAt)+'</small></div><em>继续填写 ›</em></button>';
-  function openDraft(item){formMode=item.isNew?'new':'existing';mobileProject=item.isNew?item.projectSnapshot:findProject(item.projectId);if(mobileProject){if(item.report)mobileProject.report=item.report;bindForm(item.stage)}}
+  function openDraft(item){const stored=findMobileProject(item.projectId);formMode=stored?'existing':item.isNew?'new':'existing';mobileProject=stored||item.projectSnapshot;if(mobileProject){if(item.report)mobileProject.report=item.report;bindForm(item.stage)}}
   function renderDrafts(){
     mobileDrafts.innerHTML='<section class="draftPage"><div class="draftPageBody">'+(draftItems.length?draftItems.map(draftRow).join(''):'<div class="draftEmpty draftPageEmpty"><b>暂无草稿</b><span>在阶段填报页点击“保存草稿”，内容会集中保存在这里。</span></div>')+'</div></section>';
     mobileDrafts.querySelectorAll('[data-draft-id]').forEach(button=>button.onclick=()=>{const item=draftItems.find(draft=>draft.id===button.dataset.draftId);if(item)openDraft(item)});
@@ -900,16 +911,16 @@
     shortcut.onclick=()=>{renderDrafts();view('drafts')};
   }
   function renderMobileHome(){
-    mobileHome.innerHTML='<section class="welcome"><div><h2>上午好，王建国</h2></div><span>王</span></section><div class="homeActions"><button class="create" id="mobileNew"><span>＋</span><div><b>新建项目报备</b><small>建立安装前项目档案</small></div><em>›</em></button><button class="draftShortcut" id="mobileDraftShortcut"><span>▤</span><div><b>草稿箱</b><small>0 条待继续</small></div><em>›</em></button></div><div class="pkpis">'+[['进行中',data.filter(p=>p.status==='进行中').length],['已完工',data.filter(p=>p.status==='已完工').length],['全部',data.length]].map(([label,count])=>'<button data-mobile-filter="'+label+'"><b>'+count+'</b><span>'+label+'</span></button>').join('')+'</div><section class="section"><header><h3>待办任务</h3></header><button class="todo" id="mobileTodo"><div><b>补充胶粘剂透明状态照片</b><small>字节跳动上海办公室</small><em>施工流程</em></div><i>›</i></button></section><section class="section"><header><h3>最近项目</h3><button id="mobileAll">全部项目</button></header>'+data.map(card).join('')+'</section>';
+    const projects=mobileProjects;
+    mobileHome.innerHTML='<section class="welcome"><div><h2>上午好，王建国</h2></div><span>王</span></section><div class="homeActions"><button class="create" id="mobileNew"><span>＋</span><div><b>新建项目报备</b><small>安装前建立项目档案</small></div><em>›</em></button><button class="draftShortcut" id="mobileDraftShortcut"><span>▤</span><div><b>草稿箱</b><small>0 条待继续</small></div><em>›</em></button></div><div class="pkpis">'+[['进行中',projects.filter(p=>p.status==='进行中').length],['已完工',projects.filter(p=>p.status==='已完工').length],['全部',projects.length]].map(([label,count])=>'<button data-mobile-filter="'+label+'"><b>'+count+'</b><span>'+label+'</span></button>').join('')+'</div><section class="section"><header><h3>待办任务</h3></header><div class="todoEmpty">暂无待补充任务</div></section><section class="section"><header><h3>最近项目</h3><button id="mobileAll">全部项目</button></header>'+projects.map(card).join('')+'<div class="mobileProjectEmpty"'+(projects.length?' style="display:none"':'')+'>暂无项目，点击“新建项目报备”开始</div></section>';
     ensureDraftBox();
     $one('#mobileNew').onclick=startNewReport;
-    $one('#mobileTodo').onclick=()=>{mobileProject=data[0];bindForm(3)};
     $one('#mobileAll').onclick=()=>{mobileFilter='全部';renderMobileList();view('projects')};
     mobileHome.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList();view('projects')});bindCards(mobileHome);
     const recent=mobileHome.querySelectorAll('.section')[1],cards=[...recent.querySelectorAll('[data-mobile-project]')];
     const search=document.createElement('label');search.className='homeProjectSearch';search.innerHTML='<span>查询项目</span><input id="homeProjectQuery" aria-label="搜索项目名称" placeholder="输入项目名称"><button type="button" id="homeProjectClear">清除</button>';
     const empty=document.createElement('div');empty.className='homeSearchEmpty';empty.textContent='没有匹配的项目';mobileHome.querySelector('.welcome').after(search);recent.append(empty);
-    const drawHomeSearch=()=>{const query=$one('#homeProjectQuery').value.trim();let visible=0;cards.forEach(card=>{const project=findProject(card.dataset.mobileProject),match=!query||project.name.includes(query)||project.time.includes(query);card.style.display=match?'':'none';if(match)visible++});empty.style.display=visible?'none':'block'};
+    const drawHomeSearch=()=>{const query=$one('#homeProjectQuery').value.trim();let visible=0;cards.forEach(card=>{const project=findMobileProject(card.dataset.mobileProject),match=!query||project.name.includes(query)||project.time.includes(query);card.style.display=match?'':'none';if(match)visible++});empty.style.display=visible?'none':'block'};
     $one('#homeProjectQuery').oninput=drawHomeSearch;$one('#homeProjectClear').onclick=()=>{$one('#homeProjectQuery').value='';drawHomeSearch()};
   }
   const legacyRenderMobileHome=renderMobileHome;
@@ -919,16 +930,16 @@
     $one('#mobileNew').onclick=startNewReport;
     const taskSection=mobileHome.querySelectorAll('.section')[0];
     if(!taskSection)return;
-    const tasks=data.filter(p=>p.status==='进行中'&&p.risk);
+    const tasks=mobileProjects.filter(p=>p.status==='进行中'&&p.risk);
     taskSection.querySelector('header').innerHTML='<h3>待补充任务</h3><small>仅显示需要现场补录的质量事项</small>';
-    taskSection.querySelectorAll('.todo').forEach(item=>item.remove());
+    taskSection.querySelectorAll('.todo,.todoEmpty').forEach(item=>item.remove());
     taskSection.insertAdjacentHTML('beforeend',tasks.length?tasks.map(p=>'<button class="todo" data-todo-project="'+p.id+'"><span>'+names[p.stage-1]+'</span><div><b>'+esc(todoTitle(p))+'</b><small>'+esc(p.name)+'</small><em>进入阶段填写</em></div><i>›</i></button>').join(''):'<div class="todoEmpty">当前没有待补充任务</div>');
-    taskSection.querySelectorAll('[data-todo-project]').forEach(item=>item.onclick=()=>{formMode='existing';mobileProject=findProject(item.dataset.todoProject);bindForm(mobileProject.stage)});
+    taskSection.querySelectorAll('[data-todo-project]').forEach(item=>item.onclick=()=>{formMode='existing';mobileProject=findMobileProject(item.dataset.todoProject);if(mobileProject)bindForm(mobileProject.stage)});
   };
   document.querySelectorAll('.principles div').forEach(item=>{if(item.textContent.includes('审核放行')){item.querySelector('b').textContent='阶段推进';item.querySelector('span').textContent='报备完成后直接进入下一阶段'}});
   function renderMobileList(){
     mobileList.innerHTML='<label class="fieldItem"><input id="mobileQuery" aria-label="搜索项目名称" placeholder="搜索项目名称，例如苏州研发中心" value="'+esc(mobileQuery)+'"></label><div class="mobile-filter">'+['全部','进行中','已完工'].map(label=>'<button data-mobile-filter="'+label+'" class="'+(mobileFilter===label?'active':'')+'">'+label+'</button>').join('')+'</div><section id="mobileCards"></section>';
-    const draw=()=>{const result=data.filter(p=>(mobileFilter==='全部'||p.status===mobileFilter)&&(p.name.includes(mobileQuery)||p.time.includes(mobileQuery)));$one('#mobileCards').innerHTML=result.map(card).join('')||'<div class="emptyState">没有符合条件的项目</div>';bindCards($one('#mobileCards'))};
+    const draw=()=>{const result=mobileProjects.filter(p=>(mobileFilter==='全部'||p.status===mobileFilter)&&(p.name.includes(mobileQuery)||p.time.includes(mobileQuery)));$one('#mobileCards').innerHTML=result.map(card).join('')||'<div class="emptyState">暂无项目，点击首页“新建项目报备”开始</div>';bindCards($one('#mobileCards'))};
     $one('#mobileQuery').oninput=e=>{mobileQuery=e.target.value;draw()};
     mobileList.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{mobileFilter=b.dataset.mobileFilter;renderMobileList()});draw();
   }
@@ -1003,6 +1014,7 @@
       previousSubmit?.();
       if($one('[data-view="detail"]').classList.contains('active')){
         if(stage===p.stage){if(stage===4)p.status='已完工';else p.stage++}
+        persistMobileProjects();
         renderMobileHome();showMobileDetail();
       }
     };
@@ -1010,7 +1022,7 @@
   };
   const priorView=view;
   view=function(name){priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').textContent='安装质量';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
-  document.querySelectorAll('.steps [data-stage]').forEach(b=>b.onclick=()=>{mobileProject=data.find(p=>p.stage===Number(b.dataset.stage))||data[0];bindForm(Number(b.dataset.stage))});
+  document.querySelectorAll('.steps [data-stage]').forEach(b=>b.onclick=()=>{const target=mobileProjects.find(p=>p.stage===Number(b.dataset.stage));if(target){mobileProject=target;formMode='existing';bindForm(Number(b.dataset.stage))}else toast('暂无该阶段项目，请先新建项目报备')});
   renderContacts();renderLauncher();renderDrafts();renderMobileHome();renderMobileList();bindForm(3);switchAdmin('projects');view('contacts');
 })();
 </script>
