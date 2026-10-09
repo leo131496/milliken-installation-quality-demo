@@ -352,7 +352,16 @@
     async function resolveWeather(latitude,longitude){
       // The authorized Moji API is called by the backend, never with a secret in this HTML.
       const endpoint=document.querySelector('meta[name="milliken-moji-weather-endpoint"]')?.content.trim();
-      if(!endpoint)throw Object.assign(new Error('Moji service not configured'),{code:'NOT_CONFIGURED'});
+      if(!endpoint){
+        const url=new URL('https://api.open-meteo.com/v1/forecast');
+        url.search=new URLSearchParams({latitude,longitude,current:'temperature_2m,weather_code',timeformat:'unixtime',timezone:'auto'}).toString();
+        const result=await fetchContextJson(url.href);
+        const current=result.current;
+        const names={0:'晴',1:'晴',2:'多云',3:'阴',45:'雾',48:'雾凇',51:'小毛毛雨',53:'毛毛雨',55:'大毛毛雨',56:'冻毛毛雨',57:'冻毛毛雨',61:'小雨',63:'中雨',65:'大雨',66:'冻雨',67:'冻雨',71:'小雪',73:'中雪',75:'大雪',77:'米雪',80:'阵雨',81:'中阵雨',82:'强阵雨',85:'阵雪',86:'强阵雪',95:'雷雨',96:'雷雨伴冰雹',99:'雷雨伴冰雹'};
+        const age=Date.now()-current?.time*1000;
+        if(!current||typeof current.temperature_2m!=='number'||!Number.isFinite(current.temperature_2m)||current.temperature_2m < -100||current.temperature_2m > 70||!Object.hasOwn(names,current.weather_code)||result.current_units?.temperature_2m!=='°C'||!Number.isFinite(age)||age < -300000||age > 7200000)throw new Error('Invalid or outdated weather');
+        return {name:names[current.weather_code],temp:current.temperature_2m,source:'Open-Meteo'};
+      }
       const url=new URL(endpoint,window.location.href);
       if(url.protocol!=='https:')throw new Error('Weather service requires HTTPS');
       url.searchParams.set('latitude',latitude);
@@ -362,15 +371,15 @@
       const observedAt=Date.parse(result.observedAt);
       const age=Date.now()-observedAt;
       if(result.source!=='moji'||typeof result.temp!=='number'||!Number.isFinite(result.temp)||result.temp < -100||result.temp > 70||typeof result.name!=='string'||!result.name.trim()||!Number.isFinite(age)||age < -300000||age > 7200000)throw new Error('Invalid or outdated Moji observation');
-      return {name:result.name.trim(),temp:result.temp};
+      return {name:result.name.trim(),temp:result.temp,source:'墨迹天气'};
     }
     let stageThreeContextRequestId=0;
     function requestStageThreeLocation(onSuccess,onError){
-      let settled=false,browserStarted=false;
-      let bridgeTimer;
+      let settled=false,browserStarted=false,attempt=0;
+      let bridgeTimer,attemptTimer;
       const finish=(callback,value)=>{
         if(settled)return;
-        settled=true;clearTimeout(deadline);clearTimeout(bridgeTimer);callback(value);
+        settled=true;clearTimeout(deadline);clearTimeout(bridgeTimer);clearTimeout(attemptTimer);callback(value);
       };
       const fail=error=>finish(onError,error);
       const success=position=>{
@@ -379,12 +388,28 @@
         finish(onSuccess,{coords:{latitude,longitude}});
       };
       // Some WeChat clients never call fail; the independent deadline also covers that case.
-      const deadline=setTimeout(()=>fail({code:3}),22000);
+      const deadline=setTimeout(()=>fail({code:3}),45000);
       const browserLocation=()=>{
         if(settled||browserStarted)return;
         browserStarted=true;
         if(!navigator.geolocation){fail({code:2});return}
-        try{navigator.geolocation.getCurrentPosition(success,fail,{enableHighAccuracy:true,timeout:15000,maximumAge:0})}catch{fail({code:2})}
+        // Try a fresh system fix first; requiring high accuracy can stall indoors.
+        const locate=highAccuracy=>{
+          if(settled)return;
+          const currentAttempt=++attempt;
+          clearTimeout(attemptTimer);
+          const retry=error=>{
+            if(settled||currentAttempt!==attempt)return;
+            clearTimeout(attemptTimer);
+            if(error?.code===1){fail(error);return}
+            if(!highAccuracy){locate(true);return}
+            fail(error||{code:2});
+          };
+          const timeout=highAccuracy?20000:12000;
+          attemptTimer=setTimeout(()=>retry({code:3}),timeout+1000);
+          try{navigator.geolocation.getCurrentPosition(success,retry,{enableHighAccuracy:highAccuracy,timeout,maximumAge:highAccuracy?0:300000})}catch{retry({code:2})}
+        };
+        locate(false);
       };
       try{
         if(window.wx?.getLocation){
@@ -403,6 +428,7 @@
       const weather=upload.querySelector('[data-stage3-weather]');
       if(!location||!weather)return;
       const setValue=(node,label,value)=>{const title=document.createElement('b');title.textContent=label;node.replaceChildren(title,document.createTextNode(value))};
+      upload.querySelector('[data-location-help]')?.remove();
       if(!navigator.geolocation&&!window.wx?.getLocation){setValue(location,'项目地点：','浏览器不支持定位');setValue(weather,'天气情况：','获取位置后查询');return}
       const requestId=++stageThreeContextRequestId;
       const isActive=()=>requestId===stageThreeContextRequestId&&upload.isConnected;
@@ -410,7 +436,7 @@
       requestStageThreeLocation(async position=>{
         if(!isActive())return;
         const {latitude,longitude}=position.coords;
-        setValue(location,'项目地点：','正在读取中文地址');setValue(weather,'天气情况：','正在读取墨迹天气');
+        setValue(location,'项目地点：','正在读取中文地址');setValue(weather,'天气情况：','正在查询当地天气');
         let addressReady=false,weatherReady=false;
         await Promise.allSettled([
           resolveChineseAddress(latitude,longitude).then(address=>{
@@ -419,8 +445,12 @@
           }).catch(()=>{if(isActive())setValue(location,'项目地点：','地址获取失败，请重试')}),
           resolveWeather(latitude,longitude).then(current=>{
             if(!isActive())return;
-            weatherReady=true;setValue(weather,'天气情况：',current.name+' '+current.temp+'℃（墨迹天气）');
-          }).catch(error=>{if(isActive())setValue(weather,'天气情况：',error.code==='NOT_CONFIGURED'?'墨迹天气尚未接入':'墨迹天气获取失败，请重试')})
+            weatherReady=true;setValue(weather,'天气情况：',current.name+' '+current.temp+'℃');
+            const source=document.createElement('a');source.textContent=current.source;
+            source.href=current.source==='Open-Meteo'?'https://open-meteo.com/':'https://tianqi.moji.com/';
+            source.target='_blank';source.rel='noopener noreferrer';source.style.cssText='display:block;font-size:16px;line-height:1.5;';
+            source.onclick=event=>event.stopPropagation();weather.append(source);
+          }).catch(()=>{if(isActive())setValue(weather,'天气情况：','天气获取失败，请重试')})
         ]);
         if(!isActive())return;
         action.disabled=false;action.textContent=addressReady&&weatherReady?'重新获取位置与天气':'重新获取';
@@ -428,6 +458,13 @@
         if(!isActive())return;
         setValue(location,'项目地点：',error.code===1?'未授权定位':error.code===3?'定位超时，请重试':'暂时无法定位，请重试');
         setValue(weather,'天气情况：','获取位置后查询');action.disabled=false;action.textContent='重新获取位置与天气';
+        const help=document.createElement('p');
+        help.dataset.locationHelp='';help.setAttribute('role','status');
+        help.style.cssText='grid-column:1 / -1;margin:8px 0 0;font-size:16px;line-height:1.6;overflow-wrap:anywhere;';
+        help.textContent=/MicroMessenger/i.test(navigator.userAgent)
+          ? '请在手机设置中开启定位服务，并允许微信在使用期间访问位置。如果仍然超时，请从微信右上角“…”选择在浏览器中打开，再获取位置。'
+          : '请在手机设置中开启定位服务，并允许当前浏览器和此网站访问位置，然后重试。';
+        upload.append(help);
       });
     }
 
