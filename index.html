@@ -446,10 +446,6 @@
           resolveWeather(latitude,longitude).then(current=>{
             if(!isActive())return;
             weatherReady=true;setValue(weather,'天气情况：',current.name+' '+current.temp+'℃');
-            const source=document.createElement('a');source.textContent=current.source;
-            source.href=current.source==='Open-Meteo'?'https://open-meteo.com/':'https://tianqi.moji.com/';
-            source.target='_blank';source.rel='noopener noreferrer';source.style.cssText='display:block;font-size:16px;line-height:1.5;';
-            source.onclick=event=>event.stopPropagation();weather.append(source);
           }).catch(()=>{if(isActive())setValue(weather,'天气情况：','天气获取失败，请重试')})
         ]);
         if(!isActive())return;
