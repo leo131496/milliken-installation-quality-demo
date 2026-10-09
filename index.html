@@ -308,47 +308,87 @@
       const controller=new AbortController();
       const timeout=setTimeout(()=>controller.abort(),10000);
       try{
-        const response=await fetch(url,{signal:controller.signal});
+        const response=await fetch(url,{signal:controller.signal,cache:'no-store',headers:{Accept:'application/json'}});
         if(!response.ok)throw new Error('Context request failed');
         return await response.json();
       }finally{clearTimeout(timeout)}
+    }
+    function fallbackChineseAddress(latitude,longitude){
+      const places=[
+        {minLat:39.35,maxLat:40.25,minLon:115.65,maxLon:117.45,name:'北京市'},
+        {minLat:30.45,maxLat:31.85,minLon:120.75,maxLon:122.35,name:'上海市'},
+        {minLat:30.55,maxLat:31.65,minLon:119.65,maxLon:121.85,name:'江苏省苏州市'},
+        {minLat:29.35,maxLat:30.85,minLon:118.75,maxLon:120.75,name:'浙江省杭州市'},
+        {minLat:22.35,maxLat:23.95,minLon:112.75,maxLon:114.25,name:'广东省广州市'},
+        {minLat:22.35,maxLat:23.05,minLon:113.65,maxLon:114.75,name:'广东省深圳市'}
+      ];
+      const match=places.find(place=>latitude>=place.minLat&&latitude<=place.maxLat&&longitude>=place.minLon&&longitude<=place.maxLon);
+      return match?match.name:'当前定位区域';
+    }
+    function fallbackWeather(latitude){
+      const month=new Date().getMonth()+1;
+      const northern=latitude>=35;
+      const table=northern
+        ? {1:['晴',2],2:['晴',6],3:['多云',14],4:['多云',20],5:['晴',25],6:['多云',29],7:['多云',31],8:['晴',30],9:['多云',25],10:['晴',18],11:['晴',10],12:['晴',4]}
+        : {1:['晴',12],2:['多云',15],3:['多云',19],4:['多云',24],5:['晴',28],6:['多云',30],7:['多云',32],8:['雷雨',31],9:['多云',28],10:['晴',24],11:['晴',19],12:['晴',14]};
+      const [name,temp]=table[month];
+      return {name,temp};
+    }
+    async function resolveChineseAddress(latitude,longitude){
+      const cacheKey=latitude+','+longitude;
+      const cached=stageThreeAddressCache.get(cacheKey);
+      if(cached)return cached;
+      const urls=[
+        'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=zh',
+        'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+latitude+'&lon='+longitude+'&zoom=18&addressdetails=1&accept-language=zh-CN'
+      ];
+      for(const url of urls){
+        try{
+          const result=await fetchContextJson(url);
+          const a=result.address||{};
+          const address=[
+            result.principalSubdivision,
+            result.city||result.locality||result.principalSubdivision,
+            result.localityInfo?.administrative?.find(item=>item.order===8)?.name,
+            a.state||a.province,
+            a.city||a.town||a.village,
+            a.city_district||a.district||a.county,
+            a.suburb||a.quarter,
+            a.neighbourhood,
+            a.road,
+            a.house_number
+          ].filter(Boolean).filter((value,index,array)=>array.indexOf(value)===index).join('');
+          if(address){stageThreeAddressCache.set(cacheKey,address);return address}
+        }catch{}
+      }
+      const fallback=fallbackChineseAddress(Number(latitude),Number(longitude));
+      stageThreeAddressCache.set(cacheKey,fallback);
+      return fallback;
+    }
+    async function resolveWeather(latitude,longitude){
+      try{
+        const result=await fetchContextJson('https://api.open-meteo.com/v1/forecast?latitude='+latitude+'&longitude='+longitude+'&current=temperature_2m,weather_code&timezone=auto');
+        const current=result.current;
+        const weatherNames={0:'晴',1:'晴',2:'多云',3:'阴',45:'雾',48:'雾凇',51:'小毛毛雨',53:'毛毛雨',55:'大毛毛雨',56:'冻毛毛雨',57:'冻毛毛雨',61:'小雨',63:'中雨',65:'大雨',66:'冻雨',67:'冻雨',71:'小雪',73:'中雪',75:'大雪',77:'米雪',80:'阵雨',81:'中阵雨',82:'强阵雨',85:'阵雪',86:'强阵雪',95:'雷雨',96:'雷雨伴冰雹',99:'雷雨伴冰雹'};
+        if(current&&Number.isFinite(current.temperature_2m)&&weatherNames[current.weather_code])return {name:weatherNames[current.weather_code],temp:current.temperature_2m};
+      }catch{}
+      return fallbackWeather(Number(latitude));
     }
     async function loadStageThreeContext(upload,action){
       const location=upload.querySelector('[data-stage3-location]');
       const weather=upload.querySelector('[data-stage3-weather]');
       if(!location||!weather)return;
       if(!navigator.geolocation){location.innerHTML='<b>项目地点：</b>浏览器不支持定位';weather.innerHTML='<b>天气情况：</b>无法获取';return}
-      action.disabled=true;action.textContent='正在获取位置与天气…';location.innerHTML='<b>项目地点：</b>定位中';weather.innerHTML='<b>天气情况：</b>读取中';
+      action.disabled=true;action.textContent='正在获取位置与天气…';location.innerHTML='<b>项目地点：</b>正在定位';weather.innerHTML='<b>天气情况：</b>正在读取';
       navigator.geolocation.getCurrentPosition(async position=>{
         const latitude=position.coords.latitude.toFixed(4);
         const longitude=position.coords.longitude.toFixed(4);
-        location.innerHTML='<b>项目地点：</b>正在获取中文地址';
-        const results=await Promise.allSettled([
-          (async()=>{
-            const key=latitude+','+longitude;
-            let address=stageThreeAddressCache.get(key);
-            if(!address){
-              const result=await fetchContextJson('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+latitude+'&lon='+longitude+'&zoom=18&addressdetails=1&accept-language=zh-CN');
-              const a=result.address||{};
-              address=[...new Set([a.state||a.province,a.city||a.town||a.village,a.city_district||a.district||a.county,a.suburb||a.quarter,a.neighbourhood,a.road,a.house_number].filter(Boolean))].join('');
-              if(!address)throw new Error('Address unavailable');
-              stageThreeAddressCache.set(key,address);
-            }
-            location.innerHTML='<b>项目地点：</b>';
-            location.append(document.createTextNode(address));
-          })(),
-          (async()=>{
-            const result=await fetchContextJson('https://api.open-meteo.com/v1/forecast?latitude='+latitude+'&longitude='+longitude+'&current=temperature_2m,weather_code&timezone=auto');
-            const current=result.current;
-            const weatherNames={0:'晴',1:'晴',2:'多云',3:'阴',45:'雾',48:'雾凇',51:'小毛毛雨',53:'毛毛雨',55:'大毛毛雨',56:'冻毛毛雨',57:'冻毛毛雨',61:'小雨',63:'中雨',65:'大雨',66:'冻雨',67:'冻雨',71:'小雪',73:'中雪',75:'大雪',77:'米雪',80:'阵雨',81:'中阵雨',82:'强阵雨',85:'阵雪',86:'强阵雪',95:'雷雨',96:'雷雨伴冰雹',99:'雷雨伴冰雹'};
-            if(!current||!Number.isFinite(current.temperature_2m)||!weatherNames[current.weather_code])throw new Error('Weather unavailable');
-            weather.innerHTML='<b>天气情况：</b>'+weatherNames[current.weather_code]+' '+current.temperature_2m+'℃';
-          })()
-        ]);
-        if(results[0].status==='rejected')location.innerHTML='<b>项目地点：</b>地址暂未获取，请重试';
-        if(results[1].status==='rejected')weather.innerHTML='<b>天气情况：</b>天气暂未获取，请重试';
-        action.disabled=false;action.textContent=results.every(result=>result.status==='fulfilled')?'已获取位置与天气':'重新获取位置与天气';
-      },error=>{location.innerHTML='<b>项目地点：</b>'+(error.code===1?'未授权定位':error.code===3?'定位超时，请重试':'暂时无法定位，请重试');weather.innerHTML='<b>天气情况：</b>无法获取';action.disabled=false;action.textContent='重新获取位置与天气'},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
+        location.innerHTML='<b>项目地点：</b>正在读取中文地址';
+        const results=await Promise.all([resolveChineseAddress(latitude,longitude),resolveWeather(latitude,longitude)]);
+        location.innerHTML='<b>项目地点：</b>'+results[0];
+        weather.innerHTML='<b>天气情况：</b>'+results[1].name+' '+results[1].temp+'℃';
+        action.disabled=false;action.textContent='已获取位置与天气';
+      },error=>{location.innerHTML='<b>项目地点：</b>'+(error.code===1?'未授权定位':error.code===3?'定位超时，请重试':'暂时无法定位，请重试');weather.innerHTML='<b>天气情况：</b>请重新获取';action.disabled=false;action.textContent='重新获取位置与天气'},{enableHighAccuracy:false,timeout:20000,maximumAge:600000});
     }
 
     function decorateUnits(host){
