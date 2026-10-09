@@ -130,25 +130,8 @@
     function syncLongTerm(host){const segment=$('.segment',host);const teamField=$$('.fieldItem',host).find(x=>x.textContent.includes('选择安装团队')||x.textContent.includes('团队 / 个人名称'));if(!segment||!teamField)return;const buttons=$$('button',segment);buttons.forEach((b,i)=>{b.classList.toggle('active',longTermState===i);b.onclick=()=>{longTermState=i===0;syncLongTerm(host)}});teamField.innerHTML=longTermState?'<span><b>选择安装团队 <em>*</em></b></span><select><option>上海华筑装饰 · 陈师傅｜上海</option><option>上海工装地材 · 刘师傅｜上海</option><option>苏州新创空间 · 周师傅｜苏州</option></select>':'<span><b>团队 / 个人名称 <em>*</em></b></span><input placeholder="公司名称或安装负责人">'}
     const timelineHtml=stage=>`<div class="formTop"><div class="stageTimeline" role="tablist" aria-label="项目阶段时间轴">${[['01','项目报备'],['02','施工前检查'],['03','施工流程'],['04','施工结束']].map((x,i)=>`<button type="button" role="tab" aria-selected="${i+1===stage}" class="${i+1===stage?'active':i+1<stage?'past':''}" data-timeline-stage="${i+1}"><span>${x[0]}</span><b>${x[1]}</b></button>`).join('')}</div><small>当前：${String(stage).padStart(2,'0')} ${['','项目报备','施工前检查','施工流程','施工结束'][stage]} · 可点击任意阶段查看或修改</small></div>`;
     function showAttachment(kind,stage){clearInterval(attachmentTimer);let remaining=5;const label=kind==='training'?'培训要求':'安装手册';const title=kind==='training'?'安装培训与现场责任确认':'地毯安装手册 · 施工流程';const copy=kind==='training'?'本项目进场人员应至少有一名人员参加过美利肯安装培训。项目经理负责确认现场人员的培训情况，并对施工过程中的质量记录负责。':'施工前应完成中心定位、基准线弹设与胶粘剂状态确认。胶粘剂由乳白色转为透明后再开始铺装，严禁加水或其他物质稀释。';const render=()=>{$('#attachmentView').innerHTML=`<div class="attachmentScreen"><section class="attachmentHero"><span>${remaining===0?'✓':remaining}</span><div><b>${remaining===0?'已完成 5 秒阅读':'请完整阅读附件内容'}</b><small>${remaining===0?'现在可以确认并返回阶段表单':`确认按钮将在 ${remaining} 秒后启用`}</small></div></section><article class="attachmentPaper"><span class="paperLabel">MILLIKEN INSTALLATION</span><h2>${title}</h2><p>${copy}</p><div class="attachmentPoints"><b>确认要点</b><span>• 按现场真实情况完成记录</span><span>• 上传照片并保留上传时间与人员</span><span>• 发现异常时及时暂停并反馈项目经理</span></div></article><footer class="attachmentActions"><button id="attachmentCancel">取消</button><button class="solid" id="attachmentConfirm" ${remaining>0?'disabled':''}>确定${remaining>0?`（${remaining}s）`:''}</button></footer></div>`;$('#attachmentCancel').onclick=()=>bindForm(stage);$('#attachmentConfirm').onclick=()=>{if(remaining>0)return;attachmentConfirmed[kind]=true;bindForm(stage);toast(kind==='training'?'培训附件已确认，可勾选对应条款':'安装手册附件已确认，可勾选对应条款')}};view('attachment');$('#phoneTitle').textContent='附件详情';render();attachmentTimer=setInterval(()=>{remaining=Math.max(0,remaining-1);render();if(remaining===0)clearInterval(attachmentTimer)},1000)}
-    bindForm=function(stage){originalBindForm(stage);const host=$('#formView');const top=$('.formTop',host);if(top){top.outerHTML=timelineHtml(stage);$$('[data-timeline-stage]',host).forEach(b=>b.onclick=()=>bindForm(Number(b.dataset.timelineStage)))}if(stage===1)syncLongTerm(host);if(stage===3){const checks=$$('.check',host);checks.forEach((b,i)=>{const kind=i===0?'training':'manual';const active=checkState[kind];b.classList.toggle('active',active);b.querySelector('span').textContent=active?'✓':'';b.onclick=()=>{if(!attachmentConfirmed[kind]){toast(kind==='training'?'请先打开培训附件并完成 5 秒阅读确认':'请先打开安装手册附件并完成 5 秒阅读确认');return}checkState[kind]=!checkState[kind];b.classList.toggle('active',checkState[kind]);b.querySelector('span').textContent=checkState[kind]?'✓':''};const link=document.createElement('button');link.className=`attachmentLink ${attachmentConfirmed[kind]?'confirmed':''}`;link.innerHTML=`<span>${attachmentConfirmed[kind]?'✓':'▧'}</span><div><b>附件：${kind==='training'?'培训要求与现场责任':'美利肯安装手册'}</b><small>${attachmentConfirmed[kind]?'已完成阅读确认，可勾选上方条款':'打开附件，阅读 5 秒后确认'}</small></div><em>›</em>`;link.onclick=()=>showAttachment(kind,stage);b.insertAdjacentElement('afterend',link)})}if(stage===4&&(!checkState.training||!checkState.manual)){$('.formTop',host).insertAdjacentHTML('afterend','<div class="alert warning"><span>!</span><div><b>请先完成培训与安装手册确认</b><small>从时间轴返回第 03 阶段，打开两个附件并完成 5 秒阅读确认。</small></div></div>')}const submit=$('#submitStage');if(submit){const oldSubmit=submit.onclick;submit.onclick=()=>{if((stage===3||stage===4)&&(!checkState.training||!checkState.manual)){toast('请先完成培训与安装手册附件确认');return}oldSubmit()}}};
-    const singleAgreementGuard=new MutationObserver(()=>{
-      const submit=$('#submitStage');
-      if(submit&&!submit.dataset.singleAgreement){
-        const oldSubmit=submit.onclick;
-        submit.dataset.singleAgreement='1';
-        submit.onclick=()=>{
-          if((checkState.training||checkState.manual)&&oldSubmit){
-            const previous={...checkState};
-            checkState={training:true,manual:true};
-            oldSubmit();
-            checkState=previous;
-          }else oldSubmit?.();
-        };
-      }
-      if(checkState.training||checkState.manual)host.querySelectorAll('.alert.warning').forEach(alert=>alert.remove());
-    });
+    bindForm=function(stage){originalBindForm(stage);const host=$('#formView');const top=$('.formTop',host);if(top){top.outerHTML=timelineHtml(stage);$$('[data-timeline-stage]',host).forEach(b=>b.onclick=()=>bindForm(Number(b.dataset.timelineStage)))}if(stage===1)syncLongTerm(host);if(stage===3){const checks=$$('.check',host);checks.forEach((b,i)=>{const kind=i===0?'training':'manual';const active=checkState[kind];b.classList.toggle('active',active);b.querySelector('span').textContent=active?'✓':'';b.onclick=()=>{if(!attachmentConfirmed[kind]){toast(kind==='training'?'请先打开培训附件并完成 5 秒阅读确认':'请先打开安装手册附件并完成 5 秒阅读确认');return}checkState[kind]=!checkState[kind];b.classList.toggle('active',checkState[kind]);b.querySelector('span').textContent=checkState[kind]?'✓':'';window.persistStageConsent?.()};const link=document.createElement('button');link.className=`attachmentLink ${attachmentConfirmed[kind]?'confirmed':''}`;link.innerHTML=`<span>${attachmentConfirmed[kind]?'✓':'▧'}</span><div><b>附件：${kind==='training'?'培训要求与现场责任':'美利肯安装手册'}</b><small>${attachmentConfirmed[kind]?'已完成阅读确认，可勾选上方条款':'打开附件，阅读 5 秒后确认'}</small></div><em>›</em>`;link.onclick=()=>showAttachment(kind,stage);b.insertAdjacentElement('afterend',link)})}if(stage===4&&!(checkState.training||checkState.manual)){$('.formTop',host).insertAdjacentHTML('afterend','<div class="alert warning"><span>!</span><div><b>请先完成培训材料或安装手册确认</b><small>从时间轴返回第 03 阶段，打开任一附件并完成 5 秒阅读确认。</small></div></div>')}const submit=$('#submitStage');if(submit){const oldSubmit=submit.onclick;submit.onclick=()=>{if((stage===3||stage===4)&&!(checkState.training||checkState.manual)){toast('请先完成培训材料或安装手册确认');return}oldSubmit()}}};
     const host=$('#formView');
-    singleAgreementGuard.observe(host,{childList:true,subtree:true});
     $$('[data-open],.steps [data-stage]').forEach(b=>b.onclick=()=>bindForm(Number(b.dataset.open||b.dataset.stage)));
     function guide(){view('form');$('#phoneTitle').textContent='安装手册';$('#formView').innerHTML=`<div class="welcome" style="display:block"><small>美利肯地毯安装手册</small><h2>中心定位与铺装</h2><p>第 3 / 5 章 · 阅读进度自动记录</p></div><section class="formCard" style="margin-top:10px"><div style="height:150px;background:linear-gradient(145deg,#ccd9d6,#738d88);border-radius:9px;display:grid;place-items:center;color:#ffe16b;font:700 50px Georgia">十</div><h3>中心定位与基准线</h3><p style="font-size:10px;line-height:1.8;color:var(--muted)">地毯铺装应从房间相对中心区域向四周延伸。施工前弹设两条相互垂直的基准线，并上传现场照片。</p></section><button class="primary" onclick="toast('本章阅读进度已记录')">完成本章阅读</button>`}$$('[data-viewgo="guide"]').forEach(b=>b.onclick=guide);
 
@@ -200,14 +183,13 @@
     function renderAgreementConsent(host){
       const card=host.querySelector('.formCard');
       if(!card)return;
-      card.querySelector('header p').textContent='培训材料和安装手册二选一，完成阅读后由系统自动勾选。';
+      card.querySelector('header p').textContent='培训材料和安装手册可分别确认，可选择其中一项或同时选择两项。';
       const fields=card.querySelector('.fields');
-      const selected=Object.keys(checkState).find(kind=>checkState[kind]);
-      fields.innerHTML=[['training','参加过美利肯安装培训','安装培训材料'],['manual','已完整阅读美利肯安装手册','安装手册材料']].map(([kind,label,material])=>`<div class="qualificationBlock"><div class="qualificationRow ${attachmentConfirmed[kind]?'ready':''} ${checkState[kind]?'checked':''}"><div class="qualificationMain"><div class="qualificationLabel"><input type="checkbox" aria-label="${label}" ${attachmentConfirmed[kind]&&!selected||checkState[kind]?'':'disabled'} ${checkState[kind]?'checked':''}><span><b>${label}</b>${checkState[kind]?'<small>已确认，满足施工结束条件</small>':attachmentConfirmed[kind]?'<small>已读完附件，可确认</small>':'<small>先打开附件并完成 5 秒阅读</small>'}</span></div><button type="button" class="qualificationLink" data-agreement="${kind}">${material}<em>›</em></button></div></div></div>`).join('');
+      fields.innerHTML=[['training','参加过美利肯安装培训','安装培训材料'],['manual','已完整阅读美利肯安装手册','安装手册材料']].map(([kind,label,material])=>`<div class="qualificationBlock"><div class="qualificationRow ${attachmentConfirmed[kind]?'ready':''} ${checkState[kind]?'checked':''}"><div class="qualificationMain"><div class="qualificationLabel"><input type="checkbox" aria-label="${label}" ${attachmentConfirmed[kind]?'':'disabled'} ${checkState[kind]?'checked':''}><span><b>${label}</b>${checkState[kind]?'<small>已确认，满足施工结束条件</small>':attachmentConfirmed[kind]?'<small>已读完附件，可确认</small>':'<small>先打开附件并完成 5 秒阅读</small>'}</span></div><button type="button" class="qualificationLink" data-agreement="${kind}">${material}<em>›</em></button></div></div></div>`).join('');
       $$('.qualificationBlock',fields).forEach((block,index)=>{
         const kind=index===0?'training':'manual';
         const checkbox=block.querySelector('input');
-        checkbox.onchange=()=>{checkState={training:false,manual:false};checkState[kind]=checkbox.checked;renderAgreementConsent(host)};
+        checkbox.onchange=()=>{checkState[kind]=checkbox.checked;renderAgreementConsent(host);window.persistStageConsent?.()};
         block.querySelector('[data-agreement]').onclick=()=>showAttachment(kind,3);
       });
     }
@@ -226,7 +208,7 @@
       update();
       attachmentTimer=setInterval(()=>{remaining=Math.max(0,remaining-1);update();if(remaining===0)clearInterval(attachmentTimer)},1000);
       $('#attachmentCancel').onclick=()=>{cleanup();bindForm(stage)};
-      confirm.onclick=()=>{if(confirm.disabled)return;cleanup();attachmentConfirmed[kind]=true;checkState={training:kind==='training',manual:kind==='manual'};bindForm(stage);toast(`${title}已完成阅读并确认`)};
+      confirm.onclick=()=>{if(confirm.disabled)return;cleanup();attachmentConfirmed[kind]=true;checkState[kind]=true;window.persistStageConsent?.();bindForm(stage);toast(`${title}已完成阅读并确认`)};
     };
 
     const legacyShowAttachment=showAttachment;
@@ -1062,10 +1044,82 @@
     mobileDetail.onclick=event=>{const button=event.target.closest('[data-record-stage]');if(!button||button.disabled)return;const next=Number(button.dataset.recordStage);if(next<=p.stage){formMode='existing';bindForm(next)}};
     view('detail');
   }
+  const stageLabel=control=>control.closest('.fieldItem')?.querySelector('b')?.textContent.replace(/\*/g,'').trim()||'';
+  const stageStateFor=(project,stage)=>{project.stageData ||= {};project.stageData[stage] ||= {fields:{},options:{},uploads:[],updatedAt:''};return project.stageData[stage]};
+  function captureStageState(stage,host){
+    if(!mobileProject||!host)return;
+    if(stage===1)captureReport();
+    const state=stageStateFor(mobileProject,stage),fields={},options={};
+    host.querySelectorAll('input,select,textarea').forEach(control=>{
+      if(control.type==='file'||control.type==='checkbox')return;
+      const key=stageLabel(control);
+      if(key)fields[key]=control.value;
+    });
+    host.querySelectorAll('.segment,.temp').forEach(group=>{
+      const key=stageLabel(group.querySelector('button'))||group.closest('.fieldItem')?.querySelector('b')?.textContent.replace(/\*/g,'').trim()||group.closest('.formCard')?.querySelector('h3')?.textContent.trim()||'';
+      if(!key)return;
+      options[key]=[...group.querySelectorAll('button')].findIndex(button=>button.classList.contains('active'));
+    });
+    const checkboxes={...state.checkboxes};
+    host.querySelectorAll('input[type="checkbox"]:not(.qualificationLabel input)').forEach((control,index)=>{const key=control.id||control.closest('label')?.textContent.replace(/\s+/g,' ').trim()||'checkbox-'+index;checkboxes[key]=control.checked});
+    state.fields={...state.fields,...fields};state.options={...state.options,...options};state.checkboxes=checkboxes;
+    state.updatedAt=new Date().toISOString();
+    persistMobileProjects();
+  }
+  function restoreStageState(stage,host){
+    const state=mobileProject?.stageData?.[stage];
+    if(!state)return;
+    host.querySelectorAll('input,select,textarea').forEach(control=>{
+      if(control.type==='file'||control.type==='checkbox')return;
+      const key=stageLabel(control);
+      if(key&&Object.prototype.hasOwnProperty.call(state.fields||{},key)){
+        control.value=state.fields[key];
+        control.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+    });
+    host.querySelectorAll('.segment,.temp').forEach(group=>{
+      const key=group.closest('.fieldItem')?.querySelector('b')?.textContent.replace(/\*/g,'').trim()||group.closest('.formCard')?.querySelector('h3')?.textContent.trim()||'';
+      const selected=state.options?.[key];
+      if(!Number.isInteger(selected))return;
+      [...group.querySelectorAll('button')].forEach((button,index)=>{button.classList.toggle('active',index===selected);button.setAttribute('aria-pressed',String(index===selected))});
+    });
+    const restoreFields=()=>host.querySelectorAll('input:not([type="file"]):not(.qualificationLabel input),select,textarea').forEach(control=>{
+      const key=stageLabel(control);if(key&&Object.prototype.hasOwnProperty.call(state.fields||{},key))control.value=state.fields[key];
+    });
+    restoreFields();
+    host.querySelectorAll('select').forEach(select=>select.dispatchEvent(new Event('change',{bubbles:true})));
+    restoreFields();
+    host.querySelectorAll('input[type="checkbox"]:not(.qualificationLabel input)').forEach((control,index)=>{const key=control.id||control.closest('label')?.textContent.replace(/\s+/g,' ').trim()||'checkbox-'+index;if(Object.prototype.hasOwnProperty.call(state.checkboxes||{},key))control.checked=!!state.checkboxes[key]});
+  }
+  function restoreUploadState(stage,host){
+    const uploads=mobileProject?.stageData?.[stage]?.uploads||[];
+    host.querySelectorAll('.upload').forEach((button,index)=>{
+      const saved=uploads[index];
+      if(!saved?.name)return;
+      button.classList.add('done');
+      const icon=button.querySelector(':scope > span');if(icon)icon.textContent='✓';
+      const detail=button.querySelector('small');if(detail)detail.textContent='已保存照片 · '+saved.name;
+      if(saved.data){const preview=button.querySelector('.uploadPreview');if(preview)preview.innerHTML='<img src="'+saved.data+'" alt="已保存上传图片"><span>'+esc(saved.name)+'</span>';}
+    });
+  }
+  function captureUploads(stage,host){
+    const state=stageStateFor(mobileProject,stage);state.uploads=[...host.querySelectorAll('.upload')].map(button=>{const input=button.querySelector('input[type="file"]'),file=input?.files?.[0],img=button.querySelector('.uploadPreview img');return {name:file?.name||button.querySelector('.uploadPreview span')?.textContent||'',data:img?.src?.startsWith('data:')?img.src:''}});persistMobileProjects();
+  }
+  function loadStageConsent(){
+    let consent=mobileProject?.stageData?.[3]?.consent;
+    if(!consent){
+      consent={training:false,manual:false,trainingConfirmed:false,manualConfirmed:false};
+      const state=stageStateFor(mobileProject,3);state.consent=consent;persistMobileProjects();
+    }
+    checkState={training:!!consent.training,manual:!!consent.manual};
+    attachmentConfirmed={training:!!consent.trainingConfirmed,manual:!!consent.manualConfirmed};
+  }
+  window.persistStageConsent=()=>{const state=stageStateFor(mobileProject,3);state.consent={training:!!checkState.training,manual:!!checkState.manual,trainingConfirmed:!!attachmentConfirmed.training,manualConfirmed:!!attachmentConfirmed.manual};state.updatedAt=new Date().toISOString();persistMobileProjects()};
   const fieldForm=bindForm;
   bindForm=function(stage){
     window.currentMobileProject=mobileProject;
     if(stage>mobileProject.stage){toast('该阶段尚未开始');return}
+    loadStageConsent();
     if(stage===1)longTermState=reportFor(mobileProject).longTerm;
     fieldForm(stage);
     const host=$one('#formView'),p=mobileProject;
@@ -1074,7 +1128,7 @@
     }
     const timeline=host.querySelector('.formTop');
     if(timeline)timeline.innerHTML='<div class="stageTimeline" role="tablist" aria-label="项目阶段时间轴">'+names.map((name,i)=>'<button role="tab" aria-selected="'+(stage===i+1)+'" class="'+(stage===i+1?'active':'')+'" data-record-stage="'+(i+1)+'" '+(i+1>p.stage?'disabled':'')+'><span class="stageNo">'+String(i+1).padStart(2,'0')+'</span><b>'+name+'</b><small>'+stageState(p,i+1)+'</small></button>').join('')+'</div>';
-    host.querySelectorAll('[data-record-stage]').forEach(b=>b.onclick=()=>bindForm(Number(b.dataset.recordStage)));
+    host.querySelectorAll('[data-record-stage]').forEach(b=>b.onclick=()=>{captureStageState(stage,host);captureUploads(stage,host);bindForm(Number(b.dataset.recordStage))});
     if(stage===1){
       const report=reportFor(p);
       Object.entries(reportFields).forEach(([key,label])=>{
@@ -1115,16 +1169,19 @@
       button.dataset.previewBound='1';
       const input=document.createElement('input');input.type='file';input.accept='image/*';input.multiple=true;input.className='demoFileInput';input.setAttribute('aria-hidden','true');input.tabIndex=-1;
       const preview=document.createElement('div');preview.className='uploadPreview';button.append(input,preview);
-      input.onchange=()=>{const file=input.files&&input.files[0];if(!file)return;const url=URL.createObjectURL(file);preview.innerHTML='<img src="'+url+'" alt="上传图片预览"><span>'+esc(file.name)+'</span>';preview.querySelector('img').onclick=event=>{event.preventDefault();event.stopPropagation();openPhotoPreview(url,file.name)};button.classList.add('done');const icon=button.querySelector(':scope > span');if(icon)icon.textContent='✓';const detail=button.querySelector('small');if(detail)detail.textContent='已显示上传图片 · '+esc(file.name)};
+      input.onchange=()=>{const file=input.files&&input.files[0];if(!file)return;const url=URL.createObjectURL(file);preview.innerHTML='<img src="'+url+'" alt="上传图片预览"><span>'+esc(file.name)+'</span>';preview.querySelector('img').onclick=event=>{event.preventDefault();event.stopPropagation();openPhotoPreview(url,file.name)};button.classList.add('done');const icon=button.querySelector(':scope > span');if(icon)icon.textContent='✓';const detail=button.querySelector('small');if(detail)detail.textContent='已显示上传图片 · '+esc(file.name);const uploadIndex=[...host.querySelectorAll('.upload')].indexOf(button);const reader=new FileReader();reader.onload=()=>{const state=stageStateFor(mobileProject,stage);state.uploads=state.uploads||[];state.uploads[uploadIndex]={name:file.name,data:String(reader.result||'')};persistMobileProjects()};reader.readAsDataURL(file)};
       button.onclick=e=>{if(e.target===input)return;e.preventDefault();input.click()};
     });
     host.querySelectorAll('.segment').forEach(group=>{
       const buttons=[...group.querySelectorAll('button')];
       buttons.forEach((b,i)=>{b.textContent=i===0?'是':'否';const previous=b.onclick;b.onclick=e=>{if(previous)previous.call(b,e);buttons.forEach((x,j)=>{x.classList.toggle('active',j===i);x.setAttribute('aria-pressed',String(j===i))})}});
     });
+    restoreStageState(stage,host);restoreUploadState(stage,host);
+    host.querySelectorAll('input:not([type="file"]),select,textarea').forEach(control=>{control.addEventListener('input',()=>captureStageState(stage,host));control.addEventListener('change',()=>captureStageState(stage,host))});
+    host.querySelectorAll('.segment,.temp').forEach(group=>group.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>setTimeout(()=>captureStageState(stage,host),0))));
     const submit=$one('#submitStage'),previousSubmit=submit?.onclick;
     if(submit)submit.onclick=()=>{
-      if(stage===4&&p.status==='已完工'){showMobileDetail();return}
+      captureStageState(stage,host);captureUploads(stage,host);window.persistStageConsent?.();
       previousSubmit?.();
       if($one('[data-view="detail"]').classList.contains('active')){
         if(stage===p.stage){if(stage===4)p.status='已完工';else p.stage++}
@@ -1132,7 +1189,7 @@
         renderMobileHome();showMobileDetail();
       }
     };
-    $one('#back').onclick=()=>{if(formMode==='new'){renderMobileHome();view('home')}else showMobileDetail()};
+    $one('#back').onclick=()=>{captureStageState(stage,host);captureUploads(stage,host);if(formMode==='new'){renderMobileHome();view('home')}else showMobileDetail()};
   };
   const priorView=view;
   view=function(name){priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').textContent='安装质量';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
