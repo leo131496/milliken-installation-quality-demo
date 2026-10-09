@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="milliken-moji-weather-endpoint" content="">
   <title>美利肯安装质量中心｜线下客户演示版</title>
   <style>
     :root{--ink:#142b35;--navy:#103d73;--teal:#1b67ee;--soft:#eaf2ff;--bg:#eef2ef;--paper:#fff;--muted:#718188;--line:#dde6e3;--orange:#c7793b;--orangeSoft:#fff2e6;--red:#c74f44;--redSoft:#fff0ed;--shadow:0 22px 70px rgba(18,48,57,.15)}*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;color:var(--ink);background:var(--bg)}button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}.hidden{display:none!important}.phonehead button.hidden{display:block!important;visibility:hidden}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 32px;position:sticky;top:0;z-index:50}.brand{display:flex;align-items:center;gap:11px;min-width:310px}.logo{width:38px;height:38px;border-radius:10px;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 22px Georgia}.brand b,.brand small{display:block}.brand b{font-size:16px}.brand small{font-size:11px;color:var(--muted);margin-top:4px}.switch{margin:auto;background:#edf1ef;padding:4px;border-radius:11px;display:flex;gap:3px}.switch button{border:0;background:none;border-radius:8px;padding:9px 18px;font-size:13px;color:#617176;font-weight:700}.switch button.active{background:#fff;color:var(--teal);box-shadow:0 3px 12px rgba(20,52,59,.1)}.version{font-size:11px;color:var(--muted);min-width:220px;text-align:right}.version i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#16a98e;margin-right:7px;box-shadow:0 0 0 4px #e7f6f2}.mode{display:none}.mode.active{display:block}.toast{position:fixed;z-index:100;left:50%;bottom:25px;transform:translateX(-50%);background:#153744;color:#fff;padding:12px 18px;border-radius:9px;font-size:13px;box-shadow:0 10px 32px rgba(0,0,0,.23);display:none}.toast.show{display:block}.solid{background:var(--teal)!important;color:#fff!important;border-color:var(--teal)!important}
@@ -306,41 +307,25 @@
     const stageThreeAddressCache=new Map();
     async function fetchContextJson(url){
       const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),10000);
+      let timeout;
       try{
-        const response=await fetch(url,{signal:controller.signal,cache:'no-store',headers:{Accept:'application/json'}});
-        if(!response.ok)throw new Error('Context request failed');
-        return await response.json();
+        return await Promise.race([
+          (async()=>{
+            const response=await fetch(url,{signal:controller.signal,cache:'no-store',headers:{Accept:'application/json'}});
+            if(!response.ok)throw new Error('Context request failed');
+            return await response.json();
+          })(),
+          new Promise((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('Context request timed out'))},10000)})
+        ]);
       }finally{clearTimeout(timeout)}
-    }
-    function fallbackChineseAddress(latitude,longitude){
-      const places=[
-        {minLat:39.35,maxLat:40.25,minLon:115.65,maxLon:117.45,name:'北京市'},
-        {minLat:30.45,maxLat:31.85,minLon:120.75,maxLon:122.35,name:'上海市'},
-        {minLat:30.55,maxLat:31.65,minLon:119.65,maxLon:121.85,name:'江苏省苏州市'},
-        {minLat:29.35,maxLat:30.85,minLon:118.75,maxLon:120.75,name:'浙江省杭州市'},
-        {minLat:22.35,maxLat:23.95,minLon:112.75,maxLon:114.25,name:'广东省广州市'},
-        {minLat:22.35,maxLat:23.05,minLon:113.65,maxLon:114.75,name:'广东省深圳市'}
-      ];
-      const match=places.find(place=>latitude>=place.minLat&&latitude<=place.maxLat&&longitude>=place.minLon&&longitude<=place.maxLon);
-      return match?match.name:'当前定位区域';
-    }
-    function fallbackWeather(latitude){
-      const month=new Date().getMonth()+1;
-      const northern=latitude>=35;
-      const table=northern
-        ? {1:['晴',2],2:['晴',6],3:['多云',14],4:['多云',20],5:['晴',25],6:['多云',29],7:['多云',31],8:['晴',30],9:['多云',25],10:['晴',18],11:['晴',10],12:['晴',4]}
-        : {1:['晴',12],2:['多云',15],3:['多云',19],4:['多云',24],5:['晴',28],6:['多云',30],7:['多云',32],8:['雷雨',31],9:['多云',28],10:['晴',24],11:['晴',19],12:['晴',14]};
-      const [name,temp]=table[month];
-      return {name,temp};
     }
     async function resolveChineseAddress(latitude,longitude){
       const cacheKey=latitude+','+longitude;
       const cached=stageThreeAddressCache.get(cacheKey);
       if(cached)return cached;
       const urls=[
-        'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=zh',
-        'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+latitude+'&lon='+longitude+'&zoom=18&addressdetails=1&accept-language=zh-CN'
+        'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+latitude+'&lon='+longitude+'&zoom=18&addressdetails=1&accept-language=zh-CN',
+        'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=zh'
       ];
       for(const url of urls){
         try{
@@ -348,7 +333,8 @@
           const a=result.address||{};
           const address=[
             result.principalSubdivision,
-            result.city||result.locality||result.principalSubdivision,
+            result.city,
+            result.locality,
             result.localityInfo?.administrative?.find(item=>item.order===8)?.name,
             a.state||a.province,
             a.city||a.town||a.village,
@@ -358,75 +344,90 @@
             a.road,
             a.house_number
           ].filter(Boolean).filter((value,index,array)=>array.indexOf(value)===index).join('');
-          if(address){stageThreeAddressCache.set(cacheKey,address);return address}
+          if(/[\u3400-\u9fff]/.test(address)){stageThreeAddressCache.set(cacheKey,address);return address}
         }catch{}
       }
-      const fallback=fallbackChineseAddress(Number(latitude),Number(longitude));
-      stageThreeAddressCache.set(cacheKey,fallback);
-      return fallback;
+      throw new Error('Chinese address unavailable');
     }
     async function resolveWeather(latitude,longitude){
-      try{
-        const result=await fetchContextJson('https://api.open-meteo.com/v1/forecast?latitude='+latitude+'&longitude='+longitude+'&current=temperature_2m,weather_code&timezone=auto');
-        const current=result.current;
-        const weatherNames={0:'晴',1:'晴',2:'多云',3:'阴',45:'雾',48:'雾凇',51:'小毛毛雨',53:'毛毛雨',55:'大毛毛雨',56:'冻毛毛雨',57:'冻毛毛雨',61:'小雨',63:'中雨',65:'大雨',66:'冻雨',67:'冻雨',71:'小雪',73:'中雪',75:'大雪',77:'米雪',80:'阵雨',81:'中阵雨',82:'强阵雨',85:'阵雪',86:'强阵雪',95:'雷雨',96:'雷雨伴冰雹',99:'雷雨伴冰雹'};
-        if(current&&Number.isFinite(current.temperature_2m)&&weatherNames[current.weather_code])return {name:weatherNames[current.weather_code],temp:current.temperature_2m};
-      }catch{}
-      return fallbackWeather(Number(latitude));
+      // The authorized Moji API is called by the backend, never with a secret in this HTML.
+      const endpoint=document.querySelector('meta[name="milliken-moji-weather-endpoint"]')?.content.trim();
+      if(!endpoint)throw Object.assign(new Error('Moji service not configured'),{code:'NOT_CONFIGURED'});
+      const url=new URL(endpoint,window.location.href);
+      if(url.protocol!=='https:')throw new Error('Weather service requires HTTPS');
+      url.searchParams.set('latitude',latitude);
+      url.searchParams.set('longitude',longitude);
+      url.searchParams.set('coordinateSystem','wgs84');
+      const result=await fetchContextJson(url.href);
+      const observedAt=Date.parse(result.observedAt);
+      const age=Date.now()-observedAt;
+      if(result.source!=='moji'||typeof result.temp!=='number'||!Number.isFinite(result.temp)||result.temp < -100||result.temp > 70||typeof result.name!=='string'||!result.name.trim()||!Number.isFinite(age)||age < -300000||age > 7200000)throw new Error('Invalid or outdated Moji observation');
+      return {name:result.name.trim(),temp:result.temp};
     }
     let stageThreeContextRequestId=0;
     function requestStageThreeLocation(onSuccess,onError){
-      const bridgeSuccess=result=>{
-        const latitude=Number(result?.latitude),longitude=Number(result?.longitude);
-        if(Number.isFinite(latitude)&&Number.isFinite(longitude))onSuccess({coords:{latitude,longitude}});
-        else onError({code:2});
+      let settled=false,browserStarted=false;
+      let bridgeTimer;
+      const finish=(callback,value)=>{
+        if(settled)return;
+        settled=true;clearTimeout(deadline);clearTimeout(bridgeTimer);callback(value);
+      };
+      const fail=error=>finish(onError,error);
+      const success=position=>{
+        const latitude=position?.coords?.latitude,longitude=position?.coords?.longitude;
+        if(typeof latitude!=='number'||typeof longitude!=='number'||!Number.isFinite(latitude)||!Number.isFinite(longitude)||Math.abs(latitude)>90||Math.abs(longitude)>180){fail({code:2});return}
+        finish(onSuccess,{coords:{latitude,longitude}});
+      };
+      // Some WeChat clients never call fail; the independent deadline also covers that case.
+      const deadline=setTimeout(()=>fail({code:3}),22000);
+      const browserLocation=()=>{
+        if(settled||browserStarted)return;
+        browserStarted=true;
+        if(!navigator.geolocation){fail({code:2});return}
+        try{navigator.geolocation.getCurrentPosition(success,fail,{enableHighAccuracy:true,timeout:15000,maximumAge:0})}catch{fail({code:2})}
       };
       try{
-        if(window.wx?.getLocation){window.wx.getLocation({type:'gcj02',success:bridgeSuccess,fail:onError});return}
+        if(window.wx?.getLocation){
+          bridgeTimer=setTimeout(browserLocation,5000);
+          window.wx.getLocation({type:'wgs84',success:result=>success({coords:{latitude:result?.latitude,longitude:result?.longitude}}),cancel:()=>fail({code:1}),fail:error=>{
+            if(error?.code===1||/deny|denied|cancel|auth deny/i.test(error?.errMsg||''))fail({code:1});
+            else browserLocation();
+          }});
+          return;
+        }
       }catch{}
-      if(!navigator.geolocation){onError({code:2});return}
-      navigator.geolocation.getCurrentPosition(onSuccess,onError,{enableHighAccuracy:true,timeout:20000,maximumAge:600000});
+      browserLocation();
     }
     async function loadStageThreeContext(upload,action){
       const location=upload.querySelector('[data-stage3-location]');
       const weather=upload.querySelector('[data-stage3-weather]');
       if(!location||!weather)return;
-      if(!navigator.geolocation&&!window.wx?.getLocation){location.innerHTML='<b>项目地点：</b>浏览器不支持定位';weather.innerHTML='<b>天气情况：</b>无法获取';return}
+      const setValue=(node,label,value)=>{const title=document.createElement('b');title.textContent=label;node.replaceChildren(title,document.createTextNode(value))};
+      if(!navigator.geolocation&&!window.wx?.getLocation){setValue(location,'项目地点：','浏览器不支持定位');setValue(weather,'天气情况：','获取位置后查询');return}
       const requestId=++stageThreeContextRequestId;
-      let fallbackShown=false;
-      const activeProject=window.currentMobileProject||null;
-      const rawProjectCity=String(activeProject?.region||'').split(' / ').pop();
-      const projectCity=rawProjectCity?(/[省市区县]$/.test(rawProjectCity)?rawProjectCity:rawProjectCity+'市'):'当前定位区域';
-      const fallback=fallbackWeather(31.2);
-      const showFallback=()=>{
-        if(requestId!==stageThreeContextRequestId)return;
-        fallbackShown=true;
-        location.innerHTML='<b>项目地点：</b>'+projectCity+'（当前定位）';
-        weather.innerHTML='<b>天气情况：</b>'+fallback.name+' '+fallback.temp+'℃';
-        action.disabled=false;action.textContent='已获取位置与天气';
-      };
-      action.disabled=true;action.textContent='正在获取位置与天气…';location.innerHTML='<b>项目地点：</b>正在定位';weather.innerHTML='<b>天气情况：</b>正在读取';
-      const fallbackTimer=setTimeout(showFallback,3000);
+      const isActive=()=>requestId===stageThreeContextRequestId&&upload.isConnected;
+      action.disabled=true;action.textContent='正在获取位置与天气…';setValue(location,'项目地点：','正在定位');setValue(weather,'天气情况：','等待定位');
       requestStageThreeLocation(async position=>{
-        clearTimeout(fallbackTimer);
-        if(requestId!==stageThreeContextRequestId)return;
-        const latitude=position.coords.latitude.toFixed(4);
-        const longitude=position.coords.longitude.toFixed(4);
-        location.innerHTML='<b>项目地点：</b>正在读取中文地址';
-        try{
-          const results=await Promise.all([resolveChineseAddress(latitude,longitude),resolveWeather(latitude,longitude)]);
-          if(requestId!==stageThreeContextRequestId)return;
-          location.innerHTML='<b>项目地点：</b>'+results[0];
-          weather.innerHTML='<b>天气情况：</b>'+results[1].name+' '+results[1].temp+'℃';
-        }catch{
-          showFallback();
-        }
-        action.disabled=false;action.textContent='已获取位置与天气';
+        if(!isActive())return;
+        const {latitude,longitude}=position.coords;
+        setValue(location,'项目地点：','正在读取中文地址');setValue(weather,'天气情况：','正在读取墨迹天气');
+        let addressReady=false,weatherReady=false;
+        await Promise.allSettled([
+          resolveChineseAddress(latitude,longitude).then(address=>{
+            if(!isActive())return;
+            addressReady=true;setValue(location,'项目地点：',address);
+          }).catch(()=>{if(isActive())setValue(location,'项目地点：','地址获取失败，请重试')}),
+          resolveWeather(latitude,longitude).then(current=>{
+            if(!isActive())return;
+            weatherReady=true;setValue(weather,'天气情况：',current.name+' '+current.temp+'℃（墨迹天气）');
+          }).catch(error=>{if(isActive())setValue(weather,'天气情况：',error.code==='NOT_CONFIGURED'?'墨迹天气尚未接入':'墨迹天气获取失败，请重试')})
+        ]);
+        if(!isActive())return;
+        action.disabled=false;action.textContent=addressReady&&weatherReady?'重新获取位置与天气':'重新获取';
       },error=>{
-        clearTimeout(fallbackTimer);
-        if(fallbackShown||requestId!==stageThreeContextRequestId)return;
-        location.innerHTML='<b>项目地点：</b>'+(error.code===1?'未授权定位':error.code===3?'定位超时，请重试':'暂时无法定位，请重试');
-        weather.innerHTML='<b>天气情况：</b>请重新获取';action.disabled=false;action.textContent='重新获取位置与天气';
+        if(!isActive())return;
+        setValue(location,'项目地点：',error.code===1?'未授权定位':error.code===3?'定位超时，请重试':'暂时无法定位，请重试');
+        setValue(weather,'天气情况：','获取位置后查询');action.disabled=false;action.textContent='重新获取位置与天气';
       });
     }
 
