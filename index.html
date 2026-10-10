@@ -1194,7 +1194,7 @@
   const priorView=view;
   view=function(name){priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').textContent='安装质量';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
   document.querySelectorAll('.steps [data-stage]').forEach(b=>b.onclick=()=>{const target=mobileProjects.find(p=>p.stage===Number(b.dataset.stage));if(target){mobileProject=target;formMode='existing';bindForm(Number(b.dataset.stage))}else toast('暂无该阶段项目，请先新建项目报备')});
-  renderContacts();renderLauncher();renderDrafts();renderMobileHome();renderMobileList();bindForm(3);switchAdmin('projects');view('contacts');
+    renderContacts();renderLauncher();renderDrafts();renderMobileHome();renderMobileList();bindForm(Math.min(3,mobileProject.stage||1));switchAdmin('projects');view('contacts');
 })();
 </script>
 </body>
