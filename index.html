@@ -301,6 +301,26 @@
         ]);
       }finally{clearTimeout(timeout)}
     }
+    function formatChineseAddress(result){
+      const a=result.address||{};
+      const clean=values=>values.filter(value=>typeof value==='string'&&value.trim()).map(value=>value.trim())
+        .filter((value,index,array)=>array.indexOf(value)===index);
+      const regions=clean([a.province,a.state,a.city,a.county,a.district,a.city_district,a.town,a.village,a.suburb,
+        result.principalSubdivision,result.city,result.locality]);
+      const road=a.road||a.pedestrian||a.footway||a.path;
+      const number=typeof a.house_number==='string'&&/^\d+[A-Za-z-]*$/.test(a.house_number)?a.house_number+'号':a.house_number;
+      const place=clean([a.residential,a.building,a.amenity,a.shop,a.office,a.tourism,
+        /^(house|building|residential|commercial|industrial|amenity|shop|office|tourism)$/.test(result.addresstype||'')?result.name:'']);
+      // Assemble large-to-small Chinese addresses; do not drop POIs or numeric house numbers.
+      const fields=clean([...regions,a.quarter,a.neighbourhood,road,number,...place]);
+      const display=clean((result.display_name||'').split(/[,，]/)).filter(value=>! /^(中国|中华人民共和国|china|\d{5,6})$/i.test(value));
+      if(display.length>1&&/省$|市$|自治区$/.test(display[display.length-1]))display.reverse();
+      const fieldDetail=Boolean(road||number||place.length);
+      const displayDetail=display.some(value=>!regions.includes(value)&&! /街道$/.test(value)&&/(路|街|巷|弄|号|大厦|花园|广场|园区|小区|中心)/.test(value));
+      const extraPlaces=display.filter(value=>!fields.some(part=>part.includes(value)||value.includes(part)));
+      const address=(fieldDetail?clean([...fields,...extraPlaces]):displayDetail?display:fields.length?fields:display).join('');
+      return {address,detailed:(fieldDetail||displayDetail)&&/[\u3400-\u9fff]/.test(address)};
+    }
     async function resolveChineseAddress(latitude,longitude){
       const cacheKey=latitude+','+longitude;
       const cached=stageThreeAddressCache.get(cacheKey);
@@ -309,43 +329,18 @@
         'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+latitude+'&lon='+longitude+'&zoom=18&addressdetails=1&accept-language=zh-CN',
         'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+latitude+'&longitude='+longitude+'&localityLanguage=zh'
       ];
+      let coarseAddress='';
       for(const url of urls){
         try{
           const result=await fetchContextJson(url);
-          const a=result.address||{};
-          const cleanParts=values=>(Array.isArray(values)?values:[values]).flatMap(value=>typeof value==='string'?value.split(','):[])
-            .map(value=>value.trim())
-            .filter(value=>value&&!/^(中国|中华人民共和国|china)$/i.test(value)&&!/^\d{5,6}$/.test(value))
-            .filter((value,index,array)=>array.indexOf(value)===index);
-          const displayParts=cleanParts(result.display_name||'');
-          const fieldParts=cleanParts([
-            result.principalSubdivision,
-            result.city,
-            result.locality,
-            result.localityInfo?.administrative?.find(item=>item.order===8)?.name,
-            a.province,
-            a.state,
-            a.city,
-            a.town,
-            a.village,
-            a.county,
-            a.district,
-            a.city_district,
-            a.suburb,
-            a.quarter,
-            a.neighbourhood,
-            a.residential,
-            a.road,
-            a.house_number
-          ]);
-          const candidates=[displayParts,fieldParts]
-            .filter(parts=>parts.length&&/[\u3400-\u9fff]/.test(parts.join('')))
-            .sort((left,right)=>right.join('').length-left.join('').length);
-          const address=candidates[0]?.join('');
-          if(address){stageThreeAddressCache.set(cacheKey,address);return address}
+          const {address,detailed}=formatChineseAddress(result);
+          if(detailed){stageThreeAddressCache.set(cacheKey,address);return address}
+          if(/[\u3400-\u9fff]/.test(address))coarseAddress=address;
         }catch{}
       }
-      throw new Error('Chinese address unavailable');
+      const error=new Error('Detailed Chinese address unavailable');
+      error.coarseAddress=coarseAddress;
+      throw error;
     }
     async function resolveWeather(latitude,longitude){
       // The authorized Moji API is called by the backend, never with a secret in this HTML.
@@ -373,7 +368,7 @@
     }
     let stageThreeContextRequestId=0;
     function requestStageThreeLocation(onSuccess,onError){
-      let settled=false,browserStarted=false,attempt=0;
+      let settled=false,browserStarted=false,attempt=0,bestPosition;
       let bridgeTimer,attemptTimer;
       const finish=(callback,value)=>{
         if(settled)return;
@@ -383,7 +378,8 @@
       const success=position=>{
         const latitude=position?.coords?.latitude,longitude=position?.coords?.longitude;
         if(typeof latitude!=='number'||typeof longitude!=='number'||!Number.isFinite(latitude)||!Number.isFinite(longitude)||Math.abs(latitude)>90||Math.abs(longitude)>180){fail({code:2});return}
-        finish(onSuccess,{coords:{latitude,longitude}});
+        const accuracy=position.coords.accuracy;
+        finish(onSuccess,{coords:{latitude,longitude,accuracy}});
       };
       // Some WeChat clients never call fail; the independent deadline also covers that case.
       const deadline=setTimeout(()=>fail({code:3}),45000);
@@ -391,8 +387,8 @@
         if(settled||browserStarted)return;
         browserStarted=true;
         if(!navigator.geolocation){fail({code:2});return}
-        // Try a fresh system fix first; requiring high accuracy can stall indoors.
-        const locate=highAccuracy=>{
+        // Always request a fresh precise fix; a cached city-level fix is not a project address.
+        const locate=isRetry=>{
           if(settled)return;
           const currentAttempt=++attempt;
           clearTimeout(attemptTimer);
@@ -400,19 +396,29 @@
             if(settled||currentAttempt!==attempt)return;
             clearTimeout(attemptTimer);
             if(error?.code===1){fail(error);return}
-            if(!highAccuracy){locate(true);return}
-            fail(error||{code:2});
+            if(!isRetry){locate(true);return}
+            if(bestPosition)success(bestPosition);else fail(error||{code:2});
           };
-          const timeout=highAccuracy?20000:12000;
+          const timeout=isRetry?12000:20000;
           attemptTimer=setTimeout(()=>retry({code:3}),timeout+1000);
-          try{navigator.geolocation.getCurrentPosition(success,retry,{enableHighAccuracy:highAccuracy,timeout,maximumAge:highAccuracy?0:300000})}catch{retry({code:2})}
+          try{navigator.geolocation.getCurrentPosition(position=>{
+            if(settled||currentAttempt!==attempt)return;
+            if(position?.coords?.accuracy>100){
+              if(!bestPosition||position.coords.accuracy<bestPosition.coords.accuracy)bestPosition=position;
+              retry({code:2});return;
+            }
+            success(position);
+          },retry,{enableHighAccuracy:true,timeout,maximumAge:0})}catch{retry({code:2})}
         };
         locate(false);
       };
       try{
         if(window.wx?.getLocation){
           bridgeTimer=setTimeout(browserLocation,5000);
-          window.wx.getLocation({type:'wgs84',success:result=>success({coords:{latitude:result?.latitude,longitude:result?.longitude}}),cancel:()=>fail({code:1}),fail:error=>{
+          window.wx.getLocation({type:'wgs84',success:result=>{
+            const position={coords:{latitude:result?.latitude,longitude:result?.longitude,accuracy:result?.accuracy}};
+            if(result?.accuracy>100){bestPosition=position;browserLocation()}else success(position);
+          },cancel:()=>fail({code:1}),fail:error=>{
             if(error?.code===1||/deny|denied|cancel|auth deny/i.test(error?.errMsg||''))fail({code:1});
             else browserLocation();
           }});
@@ -433,14 +439,14 @@
       action.disabled=true;action.textContent='正在获取位置与天气…';setValue(location,'项目地点：','正在定位');setValue(weather,'天气情况：','等待定位');
       requestStageThreeLocation(async position=>{
         if(!isActive())return;
-        const {latitude,longitude}=position.coords;
+        const {latitude,longitude,accuracy}=position.coords;
         setValue(location,'项目地点：','正在读取中文地址');setValue(weather,'天气情况：','正在查询当地天气');
         let addressReady=false,weatherReady=false;
         await Promise.allSettled([
-          resolveChineseAddress(latitude,longitude).then(address=>{
+          (accuracy>100?Promise.reject(new Error('Imprecise location')):resolveChineseAddress(latitude,longitude)).then(address=>{
             if(!isActive())return;
             addressReady=true;setValue(location,'项目地点：',address);
-          }).catch(()=>{if(isActive())setValue(location,'项目地点：','地址获取失败，请重试')}),
+          }).catch(error=>{if(isActive())setValue(location,'项目地点：',accuracy>100?'定位精度不足，请开启精确位置后重试':error.coarseAddress?error.coarseAddress+'（尚未获取街道、门牌或楼宇，请重试）':'详细地址获取失败，请重试')}),
           resolveWeather(latitude,longitude).then(current=>{
             if(!isActive())return;
             weatherReady=true;setValue(weather,'天气情况：',current.name+' '+current.temp+'℃');
