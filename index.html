@@ -126,7 +126,7 @@
     new MutationObserver(wireDraftControls).observe($('#formView'),{childList:true,subtree:true});
     setInterval(wireDraftControls,250);
     $('#formView').addEventListener('click',event=>{const button=event.target.closest('#saveDraft');if(!button)return;event.preventDefault();event.stopPropagation();window.saveDraftToBox?.()},true);
-    const originalBindForm=bindForm; let checkState={training:false,manual:false}; let attachmentConfirmed={training:false,manual:false}; let attachmentTimer=0; let longTermState=true;
+    const originalBindForm=bindForm; let checkState={training:false,manual:false}; let attachmentConfirmed={training:false,manual:false}; let attachmentTimer=0; let longTermState=false;
     function syncLongTerm(host){const segment=$('.segment',host);const teamField=$$('.fieldItem',host).find(x=>x.textContent.includes('选择安装团队')||x.textContent.includes('团队 / 个人名称'));if(!segment||!teamField)return;const buttons=$$('button',segment);buttons.forEach((b,i)=>{b.classList.toggle('active',longTermState===i);b.onclick=()=>{longTermState=i===0;syncLongTerm(host)}});teamField.innerHTML=longTermState?'<span><b>选择安装团队 <em>*</em></b></span><select><option>上海华筑装饰 · 陈师傅｜上海</option><option>上海工装地材 · 刘师傅｜上海</option><option>苏州新创空间 · 周师傅｜苏州</option></select>':'<span><b>团队 / 个人名称 <em>*</em></b></span><input placeholder="公司名称或安装负责人">'}
     const timelineHtml=stage=>`<div class="formTop"><div class="stageTimeline" role="tablist" aria-label="项目阶段时间轴">${[['01','项目报备'],['02','施工前检查'],['03','施工流程'],['04','施工结束']].map((x,i)=>`<button type="button" role="tab" aria-selected="${i+1===stage}" class="${i+1===stage?'active':i+1<stage?'past':''}" data-timeline-stage="${i+1}"><span>${x[0]}</span><b>${x[1]}</b></button>`).join('')}</div><small>当前：${String(stage).padStart(2,'0')} ${['','项目报备','施工前检查','施工流程','施工结束'][stage]} · 可点击任意阶段查看或修改</small></div>`;
     function showAttachment(kind,stage){clearInterval(attachmentTimer);let remaining=5;const label=kind==='training'?'培训要求':'安装手册';const title=kind==='training'?'安装培训与现场责任确认':'地毯安装手册 · 施工流程';const copy=kind==='training'?'本项目进场人员应至少有一名人员参加过美利肯安装培训。项目经理负责确认现场人员的培训情况，并对施工过程中的质量记录负责。':'施工前应完成中心定位、基准线弹设与胶粘剂状态确认。胶粘剂由乳白色转为透明后再开始铺装，严禁加水或其他物质稀释。';const render=()=>{$('#attachmentView').innerHTML=`<div class="attachmentScreen"><section class="attachmentHero"><span>${remaining===0?'✓':remaining}</span><div><b>${remaining===0?'已完成 5 秒阅读':'请完整阅读附件内容'}</b><small>${remaining===0?'现在可以确认并返回阶段表单':`确认按钮将在 ${remaining} 秒后启用`}</small></div></section><article class="attachmentPaper"><span class="paperLabel">MILLIKEN INSTALLATION</span><h2>${title}</h2><p>${copy}</p><div class="attachmentPoints"><b>确认要点</b><span>• 按现场真实情况完成记录</span><span>• 上传照片并保留上传时间与人员</span><span>• 发现异常时及时暂停并反馈项目经理</span></div></article><footer class="attachmentActions"><button id="attachmentCancel">取消</button><button class="solid" id="attachmentConfirm" ${remaining>0?'disabled':''}>确定${remaining>0?`（${remaining}s）`:''}</button></footer></div>`;$('#attachmentCancel').onclick=()=>bindForm(stage);$('#attachmentConfirm').onclick=()=>{if(remaining>0)return;attachmentConfirmed[kind]=true;bindForm(stage);toast(kind==='training'?'培训附件已确认，可勾选对应条款':'安装手册附件已确认，可勾选对应条款')}};view('attachment');$('#phoneTitle').textContent='附件详情';render();attachmentTimer=setInterval(()=>{remaining=Math.max(0,remaining-1);render();if(remaining===0)clearInterval(attachmentTimer)},1000)}
@@ -313,20 +313,36 @@
         try{
           const result=await fetchContextJson(url);
           const a=result.address||{};
-          const address=[
+          const cleanParts=values=>(Array.isArray(values)?values:[values]).flatMap(value=>typeof value==='string'?value.split(','):[])
+            .map(value=>value.trim())
+            .filter(value=>value&&!/^(中国|中华人民共和国|china)$/i.test(value)&&!/^\d{5,6}$/.test(value))
+            .filter((value,index,array)=>array.indexOf(value)===index);
+          const displayParts=cleanParts(result.display_name||'');
+          const fieldParts=cleanParts([
             result.principalSubdivision,
             result.city,
             result.locality,
             result.localityInfo?.administrative?.find(item=>item.order===8)?.name,
-            a.state||a.province,
-            a.city||a.town||a.village,
-            a.city_district||a.district||a.county,
-            a.suburb||a.quarter,
+            a.province,
+            a.state,
+            a.city,
+            a.town,
+            a.village,
+            a.county,
+            a.district,
+            a.city_district,
+            a.suburb,
+            a.quarter,
             a.neighbourhood,
+            a.residential,
             a.road,
             a.house_number
-          ].filter(Boolean).filter((value,index,array)=>array.indexOf(value)===index).join('');
-          if(/[\u3400-\u9fff]/.test(address)){stageThreeAddressCache.set(cacheKey,address);return address}
+          ]);
+          const candidates=[displayParts,fieldParts]
+            .filter(parts=>parts.length&&/[\u3400-\u9fff]/.test(parts.join('')))
+            .sort((left,right)=>right.join('').length-left.join('').length);
+          const address=candidates[0]?.join('');
+          if(address){stageThreeAddressCache.set(cacheKey,address);return address}
         }catch{}
       }
       throw new Error('Chinese address unavailable');
@@ -726,7 +742,7 @@
     .pview .evidenceRule{font-size:15px!important;line-height:1.75;padding:15px 16px;margin-top:14px}
     .pview .evidenceRule b{font-size:17px!important;margin-bottom:7px}
     .pview[data-view="form"]{padding:16px 14px 104px;background:#f4f6f5}
-    .pview[data-view="form"] .formTop{padding:15px 14px;margin-bottom:14px;border-radius:12px;box-shadow:0 2px 8px rgba(36,64,77,.05)}
+    .pview[data-view="form"] .formTop{position:sticky;top:0;z-index:30;padding:15px 14px;margin:-16px -14px 14px;border-radius:0 0 12px 12px;background:#fff;box-shadow:0 2px 8px rgba(36,64,77,.08)}
     .pview[data-view="form"] .stageTimeline{gap:5px;margin-bottom:2px}
     .pview[data-view="form"] .stageTimeline button{min-height:72px;gap:6px}
     .pview[data-view="form"] .formCard{padding:18px 16px;margin-bottom:14px;border-radius:14px;box-shadow:0 2px 8px rgba(36,64,77,.05)}
@@ -820,7 +836,7 @@
   } catch {}
   const findMobileProject=id=>mobileProjects.find(p=>p.id===id);
   const persistMobileProjects=()=>{try{localStorage.setItem(MOBILE_STATE_KEY,JSON.stringify(mobileProjects))}catch{}};
-  const blankMobileProject=()=>({id:'empty-session',name:'',region:'',owner:'王建国',stage:1,status:'进行中',time:'',area:'',team:'',count:0,risk:'',report:{name:'',province:'',city:'',area:'',start:'',end:'',team:'',count:'',longTerm:null}});
+  const blankMobileProject=()=>({id:'empty-session',name:'',region:'',owner:'王建国',stage:1,status:'进行中',time:'',area:'',team:'',count:0,risk:'',report:{name:'',province:'',city:'',area:'',start:'',end:'',team:'',count:'',longTerm:false}});
   const stageState = (p,stage) => stage > p.stage ? '未开始' : stage < p.stage || p.status==='已完工' ? '已完成' : '进行中';
   const $one = selector => document.querySelector(selector);
   const findProject = id => data.find(p => p.id===id);
@@ -832,11 +848,14 @@
   let adminPage='projects', historyProject=data[2], mobileProject=mobileProjects[0]||blankMobileProject(), mobileFilter='全部', mobileQuery='', formMode='existing';
   const reportFields={name:'项目 / 客户名称',province:'省 / 直辖市',city:'城市',area:'项目面积',start:'开始月份',end:'结束月份',team:'选择安装团队',count:'本项目计划安装人数'};
   function reportFor(project){
-    if(project.report)return project.report;
+    if(project.report){
+      if(typeof project.report.longTerm!=='boolean')project.report.longTerm=false;
+      return project.report;
+    }
     const city=project.region.split(' / ').pop();
     const provinces={上海:'上海市',苏州:'江苏省',北京:'北京市',杭州:'浙江省',深圳:'广东省',成都:'四川省',广州:'广东省'};
     const months=project.time.split('–').map(value=>value.replace('.','-'));
-    return project.report={name:project.name,province:provinces[city]||'',city:city+'市',area:project.area.replace(/,/g,''),start:months[0]||'',end:months[1]||'',team:project.team,count:String(project.count),longTerm:true};
+    return project.report={name:project.name,province:provinces[city]||'',city:city+'市',area:project.area.replace(/,/g,''),start:months[0]||'',end:months[1]||'',team:project.team,count:String(project.count),longTerm:false};
   }
   function captureReport(){
     const report=reportFor(mobileProject);
