@@ -869,6 +869,8 @@
   @media(max-width:1300px){.qualityBoard .qbStages b{font-size:13px}.qualityBoard .qbMetricLabel{font-size:14px}.qualityBoard .qbManagerRisk{font-size:11px}}
   @media(max-width:600px){.qualityBoard .qbMetricLabel{font-size:12px}.qualityBoard .qbMetric p{font-size:12px;line-height:1.6}.qualityBoard .qbPanel h2{font-size:17px}.qualityBoard .qbPanel header p{font-size:12px}.qualityBoard .qbStages b{font-size:12px}.qualityBoard .qbStages p{font-size:11px}.qualityBoard .qbMonth>small{font-size:9px}.qualityBoard .qbRiskTable{display:block;min-width:0}.qualityBoard .qbRiskTable thead{display:none}.qualityBoard .qbRiskTable tbody{display:grid;padding:0 16px 16px;gap:12px}.qualityBoard .qbRiskTable tr{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e4ebf2;border-radius:7px;padding:12px;gap:8px}.qualityBoard .qbRiskTable td{display:block;border:0;padding:0;font-size:12px}.qualityBoard .qbRiskTable td:first-child{grid-column:1/-1}.qualityBoard .qbRiskTable td:nth-child(2){grid-row:2;grid-column:1}.qualityBoard .qbRiskTable td:nth-child(2)::before{content:"阶段 · ";color:#6c8093}.qualityBoard .qbRiskTable td:nth-child(3){grid-row:3;grid-column:1/-1}.qualityBoard .qbRiskTable td:nth-child(4){grid-row:2;grid-column:2}.qualityBoard .qbRiskTable td:nth-child(4)::before{content:"负责人 · ";color:#6c8093}.qualityBoard .qbRiskTable td:last-child{grid-row:4;grid-column:1/-1;text-align:right;border-top:1px solid #edf1f6;padding-top:9px;margin-top:3px}.qualityBoard .qbRiskTable .qbLink{font-size:13px;padding:6px 0}.qualityBoard .qbHeaderBadge{font-size:11px}.qualityBoard .qbManagerList small{font-size:11px}.qualityBoard .qbManagerRisk{font-size:10px;min-width:65px}.qualityBoard .qbManagerList strong{min-width:53px}.qualityBoard .qbFootnote{font-size:11px}}
 </style>
+<link rel="stylesheet" href="requirements.css">
+<script src="requirements.js"></script>
 <script id="quality-demo-controller">
 (() => {
   const names = ['项目报备', '施工前检查', '施工流程', '施工结束'];
@@ -974,6 +976,8 @@
   admin.querySelector('.content').append(teamPage);
   const materialNav=document.createElement('button');materialNav.type='button';materialNav.textContent='材料管理';materialNav.dataset.page='materials';admin.querySelector('.nav').append(materialNav);nav.push(materialNav);
   const materialPage=document.createElement('div');materialPage.className='apage materialPage';materialPage.dataset.pageview='materials';admin.querySelector('.content').append(materialPage);
+  const requirementsNav=document.createElement('button');requirementsNav.type='button';requirementsNav.textContent='需求说明';requirementsNav.dataset.page='requirements';admin.querySelector('.nav').append(requirementsNav);nav.push(requirementsNav);
+  const requirementsPage=document.createElement('div');requirementsPage.className='apage requirementsPage';requirementsPage.dataset.pageview='requirements';admin.querySelector('.content').append(requirementsPage);
   $one('.user b').textContent='李雯'; $one('.user small').textContent='运营人员 · 总部';
   const DIRECTORY_KEY='milliken-installation-directory-v1';
   const directorySeed={version:1,teams:[
@@ -1308,18 +1312,20 @@
   function switchAdmin(name) {
     adminPage=name;
     admin.querySelectorAll('.apage').forEach(el=>el.classList.toggle('active',el.dataset.pageview===name));
-    nav.forEach((b,i)=>b.classList.toggle('active',i===(name==='dashboard'?0:name==='teams'?2:name==='materials'?3:1)));
-    $one('#adminTitle').textContent=name==='dashboard'?'数据看板':name==='transfers'?'交接明细':name==='teams'?'安装团队管理':name==='materials'?'材料管理':'项目档案';
-    $one('#adminDesc').textContent=name==='dashboard'?'项目进度、施工规模与质量关注的全局视图':name==='transfers'?'项目负责人交接记录':name==='teams'?'统一维护合作团队、师傅信息与服务地址':name==='materials'?'管理安装培训与安装手册，统一现场端使用的材料版本':'';
+    nav.forEach((b,i)=>b.classList.toggle('active',i===(name==='dashboard'?0:name==='teams'?2:name==='materials'?3:name==='requirements'?4:1)));
+    $one('#adminTitle').textContent=name==='dashboard'?'数据看板':name==='transfers'?'交接明细':name==='teams'?'安装团队管理':name==='materials'?'材料管理':name==='requirements'?'需求说明':'项目档案';
+    $one('#adminDesc').textContent=name==='dashboard'?'项目进度、施工规模与质量关注的全局视图':name==='transfers'?'项目负责人交接记录':name==='teams'?'统一维护合作团队、师傅信息与服务地址':name==='materials'?'管理安装培训与安装手册，统一现场端使用的材料版本':name==='requirements'?'现场与总部的功能逻辑、界面规范及开发测试验收说明':'';
     if(name==='projects')renderProjects();
     else if(name==='transfers')renderHistory(historyProject);
     else if(name==='teams')renderTeamDirectory();
     else if(name==='materials')renderMaterialLibrary();
+    else if(name==='requirements')window.MillikenRequirements.mount(requirementsPage);
     else renderDashboard();
   }
   nav[0].onclick=()=>switchAdmin('dashboard'); nav[1].onclick=()=>switchAdmin('projects');
   teamNav.onclick=()=>switchAdmin('teams');
   materialNav.onclick=()=>switchAdmin('materials');
+  requirementsNav.onclick=()=>switchAdmin('requirements');
   document.querySelectorAll('.switch button').forEach(button=>button.onclick=()=>{
     document.querySelectorAll('.switch button').forEach(b=>b.classList.toggle('active',b===button));
     document.querySelectorAll('.mode').forEach(el=>el.classList.toggle('active',el.id===button.dataset.mode));
@@ -1716,6 +1722,7 @@
     if(window.location.hash==='#quality-dashboard'){$one('.switch [data-mode="admin"]').click();switchAdmin('dashboard')}
     if(window.location.hash==='#installation-teams'){$one('.switch [data-mode="admin"]').click();switchAdmin('teams')}
     if(window.location.hash==='#installation-materials'){$one('.switch [data-mode="admin"]').click();switchAdmin('materials')}
+    if(window.location.hash==='#requirements'){$one('.switch [data-mode="admin"]').click();switchAdmin('requirements')}
 })();
 </script>
 </body>
