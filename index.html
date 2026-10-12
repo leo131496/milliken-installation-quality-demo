@@ -805,6 +805,38 @@
     .todoEmpty{background:#fff;border-radius:10px;padding:18px;color:var(--muted);font-size:16px;text-align:center}
     #readingCountdown{display:none!important}
 </style>
+<style id="installation-directory-styles">
+  .directoryPage{max-width:1600px;margin:0 auto;color:#173344}
+  .directoryOverview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:24px}
+  .directoryOverview>div{padding:22px 24px;background:#fff;border:1px solid #e0e7ef;border-radius:12px;position:relative;overflow:hidden}
+  .directoryOverview>div:before{content:"";position:absolute;left:0;top:23px;width:3px;height:23px;background:#1b67ee;border-radius:0 2px 2px 0}
+  .directoryOverview span{font-size:14px;color:#617487}.directoryOverview strong{display:block;font-size:34px;line-height:1.25;font-weight:650;margin-top:10px;color:#123e74;font-variant-numeric:tabular-nums}.directoryOverview strong small{font-size:14px;font-weight:400;color:#7b8898}.directoryOverview p{font-size:12px;line-height:1.6;color:#7b8898;margin:8px 0 0}
+  .directoryCard{background:#fff;border:1px solid #e0e7ef;border-radius:12px;overflow:hidden}
+  .directoryToolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid #e9eef4;min-height:78px}
+  .directoryTabs{display:flex;align-self:stretch;gap:30px}.directoryTabs button{border:0;border-bottom:3px solid transparent;background:none;font-size:17px;color:#738295;padding:0 0 1px}.directoryTabs button.active{color:#165fcc;border-bottom-color:#1b67ee;font-weight:650}
+  .directoryPrimary{border:1px solid #1b67ee!important;background:#1b67ee!important;color:#fff!important;border-radius:7px;padding:10px 18px;font-size:14px;font-weight:600;line-height:1.4;white-space:nowrap}
+  .directoryPrimary:hover{background:#1257d0!important}.directoryPage button:focus-visible,.directoryDialog button:focus-visible,.directoryConfirm button:focus-visible{outline:3px solid #a7caff;outline-offset:3px}
+  .directoryFilters{display:flex;gap:10px;padding:22px 24px;flex-wrap:wrap;align-items:center}
+  .directorySearch{flex:1;min-width:200px;max-width:400px;display:flex;align-items:center;gap:8px;border:1px solid #d5dfe9;border-radius:7px;padding:0 12px;background:#fff}.directorySearch>span{font-size:23px;color:#8293a5}.directorySearch input{border:0;width:100%;outline:0;min-width:0;height:40px;font-size:14px;background:none}.directorySearch:focus-within{border-color:#1b67ee;box-shadow:0 0 0 3px #edf4ff}
+  .directoryFilters>select,.directoryFilters>button{height:42px;border:1px solid #d5dfe9;border-radius:7px;padding:0 13px;font-size:14px;background:#fff;max-width:220px}.directoryFilters>select{min-width:125px}.directoryFilters>.directoryQuery{border-color:#c3d8fc;color:#165fcc;background:#f4f8ff}
+  .directoryTableScroll{overflow-x:auto}.directoryTableScroll table{width:100%;min-width:1020px;border-collapse:collapse;text-align:left;font-size:14px}.directoryTableScroll th{background:#f7f9fc;color:#65778c;font-weight:500;font-size:13px;border-top:1px solid #edf1f6;border-bottom:1px solid #e6edf5;padding:14px 20px;white-space:nowrap}.directoryTableScroll td{padding:21px 20px;border-bottom:1px solid #edf1f6;vertical-align:middle;font-size:14px;line-height:1.6}.directoryTableScroll tbody tr:hover{background:#fbfdff}.directoryTableScroll td b{display:block;font-size:14px;font-weight:600}.directoryTableScroll td small{display:block;margin-top:4px;color:#84909e;font-size:12px;line-height:1.6}
+  .directoryName{display:flex;align-items:center;gap:12px;min-width:190px}.directoryName>div{min-width:0}.directoryAvatar{width:38px;height:38px;border-radius:10px;background:#edf3ff;color:#2863bb;display:grid;place-items:center;font-weight:600;flex:none}.directoryAvatar.person{border-radius:50%;background:#edf4f4;color:#427a7f}.directoryAddress{max-width:245px;min-width:160px;overflow-wrap:anywhere}
+  .directoryLink{border:0;background:none;font-size:14px;color:#1762d1;padding:3px 0;white-space:nowrap}.directoryLink:hover{text-decoration:underline}.directoryLink.danger{color:#bc4c4c}.directoryActions{display:flex;gap:18px;align-items:center;white-space:nowrap}
+  .directoryStatus{display:inline-flex;align-items:center;gap:6px;background:#edf7f1;color:#2e805a;border-radius:5px;font-size:12px;padding:4px 9px;white-space:nowrap}.directoryStatus i{width:5px;height:5px;border-radius:50%;background:currentColor}.directoryStatus.paused{background:#f2f3f5;color:#85909c}.directoryTraining{color:#9b7738;background:#fbf5e9;font-size:12px;padding:4px 9px;border-radius:5px;white-space:nowrap}.directoryTraining.trained{background:#edf3ff;color:#386daf}
+  .directoryCount{display:flex;justify-content:space-between;gap:16px;padding:17px 24px;color:#6c7d90;font-size:13px;line-height:1.6}.directoryCount span{font-size:12px;color:#8995a4}.directoryEmpty{text-align:center;padding:54px 20px}.directoryEmpty>span{font-size:17px;font-weight:600}.directoryEmpty p{font-size:14px;color:#7a8998}
+  .directoryDialog{position:fixed;inset:0 0 0 auto;margin:0;border:0;padding:0;width:min(720px,100vw);height:100dvh;max-height:100dvh;max-width:100vw;background:#fff;color:#173344;box-shadow:-12px 0 60px #102b4430;overflow:hidden}
+  .directoryDialog::backdrop,.directoryConfirm::backdrop{background:rgba(17,39,61,.4);backdrop-filter:blur(2px)}
+  .directoryDialog form{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%}
+  .directoryDialog header{padding:26px 30px 24px;border-bottom:1px solid #e6edf5;display:flex;align-items:center;justify-content:space-between}.directoryDialog header small{color:#7d8ea2;font-size:12px}.directoryDialog h2{margin:8px 0 0;font-size:25px;font-weight:650}.directoryClose{background:none;border:0;font-size:29px;line-height:1;width:36px;height:36px;color:#8b9aab;border-radius:6px}.directoryClose:hover{background:#f4f7fa}
+  .directoryFormBody{padding:26px 30px;overflow:auto}.directoryFormBody section+section{margin-top:30px;padding-top:24px;border-top:1px solid #e8edf4}.directoryFormBody h3{display:flex;align-items:center;gap:10px;font-size:16px;margin:0 0 20px}.directoryFormBody h3>span{font-size:12px;color:#2264c0;background:#edf4ff;border-radius:5px;padding:5px 6px;font-weight:600}
+  .directoryFieldGrid{display:grid;grid-template-columns:1fr 1fr;gap:20px 18px}.directoryField{display:flex;flex-direction:column;gap:9px;min-width:0;font-size:14px}.directoryField.full{grid-column:1 / -1}.directoryField>span{font-weight:500}.directoryField em{color:#c94d4d;font-style:normal}.directoryField small{font-size:12px;margin-left:7px;color:#95a1af;font-weight:400}
+  .directoryField input,.directoryField select,.directoryField textarea{width:100%;min-width:0;border:1px solid #d5dfe9;border-radius:7px;background:#fff;color:#173344;padding:11px 12px;font-size:14px;line-height:1.5;font-family:inherit}.directoryField input,.directoryField select{height:44px}.directoryField textarea{min-height:80px;resize:vertical}.directoryField input::placeholder,.directoryField textarea::placeholder{color:#9da8b6}.directoryField input:focus,.directoryField select:focus,.directoryField textarea:focus{outline:0;border-color:#1b67ee;box-shadow:0 0 0 3px #edf4ff}
+  .directoryFormHint{padding:12px 14px;background:#f5f8fc;color:#718499;font-size:12px;line-height:1.7;border-radius:7px;margin:24px 0 0}.directoryError{font-size:14px;color:#c34444;line-height:1.6;margin:14px 0 0}.directoryError:empty{display:none}
+  .directoryDialog footer,.directoryConfirm footer{display:flex;justify-content:flex-end;gap:12px;padding:18px 30px;border-top:1px solid #e6edf5;background:#fff}.directoryDialog footer button,.directoryConfirm footer button{font-size:14px;padding:10px 22px;border:1px solid #d5dfe9;border-radius:7px;background:#fff;line-height:1.4}
+  .directoryConfirm{width:min(440px,calc(100vw - 32px));padding:28px;border:0;border-radius:14px;color:#173344;box-shadow:0 20px 70px #102b4430}.directoryConfirm h2{font-size:22px;margin:0 0 18px}.directoryConfirm p{font-size:14px;color:#65788c;line-height:1.8;overflow-wrap:anywhere}.directoryConfirm .directoryDeleteHint{font-size:12px;color:#99a3b0}.directoryConfirm footer{padding:22px 0 0;margin-top:22px}.directoryConfirm footer .directoryDanger{background:#c74747;color:#fff;border-color:#c74747}
+  @media(max-width:1100px){.directoryFilters{gap:8px;padding:18px}.directoryOverview{gap:12px}.directoryOverview>div{padding:20px}.directoryCount span{max-width:55%}}
+  @media(max-width:600px){.directoryOverview{gap:8px;margin-bottom:16px}.directoryOverview>div{padding:14px 12px}.directoryOverview span{font-size:12px}.directoryOverview strong{font-size:26px}.directoryOverview p{font-size:11px}.directoryToolbar{padding:0 14px;min-height:70px;flex-wrap:wrap}.directoryTabs{gap:20px;min-height:64px}.directoryTabs button{font-size:15px}.directoryToolbar>.directoryPrimary{padding:9px 11px;font-size:12px}.directorySearch{flex-basis:100%;max-width:none}.directoryFilters>select{min-width:0;flex:1;font-size:12px}.directoryCount{padding:16px;flex-wrap:wrap}.directoryCount span{max-width:none}.directoryDialog header{padding:20px}.directoryDialog h2{font-size:23px}.directoryFormBody{padding:22px 20px}.directoryFieldGrid{grid-template-columns:1fr}.directoryDialog footer{padding:16px 20px}.directoryField input,.directoryField select,.directoryField textarea{font-size:16px}}
+</style>
 <script id="quality-demo-controller">
 (() => {
   const names = ['项目报备', '施工前检查', '施工流程', '施工结束'];
@@ -866,6 +898,8 @@
   function captureReport(){
     const report=reportFor(mobileProject);
     $one('#formView').querySelectorAll('[data-report-field]').forEach(input=>report[input.dataset.reportField]=input.value);
+    const teamSelect=$one('#formView [data-report-field="team"]');
+    if(teamSelect)report.teamId=teamSelect.selectedOptions[0]?.dataset.teamId||'';
     return report;
   }
   function startNewReport(){
@@ -901,18 +935,147 @@
   ['reviews','risks','teams','users'].forEach(name=>$one('[data-pageview="'+name+'"]')?.remove());
   const nav=[...admin.querySelectorAll('.nav button')];
   nav[0].textContent='数据看板'; nav[1].textContent='项目档案';
+  const teamNav=document.createElement('button');
+  teamNav.type='button';teamNav.textContent='安装团队管理';teamNav.dataset.page='teams';
+  admin.querySelector('.nav').append(teamNav);nav.push(teamNav);
+  const teamPage=document.createElement('div');teamPage.className='apage directoryPage';teamPage.dataset.pageview='teams';
+  admin.querySelector('.content').append(teamPage);
   $one('.user b').textContent='李雯'; $one('.user small').textContent='运营人员 · 总部';
+  const DIRECTORY_KEY='milliken-installation-directory-v1';
+  const directorySeed={version:1,teams:[
+    {id:'team-huazhu',name:'上海华筑装饰',contact:'陈师傅',phone:'',city:'上海',address:'',serviceArea:'上海',status:'active',note:''},
+    {id:'team-gongzhuang',name:'上海工装地材',contact:'刘师傅',phone:'',city:'上海',address:'',serviceArea:'上海、嘉兴',status:'active',note:''},
+    {id:'team-xinchuang',name:'苏州新创空间',contact:'周师傅',phone:'',city:'苏州',address:'',serviceArea:'苏州、无锡',status:'active',note:''},
+    {id:'team-hengji',name:'北京恒基地材',contact:'刘志强',phone:'',city:'北京',address:'',serviceArea:'北京、天津',status:'active',note:''}
+  ],members:[]};
+  directorySeed.members=directorySeed.teams.map((team,index)=>({id:'member-'+team.id,teamId:team.id,name:team.contact,phone:'',role:'安装负责人',skill:'地毯铺装',experience:'',training:index===1?'手册已读':'已培训',address:'',status:'active',note:''}));
+  function readDirectory(raw){
+    const saved=JSON.parse(raw);
+    if(saved?.version!==1||!Array.isArray(saved.teams)||!Array.isArray(saved.members))throw new Error('Invalid directory');
+    const records=(items,fields)=>items.filter(item=>item&&typeof item.id==='string'&&typeof item.name==='string').map(item=>Object.fromEntries(fields.map(key=>[key,typeof item[key]==='string'?item[key]:''])));
+    return {version:1,teams:records(saved.teams,['id','name','contact','phone','city','address','serviceArea','status','note']),members:records(saved.members,['id','teamId','name','phone','role','skill','experience','training','address','status','note'])};
+  }
+  let directory=structuredClone(directorySeed),directoryTab='teams',directoryFilter={query:'',city:'',status:'',teamId:''};
+  try{const saved=localStorage.getItem(DIRECTORY_KEY);if(saved)directory=readDirectory(saved)}catch{}
+  const directoryId=()=>window.crypto?.randomUUID?.()||'dir-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+  const installationTeamLabel=team=>team.name+' · '+team.contact+'｜'+team.city;
+  function fillInstallationTeamSelect(select,report){
+    const active=directory.teams.filter(team=>team.status==='active');
+    const match=active.find(team=>report.teamId===team.id||[installationTeamLabel(team),team.name+' · '+team.contact,team.name].includes(report.team));
+    if(match){report.team=installationTeamLabel(match);report.teamId=match.id}
+    select.replaceChildren(new Option('请选择安装团队',''));
+    active.forEach(team=>{const option=new Option(installationTeamLabel(team),installationTeamLabel(team));option.dataset.teamId=team.id;select.add(option)});
+    if(report.team&&!match){
+      if(formMode==='new'){report.team='';report.teamId=''}
+      else{const option=new Option(report.team+'（历史记录）',report.team);option.dataset.teamId=report.teamId||'';select.add(option)}
+    }
+    select.value=report.team||'';
+    if(!active.length&&!report.team)select.options[0].textContent='暂无可选团队，请先在后台新增';
+  }
+  function syncReportTeamOptions(){
+    const select=$one('#formView [data-report-field="team"]');
+    if(select){const report=captureReport();fillInstallationTeamSelect(select,report)}
+  }
+  function saveDirectory(next,errorNode){
+    try{localStorage.setItem(DIRECTORY_KEY,JSON.stringify(next))}
+    catch{errorNode.textContent='保存失败，浏览器存储空间不足或不允许保存，请检查后重试。';return false}
+    directory=next;syncReportTeamOptions();renderTeamDirectory();return true;
+  }
+  const directoryEditor=document.createElement('dialog');directoryEditor.id='directoryEditor';directoryEditor.className='directoryDialog';directoryEditor.setAttribute('aria-labelledby','directoryEditorTitle');document.body.append(directoryEditor);
+  const directoryConfirm=document.createElement('dialog');directoryConfirm.className='directoryConfirm';directoryConfirm.setAttribute('aria-labelledby','directoryDeleteTitle');document.body.append(directoryConfirm);
+  const directoryState=record=>'<span class="directoryStatus '+(record.status==='active'?'':'paused')+'"><i></i>'+(record.status==='active'?'合作中':'暂停合作')+'</span>';
+  function renderTeamDirectory(){
+    const isTeams=directoryTab==='teams';
+    const cities=[...new Set(directory.teams.map(team=>team.city).filter(Boolean))];
+    teamPage.innerHTML=`<div class="directoryOverview">
+      <div><span>合作团队</span><strong>${directory.teams.length}<small> 支</small></strong><p>统一维护团队档案</p></div>
+      <div><span>在册师傅</span><strong>${directory.members.length}<small> 位</small></strong><p>${directory.members.filter(member=>member.training==='已培训').length} 位已完成安装培训</p></div>
+      <div><span>可选安装团队</span><strong>${directory.teams.filter(team=>team.status==='active').length}<small> 支</small></strong><p>合作中的团队可用于项目报备</p></div>
+    </div><section class="directoryCard"><header class="directoryToolbar"><div class="directoryTabs" role="tablist" aria-label="团队与师傅"><button role="tab" aria-selected="${isTeams}" data-directory-tab="teams" class="${isTeams?'active':''}">安装团队</button><button role="tab" aria-selected="${!isTeams}" data-directory-tab="members" class="${isTeams?'':'active'}">师傅名册</button></div><button class="directoryPrimary" data-directory-add>${isTeams?'＋ 新增安装团队':'＋ 新增师傅'}</button></header>
+    <form class="directoryFilters"><label class="directorySearch"><span aria-hidden="true">⌕</span><input name="query" aria-label="搜索团队或师傅" placeholder="${isTeams?'搜索团队、联系人、电话或地址':'搜索师傅、电话或工种'}" value="${esc(directoryFilter.query)}"></label>
+    ${isTeams?'<select name="city" aria-label="所在城市"><option value="">全部城市</option>'+cities.map(city=>'<option '+(directoryFilter.city===city?'selected':'')+'>'+esc(city)+'</option>').join('')+'</select>':'<select name="teamId" aria-label="所属团队"><option value="">全部团队</option><option value="unassigned" '+(directoryFilter.teamId==='unassigned'?'selected':'')+'>未分配团队</option>'+directory.teams.map(team=>'<option value="'+esc(team.id)+'" '+(directoryFilter.teamId===team.id?'selected':'')+'>'+esc(team.name)+'</option>').join('')+'</select>'}
+    <select name="status" aria-label="合作状态"><option value="">全部状态</option><option value="active" ${directoryFilter.status==='active'?'selected':''}>合作中</option><option value="paused" ${directoryFilter.status==='paused'?'selected':''}>暂停合作</option></select><button type="submit" class="directoryQuery">查询</button><button type="button" data-directory-reset>重置</button></form>
+    <div class="directoryResults"></div></section>`;
+    teamPage.querySelectorAll('[data-directory-tab]').forEach(button=>button.onclick=()=>{directoryTab=button.dataset.directoryTab;directoryFilter={query:'',city:'',status:'',teamId:''};renderTeamDirectory()});
+    teamPage.querySelector('[data-directory-add]').onclick=()=>openDirectoryEditor(directoryTab);
+    teamPage.querySelector('.directoryFilters').onsubmit=event=>{event.preventDefault();const values=Object.fromEntries(new FormData(event.currentTarget));directoryFilter={query:'',city:'',status:'',teamId:'',...values};drawDirectoryRows()};
+    teamPage.querySelector('[data-directory-reset]').onclick=()=>{directoryFilter={query:'',city:'',status:'',teamId:''};renderTeamDirectory()};
+    drawDirectoryRows();
+  }
+  function drawDirectoryRows(){
+    const isTeams=directoryTab==='teams',query=directoryFilter.query.trim().toLowerCase();
+    const result=directory[directoryTab].filter(record=>{
+      const text=isTeams?[record.name,record.contact,record.phone,record.city,record.address,record.serviceArea]:[record.name,record.phone,record.skill,record.role,record.address];
+      return text.join(' ').toLowerCase().includes(query)&&(!directoryFilter.status||record.status===directoryFilter.status)&&(!isTeams||!directoryFilter.city||record.city===directoryFilter.city)&&(isTeams||!directoryFilter.teamId||(directoryFilter.teamId==='unassigned'?!directory.teams.some(team=>team.id===record.teamId):record.teamId===directoryFilter.teamId));
+    });
+    const heads=isTeams?['团队名称 / 服务区域','联系人 / 电话','团队地址','师傅人数','合作状态','操作']:['师傅 / 联系电话','所属团队','岗位 / 工种','培训状态','合作状态','操作'];
+    teamPage.querySelector('.directoryResults').innerHTML='<div class="directoryTableScroll"><table><thead><tr>'+heads.map(head=>'<th>'+head+'</th>').join('')+'</tr></thead><tbody>'+result.map(record=>{
+      const members=directory.members.filter(member=>member.teamId===record.id);
+      const team=directory.teams.find(team=>team.id===record.teamId);
+      return '<tr data-directory-row="'+esc(record.id)+'">'+(isTeams?
+      '<td><div class="directoryName"><span class="directoryAvatar">'+esc(record.name.slice(0,1))+'</span><div><b>'+esc(record.name)+'</b><small>服务区域 · '+esc(record.serviceArea||record.city||'待补充')+'</small></div></div></td><td><b>'+esc(record.contact||'待补充')+'</b><small>'+esc(record.phone||'电话待补充')+'</small></td><td class="directoryAddress"><b>'+esc(record.city||'城市待补充')+'</b><small>'+esc(record.address||'详细地址待补充')+'</small></td><td><button class="directoryLink" data-directory-members="'+esc(record.id)+'">'+members.length+' 位师傅</button></td>':
+      '<td><div class="directoryName"><span class="directoryAvatar person">'+esc(record.name.slice(0,1))+'</span><div><b>'+esc(record.name)+'</b><small>'+esc(record.phone||'电话待补充')+'</small></div></div></td><td>'+esc(team?.name||'未分配团队')+'</td><td><b>'+esc(record.role||'安装师傅')+'</b><small>'+esc(record.skill||'工种待补充')+'</small></td><td><span class="directoryTraining '+(record.training==='已培训'?'trained':'')+'">'+esc(record.training||'待培训')+'</span></td>')+
+      '<td>'+directoryState(record)+'</td><td><div class="directoryActions"><button class="directoryLink" data-directory-edit="'+esc(record.id)+'">编辑</button><button class="directoryLink danger" data-directory-delete="'+esc(record.id)+'">删除</button></div></td></tr>';
+    }).join('')+'</tbody></table></div>'+(!result.length?'<div class="directoryEmpty"><span>暂无'+(isTeams?'安装团队':'师傅记录')+'</span><p>'+(directoryFilter.query||directoryFilter.status||directoryFilter.city||directoryFilter.teamId?'试试调整筛选条件，或点击“重置”。':isTeams?'点击“新增安装团队”，建立第一份团队档案。':'点击“新增师傅”，完善团队人员信息。')+'</p></div>':'')+'<footer class="directoryCount">共 '+result.length+(isTeams?' 支团队':' 位师傅')+'<span>'+(isTeams?'点击师傅人数，可查看和维护团队成员':'师傅信息变更后，请及时更新所属团队与联系方式')+'</span></footer>';
+    teamPage.querySelectorAll('[data-directory-edit]').forEach(button=>button.onclick=()=>openDirectoryEditor(directoryTab,button.dataset.directoryEdit));
+    teamPage.querySelectorAll('[data-directory-delete]').forEach(button=>button.onclick=()=>confirmDirectoryDelete(directoryTab,button.dataset.directoryDelete));
+    teamPage.querySelectorAll('[data-directory-members]').forEach(button=>button.onclick=()=>{directoryTab='members';directoryFilter={query:'',city:'',status:'',teamId:button.dataset.directoryMembers};renderTeamDirectory()});
+  }
+  function openDirectoryEditor(kind,id=''){
+    const isTeam=kind==='teams',existing=directory[kind].find(record=>record.id===id);
+    const record=existing||{status:'active',teamId:directoryFilter.teamId==='unassigned'?'':directoryFilter.teamId,role:'安装师傅',training:'待培训'};
+    const input=(key,label,options={})=>'<label class="directoryField '+(options.full?'full':'')+'"><span>'+label+(options.required?'<em> *</em>':'<small>选填</small>')+'</span><input name="'+key+'" value="'+esc(record[key]||'')+'" type="'+(options.type||'text')+'" '+(options.required?'required ':'')+(options.type==='number'?'min="0" max="60" step="1" ':'')+'maxlength="'+(options.max||100)+'" placeholder="'+esc(options.placeholder||'')+'" autocomplete="off"></label>';
+    const select=(key,label,values)=>'<label class="directoryField"><span>'+label+'</span><select name="'+key+'">'+values.map(([value,text])=>'<option value="'+esc(value)+'" '+(record[key]===value?'selected':'')+'>'+esc(text)+'</option>').join('')+'</select></label>';
+    const note='<label class="directoryField full"><span>备注<small>选填</small></span><textarea name="note" maxlength="500" placeholder="补充合作事项或需要说明的信息">'+esc(record.note||'')+'</textarea></label>';
+    const status=select('status','合作状态',[['active','合作中'],['paused','暂停合作']]);
+    directoryEditor.innerHTML='<form id="directoryEditForm"><header><div><small>安装团队管理 / '+(isTeam?'团队档案':'师傅名册')+'</small><h2 id="directoryEditorTitle">'+(existing?'编辑':'新增')+(isTeam?'安装团队':'师傅')+'</h2></div><button type="button" class="directoryClose" data-directory-cancel aria-label="关闭">×</button></header><div class="directoryFormBody">'+(isTeam?
+      '<section><h3><span>01</span>团队信息</h3><div class="directoryFieldGrid">'+input('name','团队 / 公司名称',{required:true,full:true,placeholder:'请输入安装团队或公司全称'})+input('city','所在城市',{required:true,placeholder:'例如：上海'})+input('serviceArea','服务区域',{placeholder:'例如：上海、苏州、嘉兴'})+status+'</div></section><section><h3><span>02</span>联系人与地址</h3><div class="directoryFieldGrid">'+input('contact','联系人 / 负责人',{required:true,placeholder:'请输入姓名',max:40})+input('phone','联系电话',{required:true,type:'tel',placeholder:'手机或固定电话号码',max:24})+input('address','详细地址',{required:true,full:true,placeholder:'省 / 市 / 区 + 街道、门牌号或楼宇',max:200})+note+'</div></section><p class="directoryFormHint">保存后，可在“师傅名册”中继续添加团队成员。</p>':
+      '<section><h3><span>01</span>师傅信息</h3><div class="directoryFieldGrid">'+input('name','师傅姓名',{required:true,placeholder:'请输入姓名',max:40})+input('phone','联系电话',{required:true,type:'tel',placeholder:'手机或固定电话号码',max:24})+select('teamId','所属团队',[['','未分配团队'],...directory.teams.map(team=>[team.id,team.name])])+select('role','岗位',[['安装负责人','安装负责人'],['安装师傅','安装师傅'],['施工辅助','施工辅助']])+input('skill','擅长工种',{placeholder:'例如：方块地毯、卷材地毯铺装'})+input('experience','从业年限（年）',{type:'number',max:2,placeholder:'例如：8'})+select('training','培训状态',[['待培训','待培训'],['手册已读','手册已读'],['已培训','已培训']])+status+'</div></section><section><h3><span>02</span>联系地址与备注</h3><div class="directoryFieldGrid">'+input('address','常驻 / 工作联系地址',{full:true,placeholder:'省 / 市 / 区 + 街道、门牌号或楼宇',max:200})+note+'</div></section>')+'<p class="directoryError" role="alert"></p></div><footer><button type="button" data-directory-cancel>取消</button><button type="submit" class="directoryPrimary">保存'+(isTeam?'团队':'师傅')+'</button></footer></form>';
+    directoryEditor.querySelectorAll('[data-directory-cancel]').forEach(button=>button.onclick=()=>directoryEditor.close());
+    directoryEditor.querySelector('form').onsubmit=event=>{
+      event.preventDefault();const error=directoryEditor.querySelector('.directoryError');
+      const values=Object.fromEntries([...new FormData(event.currentTarget)].map(([key,value])=>[key,value.trim()]));
+      if(!values.name||!values.phone||(isTeam&&(!values.contact||!values.city||!values.address))){error.textContent='请完整填写标有 * 的必填信息。';return}
+      if(!/^[+\d][\d\s()-]{5,23}$/.test(values.phone)){error.textContent='请填写有效的联系电话，支持手机或固定电话。';return}
+      if(isTeam&&directory.teams.some(team=>team.id!==id&&team.name.toLowerCase()===values.name.toLowerCase())){error.textContent='已存在同名团队，请检查后修改。';return}
+      if(!isTeam&&directory.members.some(member=>member.id!==id&&member.phone===values.phone)){error.textContent='该联系电话已存在于师傅名册中，请检查是否重复添加。';return}
+      if(!isTeam&&values.teamId&&!directory.teams.some(team=>team.id===values.teamId)){error.textContent='所选团队已删除，请重新选择团队。';return}
+      const next=structuredClone(directory),saved={...values,id:existing?.id||directoryId()};
+      if(existing){const index=next[kind].findIndex(record=>record.id===id);if(index<0){error.textContent='该档案已删除，请关闭后刷新列表。';return}next[kind][index]=saved}else next[kind].unshift(saved);
+      if(!saveDirectory(next,error))return;
+      directoryEditor.close();toast((isTeam?'团队':'师傅')+'信息已保存');
+    };
+    directoryEditor.showModal();
+  }
+  function confirmDirectoryDelete(kind,id){
+    const record=directory[kind].find(record=>record.id===id);if(!record)return;
+    const count=kind==='teams'?directory.members.filter(member=>member.teamId===id).length:0;
+    directoryConfirm.innerHTML='<h2 id="directoryDeleteTitle">删除'+(kind==='teams'?'安装团队':'师傅档案')+'？</h2><p>即将删除「<strong>'+esc(record.name)+'</strong>」。'+(kind==='teams'?'该团队将不再出现在新项目的可选列表中。':'删除后，该师傅将从名册移除。')+'</p>'+(count?'<p>'+count+' 位师傅的档案会保留，所属团队改为“未分配团队”。</p>':'')+'<p class="directoryDeleteHint">历史项目记录保留，此操作不可撤销。</p><p class="directoryError" role="alert"></p><footer><button data-delete-cancel>取消</button><button class="directoryDanger" data-delete-confirm>确认删除</button></footer>';
+    directoryConfirm.querySelector('[data-delete-cancel]').onclick=()=>directoryConfirm.close();
+    directoryConfirm.querySelector('[data-delete-confirm]').onclick=()=>{
+      const next=structuredClone(directory);next[kind]=next[kind].filter(record=>record.id!==id);
+      if(kind==='teams')next.members.forEach(member=>{if(member.teamId===id)member.teamId=''});
+      if(saveDirectory(next,directoryConfirm.querySelector('.directoryError'))){directoryConfirm.close();toast('档案已删除')}
+    };
+    directoryConfirm.showModal();directoryConfirm.querySelector('[data-delete-cancel]').focus();
+  }
+  window.addEventListener('storage',event=>{
+    if(event.key!==DIRECTORY_KEY)return;
+    try{directory=event.newValue?readDirectory(event.newValue):structuredClone(directorySeed);if(adminPage==='teams')renderTeamDirectory();syncReportTeamOptions()}catch{}
+  });
   function switchAdmin(name) {
     adminPage=name;
     admin.querySelectorAll('.apage').forEach(el=>el.classList.toggle('active',el.dataset.pageview===name));
-    nav.forEach((b,i)=>b.classList.toggle('active',i===(name==='dashboard'?0:1)));
-    $one('#adminTitle').textContent=name==='dashboard'?'数据看板':name==='transfers'?'交接明细':'项目档案';
-    $one('#adminDesc').textContent=name==='dashboard'?'项目进度与负责人概况':name==='transfers'?'项目负责人交接记录':'';
+    nav.forEach((b,i)=>b.classList.toggle('active',i===(name==='dashboard'?0:name==='teams'?2:1)));
+    $one('#adminTitle').textContent=name==='dashboard'?'数据看板':name==='transfers'?'交接明细':name==='teams'?'安装团队管理':'项目档案';
+    $one('#adminDesc').textContent=name==='dashboard'?'项目进度与负责人概况':name==='transfers'?'项目负责人交接记录':name==='teams'?'统一维护合作团队、师傅信息与服务地址':'';
     if(name==='projects')renderProjects();
     else if(name==='transfers')renderHistory(historyProject);
+    else if(name==='teams')renderTeamDirectory();
     else renderDashboard();
   }
   nav[0].onclick=()=>switchAdmin('dashboard'); nav[1].onclick=()=>switchAdmin('projects');
+  teamNav.onclick=()=>switchAdmin('teams');
   document.querySelectorAll('.switch button').forEach(button=>button.onclick=()=>{
     document.querySelectorAll('.switch button').forEach(b=>b.classList.toggle('active',b===button));
     document.querySelectorAll('.mode').forEach(el=>el.classList.toggle('active',el.id===button.dataset.mode));
@@ -1096,6 +1259,7 @@
     if(!state)return;
     host.querySelectorAll('input,select,textarea').forEach(control=>{
       if(control.type==='file'||control.type==='checkbox')return;
+      if(stage===1&&control.dataset.reportField==='team')return;
       const key=stageLabel(control);
       if(key&&Object.prototype.hasOwnProperty.call(state.fields||{},key)){
         control.value=state.fields[key];
@@ -1109,6 +1273,7 @@
       [...group.querySelectorAll('button')].forEach((button,index)=>{button.classList.toggle('active',index===selected);button.setAttribute('aria-pressed',String(index===selected))});
     });
     const restoreFields=()=>host.querySelectorAll('input:not([type="file"]):not(.qualificationLabel input),select,textarea').forEach(control=>{
+      if(stage===1&&control.dataset.reportField==='team')return;
       const key=stageLabel(control);if(key&&Object.prototype.hasOwnProperty.call(state.fields||{},key))control.value=state.fields[key];
     });
     restoreFields();
@@ -1161,6 +1326,7 @@
         const input=field?.querySelector('input,select');
         if(!input)return;
         input.dataset.reportField=key;
+        if(key==='team')fillInstallationTeamSelect(input,report);
         if(input.tagName==='SELECT'&&report[key]&&![...input.options].some(option=>option.value===report[key]))input.add(new Option(report[key],report[key]));
         input.value=report[key]||'';
         input.addEventListener('input',captureReport);
@@ -1220,6 +1386,7 @@
   view=function(name){priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').textContent='安装质量';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
   document.querySelectorAll('.steps [data-stage]').forEach(b=>b.onclick=()=>{const target=mobileProjects.find(p=>p.stage===Number(b.dataset.stage));if(target){mobileProject=target;formMode='existing';bindForm(Number(b.dataset.stage))}else toast('暂无该阶段项目，请先新建项目报备')});
     renderContacts();renderLauncher();renderDrafts();renderMobileHome();renderMobileList();bindForm(Math.min(3,mobileProject.stage||1));switchAdmin('projects');view('contacts');
+    if(window.location.hash==='#installation-teams'){$one('.switch [data-mode="admin"]').click();switchAdmin('teams')}
 })();
 </script>
 </body>
