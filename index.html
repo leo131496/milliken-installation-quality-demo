@@ -76,7 +76,9 @@
     .stage3-context-action{grid-area:context;justify-self:start;border:0;border-radius:6px;background:var(--soft);color:var(--teal);padding:6px 9px;font-size:9px;font-weight:700}
     .stage3-context-action:disabled{opacity:.55;cursor:wait}
   </style>
-</head>
+<style>
+.millikenWordmark{display:block;width:154px;height:44px;object-fit:contain;background:#063b85;border-radius:4px}.phonehead:has(.millikenWordmark){height:100px}.temp button:disabled{opacity:.42;cursor:not-allowed}.temp button{min-width:0}.temp button.low b{white-space:normal;font-size:14px!important}.temperatureLinkNote{display:block;line-height:1.65;color:#6e7f8c}.combinedConsent{cursor:pointer}.combinedConsent>span{flex:1}.combinedConsent small{line-height:1.6}.projectEditEntry{padding:16px;background:#fff;border-radius:12px;margin-bottom:14px}.projectEditEntry button{width:100%;border:1px solid #1b67ee;background:#edf4ff;border-radius:8px;color:#1b67ee;padding:12px;font-size:17px}.projectEditEntry p,.projectLockNotice{font-size:14px;line-height:1.7;color:#718188}.combinedConsent{margin-top:14px}.projectEditEntry button:disabled{background:#f3f5f6;border-color:#dce2e7;color:#9aa7b0;cursor:not-allowed}.checklistTarget{outline:3px solid #edb35a;outline-offset:5px;border-radius:8px}.completionDialog{width:min(490px,calc(100vw - 24px));max-height:85dvh;border:0;border-radius:16px;padding:0;color:#142b35;box-shadow:0 24px 80px #102b4440}.completionDialog[open]{display:flex;flex-direction:column}.completionDialog::backdrop{background:#102b4477}.completionDialog header{padding:22px 22px 16px;border-bottom:1px solid #e2e8ec}.completionDialog h2{font-size:22px;margin:0}.completionDialog header p{font-size:14px;line-height:1.7;color:#70818a;margin-bottom:0}.completionBody{padding:4px 22px 18px;overflow:auto;min-height:0}.completionBody section{border-bottom:1px solid #e5ebed;padding:8px 0 14px}.completionBody h3{font-size:16px;display:flex;justify-content:space-between;gap:10px}.completionBody h3>span{font-size:13px;color:#267863;font-weight:400}.completionBody section button{display:flex;gap:10px;justify-content:space-between;align-items:center;text-align:left;width:100%;border:0;border-radius:7px;background:#fff7ec;color:#835b24;padding:12px;margin:7px 0;font-size:15px;line-height:1.6}.completionBody section button span{color:#1b67ee;white-space:nowrap;font-size:13px}.completionDialog footer{display:flex;gap:10px;padding:16px 22px;border-top:1px solid #e2e8ec}.completionDialog footer button{flex:1;border:1px solid #d2dde4;border-radius:8px;background:#fff;font-size:16px;padding:12px 8px}.completionDialog button:disabled{opacity:.4;cursor:not-allowed}.completionWarning{font-size:18px;line-height:1.9;padding:18px;background:#fff3e6;border-radius:10px;color:#905e24}.qbLink[data-project-pdf]{margin-left:14px}.qbDownloads{margin:20px 0}.pview .projectHero dl{grid-template-columns:1fr!important}.projectHero dd{overflow-wrap:anywhere}
+</style></head>
 <body>
   <header class="top"><div class="brand"><span class="logo">M</span><div><b>美利肯安装质量中心</b><small>线下客户演示版 · 依据会议录音与清单重构</small></div></div><div class="switch"><button class="active" data-mode="field">现场 · 企微工作台</button><button data-mode="admin">总部 · 管理后台</button></div><div class="version"><i></i>无需联网 · 单文件 Demo · 4 阶段</div></header>
 
@@ -111,9 +113,9 @@
     $$('[data-viewgo]').forEach(b=>b.onclick=()=>view(b.dataset.viewgo));$('#back').onclick=()=>view('home');
     const groundOpts=['良好','一般','不平','起砂','含水率超标','自流平分层','其他'];
     const formData={
-      1:`<div class="formTop"><span>第 1 / 4 阶段</span><div><i style="width:25%"></i></div><small>项目信息、计划周期、安装团队与人数</small></div><section class="formCard"><header><span>01</span><div><h3>项目信息</h3></div></header><div class="fields"><label class="fieldItem"><span><b>项目 / 客户名称 <em>*</em></b></span><input value="字节跳动上海办公室"></label><div class="two"><label class="fieldItem"><span><b>省 / 直辖市 <em>*</em></b></span><select><option>上海市</option><option>江苏省</option></select></label><label class="fieldItem"><span><b>城市 <em>*</em></b></span><select><option>上海市</option><option>苏州市</option></select></label></div><label class="fieldItem"><span><b>项目面积 <em>*</em></b></span><input value="10000" placeholder="m²"></label></div></section><section class="formCard"><header><span>02</span><div><h3>计划安装周期</h3></div></header><div class="fields"><div class="two monthFields"><label class="fieldItem"><span><b>开始月份 <em>*</em></b></span><div class="nativeDateField monthField"><input type="month" value="2027-03"></div></label><label class="fieldItem"><span><b>结束月份 <em>*</em></b></span><div class="nativeDateField monthField"><input type="month" value="2027-04"></div></label></div></div></section><section class="formCard"><header><span>03</span><div><h3>安装团队与人数</h3></div></header><div class="fields"><label class="fieldItem"><span><b>是否长期合作团队 <em>*</em></b></span><div class="segment"><button class="active">是</button><button>否</button></div></label><label class="fieldItem"><span><b>选择安装团队 <em>*</em></b></span><select><option>上海华筑装饰 · 陈师傅｜上海</option><option>上海工装地材 · 刘师傅｜上海</option></select></label><label class="fieldItem"><span><b>本项目计划安装人数 <em>*</em></b></span><input value="6" placeholder="人"></label></div></section><div class="alert"><span>i</span><div><b>提交后进入报备审核</b><small>草稿仅本人可见；审核通过后开放施工前检查。</small></div></div>`,
+      1:`<div class="formTop"><span>第 1 / 4 阶段</span><div><i style="width:25%"></i></div><small>项目信息、计划周期、安装团队与人数</small></div><section class="formCard"><header><span>01</span><div><h3>项目信息</h3></div></header><div class="fields"><label class="fieldItem"><span><b>项目 / 客户名称 <em>*</em></b></span><input value="字节跳动上海办公室"></label><div class="two"><label class="fieldItem"><span><b>省 / 直辖市 <em>*</em></b></span><select><option>上海市</option><option>江苏省</option></select></label><label class="fieldItem"><span><b>城市 <em>*</em></b></span><select><option>上海市</option><option>苏州市</option></select></label></div><label class="fieldItem"><span><b>项目面积 <em>*</em></b></span><input value="10000" placeholder="m²"></label></div></section><section class="formCard"><header><span>02</span><div><h3>计划安装周期</h3></div></header><div class="fields"><div class="two monthFields"><label class="fieldItem"><span><b>开始日期 <em>*</em></b></span><div class="nativeDateField monthField"><input type="date" value="2027-03-01"></div></label><label class="fieldItem"><span><b>结束日期 <em>*</em></b></span><div class="nativeDateField monthField"><input type="date" value="2027-04-30"></div></label></div></div></section><section class="formCard"><header><span>03</span><div><h3>安装团队与人数</h3></div></header><div class="fields"><label class="fieldItem"><span><b>是否长期合作团队 <em>*</em></b></span><div class="segment"><button class="active">是</button><button>否</button></div></label><label class="fieldItem"><span><b>选择安装团队 <em>*</em></b></span><select><option>上海华筑装饰 · 陈师傅｜上海</option><option>上海工装地材 · 刘师傅｜上海</option></select></label><label class="fieldItem"><span><b>本项目计划安装人数 <em>*</em></b></span><input value="6" placeholder="人"></label></div></section><div class="alert"><span>i</span><div><b>提交后进入报备审核</b><small>草稿仅本人可见；审核通过后开放施工前检查。</small></div></div>`,
       2:`<div class="formTop"><span>第 2 / 4 阶段</span><div><i style="width:50%"></i></div><small>室内温度、地面状态和现场照片</small></div><section class="formCard"><header><span>01</span><div><h3>工地室内温度</h3><p>请选择现场温度是否符合装修温度要求。</p></div></header><div class="fields"><label class="fieldItem"><span><b>室内温度 <em>*</em></b></span><input value="20" inputmode="decimal" placeholder="请输入室内温度"></label></div></section><section class="formCard"><header><span>02</span><div><h3>地面状态</h3><p>选择最符合现场的情况。</p></div></header><div class="fields"><label class="fieldItem"><span><b>地面平整度情况 <em>*</em></b></span><select>${groundOpts.map(x=>`<option>${x}</option>`).join('')}</select></label><button class="upload"><span>＋</span><div><b>上传地面状态照片</b><small>至少 1 张，建议包含整体与局部</small></div><em>拍摄 / 选择</em></button></div></section><div class="evidenceRule"><b>照片留痕规则</b>记录上传时间、上传人和项目；定位与天气为辅助信息。相册照片无法可靠获取原始拍摄时间。</div>`,
-      3:`<div class="formTop"><span>第 3 / 4 阶段</span><div><i style="width:75%"></i></div><small>人员培训、安装温度、基准线和胶水</small></div><section class="formCard"><header><span>01</span><div><h3>安装人员培训与手册确认</h3><p>项目经理确认本次实际进场人员，可组合选择。</p></div></header><div class="fields"><button class="check active"><span>✓</span><div><b>参加过美利肯安装培训</b><small>本次进场人员中已有人员参训</small></div></button><button class="check"><span></span><div><b>已完整阅读安装手册</b><small>项目经理已现场确认阅读完成</small></div></button><small style="font-size:8px;color:var(--muted)">项目经理对确认结果负责，追责对象不是现场安装工人。</small></div></section><section class="formCard"><header><span>02</span><div><h3>安装环境温度</h3><p>低于 15℃ 时需补充现场原因。</p></div></header><div class="fields"><div class="temp"><button class="active"><strong>20°</strong><span><b>15–32℃</b><small>建议安装温度</small></span></button><button class="low"><strong>8°</strong><span><b>低于 15℃</b><small>需说明原因</small></span></button></div><div class="reasons" style="display:none"><b>低温施工原因（可多选）</b><label><input type="checkbox">现场无供暖设施，室内外温度基本一致</label><label><input type="checkbox">供暖 / 空调暂不具备启用条件</label><label><input type="checkbox">设备已安装，但现场暂不允许启用</label></div></div></section><section class="formCard"><header><span>03</span><div><h3>中心定位与基准线</h3><p>需拍到两条相互垂直的基准线。</p></div></header><div class="fields"><button class="upload done"><span>✓</span><div><b>中心定位及基准线已上传</b><small>1 张 · 上传时间 10:24 · 王建国</small></div><em>重新上传</em></button></div></section><section class="formCard"><header><span>04</span><div><h3>胶水施工记录</h3><p>胶粘剂转为透明后再开始铺装。</p></div></header><div class="fields"><label class="fieldItem"><span><b>是否使用美利肯胶水 <em>*</em></b></span><div class="segment"><button class="active">是</button><button>否</button></div></label><label class="fieldItem"><span><b>是否加水或其他物质稀释 <em>*</em></b></span><div class="segment dilute"><button>是</button><button class="active">否</button></div></label><div class="risknote" style="display:none"><b>质量异常：</b>胶水不应加水或其他物质稀释，后台将生成异常记录。</div><button class="upload"><span>＋</span><div><b>上传胶粘剂透明状态照片</b><small>转为透明后拍摄，再开始铺装</small></div><em>拍摄 / 选择</em></button></div></section>`,
+      3:`<div class="formTop"><span>第 3 / 4 阶段</span><div><i style="width:75%"></i></div><small>人员培训、安装温度、基准线和胶水</small></div><section class="formCard"><header><span>01</span><div><h3>安装人员培训与手册确认</h3><p>项目经理确认本次实际进场人员，可组合选择。</p></div></header><div class="fields"><button class="check active"><span>✓</span><div><b>参加过美利肯安装培训</b><small>本次进场人员中已有人员参训</small></div></button><button class="check"><span></span><div><b>已完整阅读安装手册</b><small>项目经理已现场确认阅读完成</small></div></button><small style="font-size:8px;color:var(--muted)">项目经理对确认结果负责，追责对象不是现场安装工人。</small></div></section><section class="formCard"><header><span>02</span><div><h3>安装环境温度</h3><p>低于15或大于32度时需补充现场原因</p></div></header><div class="fields"><div class="temp"><button class="active"><strong>20°</strong><span><b>15–32℃</b><small>建议安装温度</small></span></button><button class="low"><strong>8°</strong><span><b>低于15或大于32度</b><small>需说明原因</small></span></button></div><div class="reasons" style="display:none"><b>异常温度施工原因（可多选）</b><label><input type="checkbox">现场无供暖设施，室内外温度基本一致</label><label><input type="checkbox">供暖 / 空调暂不具备启用条件</label><label><input type="checkbox">设备已安装，但现场暂不允许启用</label><label><input type="checkbox">现场高温，空调或降温条件不足</label><label><input type="checkbox">其他现场原因</label></div></div></section><section class="formCard"><header><span>03</span><div><h3>中心定位与基准线</h3><p>需拍到两条相互垂直的基准线。</p></div></header><div class="fields"><button class="upload done"><span>✓</span><div><b>中心定位及基准线已上传</b><small>1 张 · 上传时间 10:24 · 王建国</small></div><em>重新上传</em></button></div></section><section class="formCard"><header><span>04</span><div><h3>胶水施工记录</h3><p>胶粘剂转为透明后再开始铺装。</p></div></header><div class="fields"><label class="fieldItem"><span><b>是否使用美利肯胶水 <em>*</em></b></span><div class="segment"><button class="active">是</button><button>否</button></div></label><label class="fieldItem"><span><b>是否加水或其他物质稀释 <em>*</em></b></span><div class="segment dilute"><button>是</button><button class="active">否</button></div></label><div class="risknote" style="display:none"><b>质量异常：</b>胶水不应加水或其他物质稀释，后台将生成异常记录。</div><button class="upload"><span>＋</span><div><b>上传胶粘剂透明状态照片</b><small>转为透明后拍摄，再开始铺装</small></div><em>拍摄 / 选择</em></button></div></section>`,
       4:`<div class="formTop"><span>第 4 / 4 阶段</span><div><i style="width:100%"></i></div><small>完成日期、面积、温度、用量和照片</small></div><div class="alert"><span>i</span><div><b>本阶段指“地毯安装工作结束”</b><small>不代表整个建设项目竣工。</small></div></div><section class="formCard"><header><span>01</span><div><h3>实际完成情况</h3><p>按本次地毯安装范围填写。</p></div></header><div class="fields"><label class="fieldItem"><span><b>安装完成日期 <em>*</em></b></span><div class="nativeDateField dateField"><input type="date" value="2027-04-01"></div></label><label class="fieldItem"><span><b>完工时室内温度 <em>*</em></b></span><input value="20" placeholder="℃"></label><label class="fieldItem"><span><b>实际完成面积 <em>*</em></b></span><input id="finishArea" value="11200" placeholder="m²"></label><div class="risknote" id="areaWarn">面积偏差 12.0%，超过 10%。<label style="display:block;margin-top:6px"><input type="checkbox"> 已核对，确认按当前面积提交</label></div></div></section><section class="formCard"><header><span>02</span><div><h3>胶水实际用量</h3></div></header><div class="fields"><div class="two"><label class="fieldItem"><span><b>数量 <em>*</em></b></span><input value="1200"></label><label class="fieldItem"><span><b>单位 <em>*</em></b></span><span class="unitFixed">kg</span></label></div></div></section><section class="formCard"><header><span>03</span><div><h3>完工照片</h3><p>至少 1 张，可上传多张。</p></div></header><div class="fields"><button class="upload"><span>＋</span><div><b>上传安装完成照片</b><small>支持多选，建议整体与重点区域</small></div><em>拍摄 / 选择</em></button></div></section>`
     };
     function bindForm(stage){const host=$('#formView');host.innerHTML=formData[stage]+`<footer class="formActions"><button id="saveDraft">保存草稿</button><button class="solid" id="submitStage">${stage===1?'提交报备':stage===4?'提交复核':'提交本阶段'}</button></footer>`;view('form');$('#phoneTitle').textContent=['','项目报备','施工前检查','施工流程','施工结束'][stage];$$('.steps button').forEach(x=>x.classList.toggle('active',x.dataset.stage==stage));$('#saveDraft').onclick=()=>toast('草稿已保存，仅本人可见');$('#submitStage').onclick=()=>{if(stage===4&&!$('#areaWarn input').checked){toast('面积偏差超过 10%，请先核对并确认');return}toast(stage===1?'项目报备已提交审核':'阶段记录已提交');view('detail')};$$('.upload',host).forEach(b=>b.onclick=()=>{b.classList.toggle('done');b.querySelector('span').textContent=b.classList.contains('done')?'✓':'＋';toast(b.classList.contains('done')?'照片已上传并记录上传时间':'照片已移除')});$$('.check',host).forEach(b=>b.onclick=()=>{b.classList.toggle('active');b.querySelector('span').textContent=b.classList.contains('active')?'✓':''});const temps=$$('.temp button',host);if(temps.length){temps.forEach((b,i)=>b.onclick=()=>{temps.forEach(x=>x.classList.remove('active'));b.classList.add('active');$('.reasons',host).style.display=i?'block':'none'})}const glue=$$('.segment:not(.dilute) button',host);if(glue.length){glue.forEach((b,i)=>b.onclick=()=>{glue.forEach(x=>x.classList.remove('active'));b.classList.add('active')})}const ds=$$('.dilute button',host);if(ds.length){ds.forEach((b,i)=>b.onclick=()=>{ds.forEach(x=>x.classList.remove('active'));b.classList.add('active');$('.risknote',host).style.display=i===0?'block':'none'})}}
@@ -183,16 +185,24 @@
     function renderAgreementConsent(host){
       const card=host.querySelector('.formCard');
       if(!card)return;
-      card.querySelector('header p').textContent='培训材料和安装手册可分别确认，可选择其中一项或同时选择两项。';
+      card.querySelector('header p').textContent='培训材料和安装手册可分别确认，可选择其中一项或同时选择两项。当两个都学习后请勾选第三个选项';
       const fields=card.querySelector('.fields');
       fields.innerHTML=[['training','参加过美利肯安装培训','安装培训材料'],['manual','已完整阅读美利肯安装手册','安装手册材料']].map(([kind,label,material])=>`<div class="qualificationBlock"><div class="qualificationRow ${attachmentConfirmed[kind]?'ready':''} ${checkState[kind]?'checked':''}"><div class="qualificationMain"><div class="qualificationLabel"><input type="checkbox" aria-label="${label}" ${attachmentConfirmed[kind]?'':'disabled'} ${checkState[kind]?'checked':''}><span><b>${label}</b>${checkState[kind]?'<small>已确认，满足施工结束条件</small>':attachmentConfirmed[kind]?'<small>已读完附件，可确认</small>':'<small>先打开附件并完成 5 秒阅读</small>'}</span></div><button type="button" class="qualificationLink" data-agreement="${kind}">${material}<em>›</em></button></div></div></div>`).join('');
       $$('.qualificationBlock',fields).forEach((block,index)=>{
         const kind=index===0?'training':'manual';
         const checkbox=block.querySelector('input');
-        checkbox.onchange=()=>{checkState[kind]=checkbox.checked;renderAgreementConsent(host);window.persistStageConsent?.()};
+        checkbox.onchange=()=>{checkState[kind]=checkbox.checked;if(!checkbox.checked)window.currentMobileProject.stageData[3].consent.both=false;renderAgreementConsent(host);window.persistStageConsent?.()};
         block.querySelector('[data-agreement]').onclick=()=>showAttachment(kind,3);
       });
-      window.updateMaterialConsentUI?.(host);
+      const combined=document.createElement('label');combined.className='qualificationRow combinedConsent';
+      combined.innerHTML='<input type="checkbox" id="combinedLearning"><span><b>您已学习安装培训材料和安装手册</b><small>勾选后同时确认上方两项</small></span>';
+      const checkbox=combined.querySelector('input');checkbox.checked=!!window.currentMobileProject?.stageData?.[3]?.consent?.both;
+      checkbox.onchange=()=>{
+        if(checkbox.checked){checkState.training=true;checkState.manual=true;attachmentConfirmed.training=true;attachmentConfirmed.manual=true}
+        const project=window.currentMobileProject;if(project){project.stageData ||= {};project.stageData[3] ||= {};project.stageData[3].consent ||= {};project.stageData[3].consent.both=checkbox.checked}
+        window.persistStageConsent?.();renderAgreementConsent(host);
+      };
+      fields.append(combined);window.updateMaterialConsentUI?.(host);
     }
 
     showAttachment=function(kind,stage){
@@ -871,6 +881,7 @@
 </style>
 <link rel="stylesheet" href="requirements.css">
 <script src="requirements.js"></script>
+<script src="project-pdf.js"></script>
 <script id="quality-demo-controller">
 (() => {
   const names = ['项目报备', '施工前检查', '施工流程', '施工结束'];
@@ -906,8 +917,9 @@
     const savedMobile=JSON.parse(localStorage.getItem(MOBILE_STATE_KEY)||'[]');
     if(Array.isArray(savedMobile))mobileProjects=savedMobile;
   } catch {}
+  mobileProjects.forEach(project=>{const index=data.findIndex(item=>item.id===project.id);if(index<0)data.push(project);else data[index]=project});
   const findMobileProject=id=>mobileProjects.find(p=>p.id===id);
-  const persistMobileProjects=()=>{try{localStorage.setItem(MOBILE_STATE_KEY,JSON.stringify(mobileProjects))}catch{}};
+  const persistMobileProjects=()=>{mobileProjects.forEach(project=>{const index=data.findIndex(item=>item.id===project.id);if(index<0)data.push(project);else data[index]=project});try{localStorage.setItem(MOBILE_STATE_KEY,JSON.stringify(mobileProjects))}catch{}};
   const blankMobileProject=()=>({id:'empty-session',name:'',region:'',owner:'王建国',stage:1,status:'进行中',time:'',area:'',team:'',count:0,risk:'',report:{name:'',province:'',city:'',area:'',start:'',end:'',team:'',count:'',longTerm:false}});
   const stageState = (p,stage) => stage > p.stage ? '未开始' : stage < p.stage || p.status==='已完工' ? '已完成' : '进行中';
   const $one = selector => document.querySelector(selector);
@@ -918,19 +930,21 @@
   const dashboard = $one('[data-pageview="dashboard"]');
   const body = $one('#drawerBody'), footer = $one('#drawerFooter'), mask = $one('#drawerMask');
   let adminPage='projects', historyProject=data[2], mobileProject=mobileProjects[0]||blankMobileProject(), mobileFilter='全部', mobileQuery='', formMode='existing';
-  const reportFields={name:'项目 / 客户名称',province:'省 / 直辖市',city:'城市',area:'项目面积',start:'开始月份',end:'结束月份',team:'选择安装团队',count:'本项目计划安装人数'};
+  const reportFields={name:'项目 / 客户名称',province:'省 / 直辖市',city:'城市',area:'项目面积',start:'开始日期',end:'结束日期',team:'选择安装团队',count:'本项目计划安装人数'};
   function reportFor(project){
     if(project.report){
       if(typeof project.report.longTerm!=='boolean')project.report.longTerm=false;
+      for(const key of ['start','end'])if(/^\d{4}-\d{2}$/.test(project.report[key]||''))project.report[key]='';
       return project.report;
     }
     const city=project.region.split(' / ').pop();
     const provinces={上海:'上海市',苏州:'江苏省',北京:'北京市',杭州:'浙江省',深圳:'广东省',成都:'四川省',广州:'广东省'};
-    const months=project.time.split('–').map(value=>value.replace('.','-'));
-    return project.report={name:project.name,province:provinces[city]||'',city:city+'市',area:project.area.replace(/,/g,''),start:months[0]||'',end:months[1]||'',team:project.team,count:String(project.count),longTerm:false};
+    const months=project.time.split('–').map(value=>value.replaceAll('.','-'));
+    return project.report={name:project.name,province:provinces[city]||'',city:city+'市',area:project.area.replace(/,/g,''),start:/^\d{4}-\d{2}-\d{2}$/.test(months[0])?months[0]:'',end:/^\d{4}-\d{2}-\d{2}$/.test(months[1])?months[1]:'',team:project.team,count:String(project.count),longTerm:false};
   }
   function captureReport(){
     const report=reportFor(mobileProject);
+    if(!canWriteProject(mobileProject))return report;
     $one('#formView').querySelectorAll('[data-report-field]').forEach(input=>report[input.dataset.reportField]=input.value);
     const teamSelect=$one('#formView [data-report-field="team"]');
     if(teamSelect)report.teamId=teamSelect.selectedOptions[0]?.dataset.teamId||'';
@@ -945,12 +959,13 @@
     const button=event.target.closest('#submitStage');
     if(!button||$one('#phoneTitle').textContent!=='项目报备')return;
     event.preventDefault();event.stopImmediatePropagation();
+    if(!canWriteProject(mobileProject)){toast('项目已锁定，请使用有效期内的编辑入口');return}
     const report=captureReport();
     const missing=Object.keys(reportFields).find(key=>(key!=='team'||report.longTerm===true)&&!report[key].trim());
     if(missing){toast('请填写'+reportFields[missing]);return}
     if(report.longTerm===null){toast('请选择是否长期合作团队');return}
     if(!(Number(report.area)>0)||!Number.isInteger(Number(report.count))||Number(report.count)<1){toast('请填写有效的面积和安装人数');return}
-    if(report.end<report.start){toast('结束月份不能早于开始月份');return}
+    if(report.end<report.start){toast('结束日期不能早于开始日期');return}
     const regionByProvince={上海市:'华东',江苏省:'华东',浙江省:'华东',北京市:'华北',广东省:'华南',四川省:'西南'};
     Object.assign(mobileProject,{name:report.name.trim(),region:(regionByProvince[report.province]||report.province)+' / '+report.city.replace(/市$/,''),area:Number(report.area).toLocaleString('en-US'),time:report.start.replace('-','.')+'–'+report.end.replace('-','.'),team:report.longTerm?report.team:'',count:Number(report.count)});
     if(formMode==='new'&&!findMobileProject(mobileProject.id))mobileProjects.unshift(mobileProject);
@@ -959,7 +974,7 @@
     persistMobileProjects();
     draftItems=draftItems.filter(item=>item.id!==mobileProject.id+'-1');
     try{localStorage.setItem('milliken-drafts-v2',JSON.stringify(draftItems))}catch{}
-    renderMobileHome();renderMobileList();showMobileDetail();toast('项目报备已提交，已进入下一阶段');
+    renderMobileHome();renderMobileList();showMobileDetail();toast(mobileProject.status==='已完工'?'项目报备修改已保存':'项目报备已提交，已进入下一阶段');
   },true);
   let filters={query:'',stage:'',region:'',status:''}, pageNumber=1, pageSize=10;
   document.documentElement.dataset.release='20260924-handover-v3';
@@ -1272,7 +1287,7 @@
     host?.querySelectorAll('[data-agreement]').forEach(link=>{
       const kind=link.dataset.agreement,record=activeMaterial(kind),block=link.closest('.qualificationBlock'),checkbox=block?.querySelector('input[type="checkbox"]');
       link.disabled=!materialsReady||!record;link.setAttribute('aria-disabled',String(link.disabled));
-      if(checkbox){checkbox.disabled=!materialsReady||!record||!attachmentConfirmed[kind];checkbox.checked=Boolean(checkState[kind]);block.querySelector('.qualificationRow')?.classList.toggle('checked',checkbox.checked)}
+      if(checkbox){checkbox.disabled=window.isCurrentProjectWritable?.()===false||!materialsReady||!record||!attachmentConfirmed[kind];checkbox.checked=Boolean(checkState[kind]);block.querySelector('.qualificationRow')?.classList.toggle('checked',checkbox.checked)}
       let caption=block?.querySelector('.currentMaterialName');if(!caption){caption=document.createElement('small');caption.className='currentMaterialName';link.after(caption)}
       caption.textContent=!materialsReady?(materialLoadError?'材料加载失败，请稍后重试':'正在加载材料…'):record?record.title+' · '+record.version:'暂未启用材料，请联系管理员';
       const state=block?.querySelector('.qualificationLabel span small');if(state)state.textContent=checkState[kind]?'已确认，满足施工结束条件':attachmentConfirmed[kind]?'已读完附件，可确认':'先打开当前材料并完成阅读';
@@ -1350,7 +1365,7 @@
   function drawRows() {
     const filtered=data.filter(p=>p.name.toLowerCase().includes(filters.query.toLowerCase())&&(!filters.owner||p.owner===filters.owner)&&(!filters.stage||p.stage===Number(filters.stage))&&(!filters.region||p.region.includes(filters.region))&&(!filters.status||p.status===filters.status)&&(!filters.risk||(filters.risk==='all'?Boolean(p.risk):boardRisk(p)===filters.risk))&&(!filters.planMonth||boardMonth(p,filters.planKind)===filters.planMonth));
     const count=Math.max(1,Math.ceil(filtered.length/pageSize));pageNumber=Math.max(1,Math.min(pageNumber,count));
-    $one('#archiveResults').innerHTML='<div class="archiveTableScroll"><table><thead><tr>'+['项目名称','区域','阶段','项目经理','状态','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+filtered.slice((pageNumber-1)*pageSize,pageNumber*pageSize).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.region)+'</td><td>'+names[p.stage-1]+'</td><td>'+esc(p.owner)+'</td><td><span class="stateTag '+(p.status==='已完工'?'complete':'')+'">'+p.status+'</span></td><td><div class="tableActions"><button class="link" data-detail="'+p.id+'">详情</button><button class="link" data-handover="'+p.id+'">交接</button><button class="link" data-history="'+p.id+'">交接明细</button></div></td></tr>').join('')+'</tbody></table></div>'+(!filtered.length?'<div class="emptyState">没有符合条件的项目</div>':'')+'<div class="final2Pager"><span>共 '+filtered.length+' 条</span><select id="archiveSize" aria-label="每页条数"><option value="10">10 条 / 页</option><option value="3">3 条 / 页</option><option value="20">20 条 / 页</option></select><div><button aria-label="上一页" data-turn="'+(pageNumber-1)+'" '+(pageNumber===1?'disabled':'')+'>‹</button>'+Array.from({length:count},(_,i)=>'<button data-turn="'+(i+1)+'" class="'+(pageNumber===i+1?'active':'')+'" aria-current="'+(pageNumber===i+1?'page':'false')+'">'+(i+1)+'</button>').join('')+'<button aria-label="下一页" data-turn="'+(pageNumber+1)+'" '+(pageNumber===count?'disabled':'')+'>›</button></div></div>';
+    $one('#archiveResults').innerHTML='<div class="archiveTableScroll"><table><thead><tr>'+['项目名称','区域','阶段','项目经理','状态','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+filtered.slice((pageNumber-1)*pageSize,pageNumber*pageSize).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.region)+'</td><td>'+names[p.stage-1]+'</td><td>'+esc(p.owner)+'</td><td><span class="stateTag '+(p.status==='已完工'?'complete':'')+'">'+p.status+'</span></td><td><div class="tableActions"><button class="link" data-detail="'+p.id+'">详情</button><button class="link" data-handover="'+p.id+'">交接</button><button class="link" data-history="'+p.id+'">交接明细</button><button class="link" data-project-pdf="'+p.id+'">下载</button></div></td></tr>').join('')+'</tbody></table></div>'+(!filtered.length?'<div class="emptyState">没有符合条件的项目</div>':'')+'<div class="final2Pager"><span>共 '+filtered.length+' 条</span><select id="archiveSize" aria-label="每页条数"><option value="10">10 条 / 页</option><option value="3">3 条 / 页</option><option value="20">20 条 / 页</option></select><div><button aria-label="上一页" data-turn="'+(pageNumber-1)+'" '+(pageNumber===1?'disabled':'')+'>‹</button>'+Array.from({length:count},(_,i)=>'<button data-turn="'+(i+1)+'" class="'+(pageNumber===i+1?'active':'')+'" aria-current="'+(pageNumber===i+1?'page':'false')+'">'+(i+1)+'</button>').join('')+'<button aria-label="下一页" data-turn="'+(pageNumber+1)+'" '+(pageNumber===count?'disabled':'')+'>›</button></div></div>';
     $one('#archiveSize').value=String(pageSize);
     $one('#archiveSize').onchange=e=>{pageSize=Number(e.target.value);pageNumber=1;drawRows()};
     projectPage.querySelectorAll('[data-turn]').forEach(b=>b.onclick=()=>{pageNumber=Number(b.dataset.turn);drawRows()});
@@ -1413,12 +1428,12 @@
   const boardRegion=p=>p.region.split(' / ')[0];
   const boardRisk=p=>!p.risk?'':p.risk.includes('8℃')||p.risk.includes('低温')?'low':p.risk.includes('照片')?'photo':p.risk.includes('温度')?'temperature':'other';
   const boardRiskNames={low:'低温施工',photo:'照片待补充',temperature:'温度记录待确认',other:'其他关注事项'};
-  const boardMonth=(p,kind)=>p.time.split('–')[kind==='end'?1:0]||'';
+  const boardMonth=(p,kind)=>(p.time.split('–')[kind==='end'?1:0]||'').slice(0,7);
   const boardNumber=value=>value.toLocaleString('zh-CN');
   function boardFilter(next){filters={query:'',stage:'',region:'',status:'',fromBoard:true,...boardScope,...next};pageNumber=1;switchAdmin('projects')}
   function exportBoardProjects(rows){
     const cell=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
-    const csv=[['项目名称','区域','项目经理','阶段','状态','计划开始月份','计划结束月份','报备面积（m²）','计划安装人数','安装团队','关注事项'],...rows.map(p=>[p.name,p.region,p.owner,names[p.stage-1],p.status,boardMonth(p,'start'),boardMonth(p,'end'),boardArea(p),p.count,p.team,p.risk])].map(row=>row.map(cell).join(',')).join('\r\n');
+    const csv=[['项目名称','区域','项目经理','阶段','状态','计划开始日期','计划结束日期','报备面积（m²）','计划安装人数','安装团队','关注事项'],...rows.map(p=>[p.name,p.region,p.owner,names[p.stage-1],p.status,boardMonth(p,'start'),boardMonth(p,'end'),boardArea(p),p.count,p.team,p.risk])].map(row=>row.map(cell).join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'})),link=document.createElement('a');
     link.href=url;link.download='美利肯项目看板-'+new Date().toISOString().slice(0,10)+'.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
@@ -1460,17 +1475,18 @@
       ${Object.entries(boardScope).some(([,value])=>value)?`<div class="qbScopeChips"><span>筛选范围</span>${Object.entries(boardScope).filter(([,value])=>value).map(([key,value])=>`<button type="button" data-board-clear="${key}" aria-label="清除${scopeLabels[key]}筛选：${esc(value)}">${scopeLabels[key]}：${esc(value)} <span aria-hidden="true">×</span></button>`).join('')}</div>`:''}
       <div class="qbMetrics">${metrics.map(([label,value,unit,desc,key,svg])=>`<button class="qbMetric ${key==='risk'?'qbAlert':key==='done'?'qbSuccess':''}" data-board-metric="${key}" ${!total||(key==='active'&&!active)||(key==='done'&&!done)||(key==='risk'&&!risks.length)?'disabled':''}><div class="qbMetricLabel"><span>${label}</span>${svg}</div><div class="qbValue">${value}<small>${unit}</small></div><p>${desc}</p></button>`).join('')}</div>
       ${!total?'<div class="qbEmpty" role="status">当前筛选范围内暂无项目，调整条件或重置筛选后查看。</div>':''}
-      <section class="qbPanel qbAttention">${panelHead('优先关注项目','优先核查低温施工，再补齐照片与温度记录',`<span class="qbHeaderBadge amber">${risks.length} 个需关注</span>`)}<div class="qbTableScroll"><table class="qbRiskTable"><thead><tr><th>项目 / 区域</th><th>当前阶段</th><th>关注事项</th><th>项目经理</th><th>操作</th></tr></thead><tbody>${risks.map(p=>`<tr><td><b>${esc(p.name)}</b><small>${esc(p.region)}</small></td><td>${names[p.stage-1]}</td><td><span class="qbRiskTag ${boardRisk(p)}">${boardRiskNames[boardRisk(p)]}</span><small>${esc(p.risk)}</small></td><td>${esc(p.owner)}</td><td><button class="qbLink" data-board-detail="${esc(p.id)}">查看档案 ›</button></td></tr>`).join('')}</tbody></table>${!risks.length?'<div class="qbPanelEmpty">当前范围暂无已记录的关注事项</div>':''}</div></section>
+      <section class="qbPanel qbAttention">${panelHead('优先关注项目','优先核查低温施工，再补齐照片与温度记录',`<span class="qbHeaderBadge amber">${risks.length} 个需关注</span>`)}<div class="qbTableScroll"><table class="qbRiskTable"><thead><tr><th>项目 / 区域</th><th>当前阶段</th><th>关注事项</th><th>项目经理</th><th>操作</th></tr></thead><tbody>${risks.map(p=>`<tr><td><b>${esc(p.name)}</b><small>${esc(p.region)}</small></td><td>${names[p.stage-1]}</td><td><span class="qbRiskTag ${boardRisk(p)}">${boardRiskNames[boardRisk(p)]}</span><small>${esc(p.risk)}</small></td><td>${esc(p.owner)}</td><td><button class="qbLink" data-board-detail="${esc(p.id)}">查看档案 ›</button><button class="qbLink" data-project-pdf="${esc(p.id)}">下载</button></td></tr>`).join('')}</tbody></table>${!risks.length?'<div class="qbPanelEmpty">当前范围暂无已记录的关注事项</div>':''}</div></section>
       <div class="qbGrid">
         <section class="qbPanel">${panelHead('项目阶段分布','按项目当前所处阶段统计',`<span class="qbHeaderBadge">已完工占比 ${percent(done)}%</span>`)}<div class="qbStageContent"><div class="qbStack" aria-label="项目阶段占比">${stageCounts.map((count,i)=>`<span style="width:${total?count/total*100:0}%;background:${colors[i]}" title="${names[i]} ${count} 个"></span>`).join('')}</div><div class="qbStages">${names.map((name,i)=>`<button data-board-stage="${i+1}" ${stageCounts[i]?'':'disabled'}><span class="qbStageNo" style="background:${colors[i]};color:${i<2?'#254872':'#fff'}">0${i+1}</span><b>${name}</b><strong>${stageCounts[i]}<small>个</small></strong><p>占比 ${percent(stageCounts[i])}%</p></button>`).join('')}</div></div></section>
         <section class="qbPanel">${panelHead('质量关注分布','根据项目已记录的关注事项分类',`<button class="qbLink" data-board-risk="all">查看 ${risks.length} 个项目 ›</button>`)}<div class="qbRiskMix">${riskMix.map(r=>`<button data-board-risk="${r.kind}" ${r.count?'':'disabled'}><span class="qbRiskLabel"><i class="${r.kind}"></i>${r.label}</span><div class="qbMiniTrack"><i style="width:${risks.length?r.count/risks.length*100:0}%"></i></div><b>${r.count}<small> 个</small></b></button>`).join('')}<p class="qbSmallNote">有关注记录不代表验收不合格，需结合项目档案核查。</p></div></section>
-        <section class="qbPanel">${panelHead('项目计划分布','按报备的计划开始与结束月份统计',`<div class="qbLegend"><span><i></i>计划开始</span><span><i></i>计划结束</span></div>`)}<div class="qbChart"><div class="qbChartScale"><span>${maxMonth} 个</span><span>${Math.round(maxMonth/2)}</span><span>0</span></div><div class="qbMonthChart">${monthly.map(m=>`<div class="qbMonth"><div class="qbMonthBars"><button data-board-month="${m.month}" data-board-kind="start" ${m.start?'':'disabled'} aria-label="${m.month}计划开始 ${m.start} 个项目" title="${m.month} 计划开始 ${m.start} 个" style="height:${m.start/maxMonth*100}%"><span>${m.start||''}</span></button><button data-board-month="${m.month}" data-board-kind="end" ${m.end?'':'disabled'} aria-label="${m.month}计划结束 ${m.end} 个项目" title="${m.month} 计划结束 ${m.end} 个" style="height:${m.end/maxMonth*100}%"><span>${m.end||''}</span></button></div><small>${m.month.replace('.','/')}</small></div>`).join('')}</div></div><p class="qbChartFoot">计划结束月份不代表实际完工月份；点击柱形查看对应项目。</p></section>
+        <section class="qbPanel">${panelHead('项目计划分布','按报备的计划开始与结束日期统计',`<div class="qbLegend"><span><i></i>计划开始</span><span><i></i>计划结束</span></div>`)}<div class="qbChart"><div class="qbChartScale"><span>${maxMonth} 个</span><span>${Math.round(maxMonth/2)}</span><span>0</span></div><div class="qbMonthChart">${monthly.map(m=>`<div class="qbMonth"><div class="qbMonthBars"><button data-board-month="${m.month}" data-board-kind="start" ${m.start?'':'disabled'} aria-label="${m.month}计划开始 ${m.start} 个项目" title="${m.month} 计划开始 ${m.start} 个" style="height:${m.start/maxMonth*100}%"><span>${m.start||''}</span></button><button data-board-month="${m.month}" data-board-kind="end" ${m.end?'':'disabled'} aria-label="${m.month}计划结束 ${m.end} 个项目" title="${m.month} 计划结束 ${m.end} 个" style="height:${m.end/maxMonth*100}%"><span>${m.end||''}</span></button></div><small>${m.month.replace('.','/')}</small></div>`).join('')}</div></div><p class="qbChartFoot">计划结束日期不代表实际完工月份；点击柱形查看对应项目。</p></section>
         <section class="qbPanel">${panelHead('区域项目分布','比较项目数量与报备施工面积')}<div class="qbRegionList">${regionRows.map(r=>`<button data-board-region="${esc(r.region)}"><div><b>${esc(r.region)}</b><small>${boardNumber(r.projects.reduce((n,p)=>n+boardArea(p),0))} m²</small></div><div class="qbRegionTrack"><span style="width:${percent(r.projects.length)}%"></span></div><strong>${r.projects.length}<small>个 / ${percent(r.projects.length)}%</small></strong></button>`).join('')||'<p class="qbPanelEmpty">暂无区域数据</p>'}</div></section>
       </div>
 
       <div class="qbGrid qbBottomGrid"><section class="qbPanel">${panelHead('项目经理当前工作量','按进行中项目数、需关注项目数和报备面积排序',`<span class="qbHeaderBadge">${managerRows.length} 位负责人</span>`)}<div class="qbManagerList">${managerRows.map(m=>{const complete=m.projects.filter(p=>p.status==='已完工').length;return `<button data-board-owner="${esc(m.owner)}"><span class="qbAvatar">${esc(m.owner[0])}</span><div><b>${esc(m.owner)}</b><small>进行中 ${m.active} · 已完工 ${complete}</small><small>进行中报备面积 ${boardNumber(m.area)} m²</small></div><span class="qbManagerRisk">${m.attention?m.attention+' 个需关注':'暂无关注记录'}</span><strong>${m.active}<small>个进行中</small></strong></button>`}).join('')||'<div class="qbPanelEmpty">暂无负责人数据</div>'}</div></section>
       <div class="qbSideStack"><section class="qbPanel">${panelHead('团队与材料配置','团队与材料库全局状态，不随项目筛选变化')}<div class="qbOperations"><button class="qbResource" data-board-nav="teams"><span>合作中团队<b>${directory.teams.filter(t=>t.status==='active').length}<small> 支</small></b></span><span>在册师傅<b>${directory.members.length}<small> 位</small></b></span><em>管理 ›</em></button>${Object.entries(MATERIAL_TYPES).map(([kind,label])=>{const record=activeMaterial(kind);return `<button class="qbMaterialStatus" data-board-nav="materials"><div><b>${label}</b><small>${materialsReady?esc(record?record.title+' · '+record.version:'暂无启用材料'):materialLoadError?'材料状态读取失败':'正在读取材料状态…'}</small></div><span class="${record?'ready':'unready'}">${materialsReady?(record?'已配置':'待配置'):materialLoadError?'读取失败':'读取中'}</span></button>`}).join('')}</div></section>
       <section class="qbPanel">${panelHead('最近负责人交接','按交接时间倒序，保留项目责任链')}<div class="qbHandovers">${handovers.map(r=>`<button data-board-history="${esc(r.projectId)}"><span class="qbTimelineDot"></span><div><b>${esc(findProject(r.projectId).name)}</b><p>${esc(r.from)} <span>→</span> ${esc(r.to)}</p><time>${esc(r.time)}</time></div><em>明细 ›</em></button>`).join('')||'<div class="qbPanelEmpty">当前范围暂无交接记录</div>'}</div></section></div></div>
+      <section class="qbPanel qbDownloads">${panelHead('项目下载','下载当前筛选范围内各项目的完整 PDF 档案')}<div class="qbTableScroll"><table class="qbRiskTable"><thead><tr><th>项目 / 区域</th><th>当前阶段</th><th>状态</th><th>项目经理</th><th>操作</th></tr></thead><tbody>${rows.map(p=>`<tr><td><b>${esc(p.name)}</b><small>${esc(p.region)}</small></td><td>${names[p.stage-1]}</td><td>${esc(p.status)}</td><td>${esc(p.owner)}</td><td><button class="qbLink" data-board-detail="${esc(p.id)}">查看档案 ›</button><button class="qbLink" data-project-pdf="${esc(p.id)}">下载</button></td></tr>`).join('')}</tbody></table>${!rows.length?'<div class="qbPanelEmpty">当前筛选暂无项目</div>':''}</div></section>
       <footer class="qbFootnote"><b>统计口径</b><span>项目指标来源于当前演示项目档案；人数为计划人次，面积为报备面积。尚未接入审核耗时、实际工期、胶水用量与验收结果，暂不展示相关绩效指标。</span></footer>`;
     $one('#boardScope').onsubmit=e=>e.preventDefault();
     $one('#boardScope').onchange=e=>{if(e.target.matches('select')){const name=e.target.name;boardScope=Object.fromEntries(new FormData(e.currentTarget));saveBoardScope();renderDashboard();$one('#boardScope [name="'+name+'"]')?.focus({preventScroll:true})}};
@@ -1502,7 +1518,7 @@
   function saveDraftToBox(){
     const stage=Math.max(1,names.indexOf($('#phoneTitle').textContent)+1);
     const project=mobileProject;
-    if(!project)return;
+    if(!project||!canWriteProject(project)){toast('项目已锁定，不能保存修改');return}
     if(stage===1)captureReport();
     draftItems=[{id:project.id+'-'+stage,projectId:project.id,project:project.report?.name||project.name||'未命名项目',stage,stageName:names[stage-1],savedAt:'刚刚',isNew:formMode==='new',report:project.report,projectSnapshot:formMode==='new'?project:undefined},...draftItems.filter(item=>item.id!==project.id+'-'+stage)];
     try{localStorage.setItem('milliken-drafts-v2',JSON.stringify(draftItems))}catch{}
@@ -1524,7 +1540,7 @@
   }
   function renderMobileHome(){
     const projects=mobileProjects;
-    mobileHome.innerHTML='<section class="welcome"><div><h2>上午好，王建国</h2></div><span>王</span></section><div class="homeActions"><button class="create" id="mobileNew"><span>＋</span><div><b>新建项目报备</b><small>安装前建立项目档案</small></div><em>›</em></button><button class="draftShortcut" id="mobileDraftShortcut"><span>▤</span><div><b>草稿箱</b><small>0 条待继续</small></div><em>›</em></button></div><div class="pkpis">'+[['进行中',projects.filter(p=>p.status==='进行中').length],['已完工',projects.filter(p=>p.status==='已完工').length],['全部',projects.length]].map(([label,count])=>'<button data-mobile-filter="'+label+'"><b>'+count+'</b><span>'+label+'</span></button>').join('')+'</div><section class="section"><header><h3>待办任务</h3></header><div class="todoEmpty">暂无待补充任务</div></section><section class="section"><header><h3>最近项目</h3><button id="mobileAll">全部项目</button></header>'+projects.map(card).join('')+'<div class="mobileProjectEmpty"'+(projects.length?' style="display:none"':'')+'>暂无项目，点击“新建项目报备”开始</div></section>';
+    mobileHome.innerHTML='<section class="welcome"><div><h2>上午好，王建国</h2></div></section><div class="homeActions"><button class="create" id="mobileNew"><span>＋</span><div><b>新建项目报备</b><small>安装前建立项目档案</small></div><em>›</em></button><button class="draftShortcut" id="mobileDraftShortcut"><span>▤</span><div><b>草稿箱</b><small>0 条待继续</small></div><em>›</em></button></div><div class="pkpis">'+[['进行中',projects.filter(p=>p.status==='进行中').length],['已完工',projects.filter(p=>p.status==='已完工').length],['全部',projects.length]].map(([label,count])=>'<button data-mobile-filter="'+label+'"><b>'+count+'</b><span>'+label+'</span></button>').join('')+'</div><section class="section"><header><h3>待办任务</h3></header><div class="todoEmpty">暂无待补充任务</div></section><section class="section"><header><h3>最近项目</h3><button id="mobileAll">全部项目</button></header>'+projects.map(card).join('')+'<div class="mobileProjectEmpty"'+(projects.length?' style="display:none"':'')+'>暂无项目，点击“新建项目报备”开始</div></section>';
     ensureDraftBox();
     $one('#mobileNew').onclick=startNewReport;
     $one('#mobileAll').onclick=()=>{mobileFilter='全部';renderMobileList();view('projects')};
@@ -1559,12 +1575,12 @@
     const p=mobileProject;
     mobileDetail.innerHTML='<section class="projectHero"><span>'+p.status+'</span><h2>'+esc(p.name)+'</h2><small>'+esc(p.region)+'</small><dl><div><dt>报备面积</dt><dd>'+p.area+' m²</dd></div><div><dt>计划周期</dt><dd>'+p.time+'</dd></div><div><dt>安装人数</dt><dd>'+p.count+' 人</dd></div></dl></section><section class="stageList"><h3>安装阶段时间轴</h3>'+names.map((name,i)=>'<button type="button" class="stageRow '+(i+1===p.stage?'current':'')+'" data-record-stage="'+(i+1)+'" '+(i+1>p.stage?'disabled':'')+'><span class="stageNo">'+String(i+1).padStart(2,'0')+'</span><div><b>'+name+'</b></div><span class="recordState">'+stageState(p,i+1)+'</span><em>›</em></button>').join('')+'</section>';
     mobileDetail.onclick=event=>{const button=event.target.closest('[data-record-stage]');if(!button||button.disabled)return;const next=Number(button.dataset.recordStage);if(next<=p.stage){formMode='existing';bindForm(next)}};
-    view('detail');
+    renderProjectEditEntry(p);view('detail');
   }
   const stageLabel=control=>control.closest('.fieldItem')?.querySelector('b')?.textContent.replace(/\*/g,'').trim()||'';
   const stageStateFor=(project,stage)=>{project.stageData ||= {};project.stageData[stage] ||= {fields:{},options:{},uploads:[],updatedAt:''};return project.stageData[stage]};
   function captureStageState(stage,host){
-    if(!mobileProject||!host)return;
+    if(!mobileProject||!host||!canWriteProject(mobileProject))return;
     if(stage===1)captureReport();
     const state=stageStateFor(mobileProject,stage),fields={},options={};
     host.querySelectorAll('input,select,textarea').forEach(control=>{
@@ -1588,7 +1604,7 @@
     if(!state)return;
     host.querySelectorAll('input,select,textarea').forEach(control=>{
       if(control.type==='file'||control.type==='checkbox')return;
-      if(stage===1&&control.dataset.reportField==='team')return;
+      if(stage===1&&control.dataset.reportField)return;
       const key=stageLabel(control);
       if(key&&Object.prototype.hasOwnProperty.call(state.fields||{},key)){
         control.value=state.fields[key];
@@ -1602,7 +1618,7 @@
       [...group.querySelectorAll('button')].forEach((button,index)=>{button.classList.toggle('active',index===selected);button.setAttribute('aria-pressed',String(index===selected))});
     });
     const restoreFields=()=>host.querySelectorAll('input:not([type="file"]):not(.qualificationLabel input),select,textarea').forEach(control=>{
-      if(stage===1&&control.dataset.reportField==='team')return;
+      if(stage===1&&control.dataset.reportField)return;
       const key=stageLabel(control);if(key&&Object.prototype.hasOwnProperty.call(state.fields||{},key))control.value=state.fields[key];
     });
     restoreFields();
@@ -1618,11 +1634,15 @@
       button.classList.add('done');
       const icon=button.querySelector(':scope > span');if(icon)icon.textContent='✓';
       const detail=button.querySelector('small');if(detail)detail.textContent='已保存照片 · '+saved.name;
-      if(saved.data){const preview=button.querySelector('.uploadPreview');if(preview)preview.innerHTML='<img src="'+saved.data+'" alt="已保存上传图片"><span>'+esc(saved.name)+'</span>';}
+      if(saved.data){const preview=button.querySelector('.uploadPreview');if(preview){preview.innerHTML=(saved.photos||[saved]).map(photo=>'<img src="'+photo.data+'" alt="'+esc(photo.name)+'">').join('')+'<span>'+esc(saved.name)+'</span>';preview.querySelectorAll('img').forEach(img=>img.onclick=event=>{event.preventDefault();event.stopPropagation();openPhotoPreview(img.src,img.alt)})}}
     });
   }
   function captureUploads(stage,host){
-    const state=stageStateFor(mobileProject,stage);state.uploads=[...host.querySelectorAll('.upload')].map(button=>{const input=button.querySelector('input[type="file"]'),file=input?.files?.[0],img=button.querySelector('.uploadPreview img');return {name:file?.name||button.querySelector('.uploadPreview span')?.textContent||'',data:img?.src?.startsWith('data:')?img.src:''}});persistMobileProjects();
+    const state=stageStateFor(mobileProject,stage);
+    host.querySelectorAll('.upload').forEach((button,index)=>{
+      const saved=state.uploads[index],img=button.querySelector('.uploadPreview img');
+      if(!saved&&img?.src?.startsWith('data:'))state.uploads[index]={name:button.querySelector('small')?.textContent||'现场照片',data:img.src};
+    });persistMobileProjects();
   }
   function loadStageConsent(){
     let consent=mobileProject?.stageData?.[3]?.consent;
@@ -1637,10 +1657,168 @@
       attachmentConfirmed[kind]=Boolean(current&&consent[kind+'Confirmed']);
     }
   }
-  window.persistStageConsent=()=>{const state=stageStateFor(mobileProject,3);state.consent={training:!!checkState.training,manual:!!checkState.manual,trainingConfirmed:!!attachmentConfirmed.training,manualConfirmed:!!attachmentConfirmed.manual,materialRefs:Object.fromEntries(Object.keys(MATERIAL_TYPES).map(kind=>[kind,materialRef(activeMaterial(kind))]))};state.updatedAt=new Date().toISOString();persistMobileProjects();window.updateMaterialConsentUI?.($one('#formView'))};
+  window.persistStageConsent=()=>{if(!canWriteProject(mobileProject))return;const state=stageStateFor(mobileProject,3);state.consent={both:!!state.consent?.both&&!!checkState.training&&!!checkState.manual,training:!!checkState.training,manual:!!checkState.manual,trainingConfirmed:!!attachmentConfirmed.training,manualConfirmed:!!attachmentConfirmed.manual,materialRefs:Object.fromEntries(Object.keys(MATERIAL_TYPES).map(kind=>[kind,materialRef(activeMaterial(kind))]))};state.updatedAt=new Date().toISOString();persistMobileProjects();window.updateMaterialConsentUI?.($one('#formView'))};
+  const EDIT_WINDOW_MS=7*24*60*60*1000;
+  let editingProjectId='';
+  const editDeadline=p=>{const stamp=Date.parse(p.completedAt||'');return Number.isFinite(stamp)?stamp+EDIT_WINDOW_MS:0};
+  const canWriteProject=p=>p.status!=='已完工'||(editingProjectId===p.id&&Date.now()<editDeadline(p));
+  window.isCurrentProjectWritable=()=>canWriteProject(mobileProject);
+  function renderProjectEditEntry(p){
+    editingProjectId='';
+    if(p.status!=='已完工')return;
+    const deadline=editDeadline(p),allowed=Date.now()<deadline;
+    const entry=document.createElement('section');entry.className='projectEditEntry';
+    entry.innerHTML='<button type="button" id="editCompletedProject" '+(allowed?'':'disabled')+'>编辑项目</button><p>'+(allowed?'可修改至 '+new Date(deadline).toLocaleString('zh-CN',{hour12:false})+'，再次提交不会延长修改期限。':deadline?'已超过7日修改期限，项目已锁定。':'历史项目无首次提交时间，项目已锁定。')+'</p>';
+    mobileDetail.prepend(entry);
+    entry.querySelector('button').onclick=()=>{if(Date.now()>=editDeadline(p)){showMobileDetail();return}editingProjectId=p.id;bindForm(1)};
+  }
+  const fieldIn=(host,label)=>[...host.querySelectorAll('.fieldItem')].find(el=>el.querySelector('b')?.textContent.replace(/\*/g,'').trim()===label);
+  function prepareStageFields(stage,host){
+    if(stage===1)return;
+    const saved=mobileProject.stageData?.[stage];
+    host.querySelectorAll('.fieldItem').forEach(field=>{
+      const control=field.querySelector('input:not([type="checkbox"]),select,textarea');if(!control)return;
+      const label=stageLabel(control);
+      if(control.tagName==='SELECT'&&!control.querySelector('option[value=""]'))control.prepend(new Option('请选择',''));
+      if(!Object.hasOwn(saved?.fields||{},label))control.value='';
+    });
+    host.querySelectorAll('.segment,.temp').forEach(group=>{
+      const key=stageLabel(group.querySelector('button'))||group.closest('.formCard')?.querySelector('h3')?.textContent.trim();
+      if(!Object.hasOwn(saved?.options||{},key))group.querySelectorAll('button').forEach(button=>button.classList.remove('active'));
+    });
+    host.querySelectorAll('.upload').forEach((label,index)=>{
+      if(!saved?.uploads?.[index]?.name){label.classList.remove('done');const icon=label.querySelector(':scope > span');if(icon)icon.textContent='＋'}
+    });
+  }
+  function bindTemperatureRule(stage,host){
+    if(stage!==3)return;
+    const buttons=[...host.querySelectorAll('.temp button')],normal=buttons[0],abnormal=buttons[1];if(!normal||!abnormal)return;
+    const raw=mobileProject.stageData?.[2]?.fields?.['室内温度'],known=raw!==''&&raw!=null&&Number.isFinite(Number(raw));
+    const outside=known&&(Number(raw)<15||Number(raw)>32);
+    const sync=()=>{const active=abnormal.classList.contains('active');const reasons=host.querySelector('.reasons');if(reasons)reasons.style.display=active?'block':'none'};
+    normal.disabled=outside;normal.title=outside?'施工前检查室内温度为'+raw+'℃，只能选择异常温度':'';
+    if(known)abnormal.querySelector('strong').textContent=raw+'℃';
+    if(outside){normal.classList.remove('active');abnormal.classList.add('active');if(canWriteProject(mobileProject))stageStateFor(mobileProject,3).options['安装环境温度']=1}
+    buttons.forEach((button,index)=>button.onclick=()=>{if(!canWriteProject(mobileProject)||button.disabled)return;buttons.forEach((item,i)=>item.classList.toggle('active',i===index));sync();captureStageState(3,host)});
+    const note=document.createElement('small');note.className='temperatureLinkNote';note.textContent=known?'施工前检查室内温度：'+raw+'℃'+(outside?'，仅可选择低于15或大于32度。':'。'):'请先填写施工前检查的室内温度。';host.querySelector('.temp').after(note);sync();
+  }
+  function bindAreaVariance(stage,host){
+    if(stage!==4)return;
+    const input=host.querySelector('#finishArea'),warning=host.querySelector('#areaWarn');if(!input||!warning)return;
+    const reported=Number(reportFor(mobileProject).area),checkbox=warning.querySelector('input');
+    const hint=host.querySelector('.fieldHint');if(hint)hint.textContent='报备 '+(reported||'未填写')+' m²';
+    const update=()=>{const actual=Number(input.value),deviation=reported>0?Math.abs(actual-reported)/reported:0;warning.style.display=actual>0&&deviation>.1?'block':'none';
+      if(warning.firstChild?.nodeType===Node.TEXT_NODE)warning.firstChild.textContent='面积偏差 '+(deviation*100).toFixed(1)+'%，超过10%。';};
+    input.addEventListener('input',()=>{checkbox.checked=false;update();captureStageState(stage,host)});update();
+  }
+  function bindRealPhotoState(stage,host){
+    host.querySelectorAll('.upload').forEach((label,index)=>{
+      const input=label.querySelector('input[type="file"]');if(!input)return;
+      input.onchange=async()=>{
+        if(!canWriteProject(mobileProject))return;
+        const project=mobileProject,files=[...input.files];if(!files.length)return;
+        if(files.some(file=>!file.type.startsWith('image/'))){toast('请选择图片文件');return}
+        label.dataset.loading='1';
+        try{
+          const photos=await Promise.all(files.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(new Error('照片读取失败'));reader.onload=()=>resolve({name:file.name,data:String(reader.result),uploadedAt:new Date().toISOString(),uploadedBy:project.owner});reader.readAsDataURL(file)})));
+          if(!canWriteProject(project)){toast('项目已超过7日修改期限');return}
+          stageStateFor(project,stage).uploads[index]={...photos[0],photos};
+          persistMobileProjects();if(project===mobileProject){restoreUploadState(stage,host);toast('照片已保存')}
+        }catch{toast('照片保存失败，请重试')}finally{delete label.dataset.loading}
+      };
+    });
+  }
+  function projectIssues(p){
+    const issues=[],report=reportFor(p),states=p.stageData||{};
+    const add=(stage,label,target,kind='field')=>issues.push({stage,label,target,kind});
+    const nonempty=value=>value!=null&&String(value).trim()!=='';
+    const numeric=value=>nonempty(value)&&Number.isFinite(Number(value));
+    const validDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value||'')&&Number.isFinite(Date.parse(value+'T00:00:00Z'))&&new Date(value+'T00:00:00Z').toISOString().slice(0,10)===value;
+    for(const [key,label] of Object.entries(reportFields)){
+      if(key==='team'&&!report.longTerm)continue;
+      if(!nonempty(report[key]))add(1,'请填写'+label,label);
+    }
+    if(report.longTerm!==true&&report.longTerm!==false)add(1,'请选择是否长期合作团队','是否长期合作团队');
+    if(nonempty(report.area)&&!(Number(report.area)>0))add(1,'项目面积须大于0','项目面积');
+    if(nonempty(report.count)&&!(Number.isInteger(Number(report.count))&&Number(report.count)>0))add(1,'计划安装人数须为正整数','本项目计划安装人数');
+    for(const key of ['start','end'])if(nonempty(report[key])&&!validDate(report[key]))add(1,'请填写有效的'+reportFields[key],reportFields[key]);
+    if(report.start&&report.end&&report.end<report.start)add(1,'结束日期不能早于开始日期','结束日期');
+    const fields2=states[2]?.fields||{},fields4=states[4]?.fields||{},options=states[3]?.options||{};
+    if(!numeric(fields2['室内温度']))add(2,'请填写有效的室内温度','室内温度');
+    if(!nonempty(fields2['地面平整度情况']))add(2,'请选择地面平整度情况','地面平整度情况');
+    if(fields2['地面平整度情况']==='其他'&&!nonempty(fields2['其他情况说明']))add(2,'请填写其他地面情况说明','其他情况说明');
+    const photoCheck=(stage,index,title)=>{const saved=states[stage]?.uploads?.[index];if(!saved?.data&&!saved?.photos?.some(photo=>photo.data))add(stage,'请上传'+title,title,'photo')};
+    photoCheck(2,0,'地面状态照片');
+    const consent=states[3]?.consent||{};
+    const learned=Object.keys(MATERIAL_TYPES).filter(kind=>consent[kind]&&consent[kind+'Confirmed']&&materialsReady&&activeMaterial(kind)&&consent.materialRefs?.[kind]===materialRef(activeMaterial(kind)));
+    if(!learned.length)add(3,'请学习并确认安装培训材料或安装手册','安装人员培训与手册确认','section');
+    if(consent.training&&consent.manual&&!consent.both)add(3,'两项均已学习，请勾选第三个选项','combinedLearning','id');
+    const raw=fields2['室内温度'],outside=numeric(raw)&&(Number(raw)<15||Number(raw)>32),choice=options['安装环境温度'];
+    if(choice!==0&&choice!==1)add(3,'请选择安装环境温度','安装环境温度','section');
+    else if(outside&&choice!==1)add(3,'室内温度为'+raw+'℃，须选择低于15或大于32度','安装环境温度','section');
+    if((choice===1||outside)&&!Object.entries(states[3]?.checkboxes||{}).some(([key,value])=>value&&!['combinedLearning','已核对，确认按当前面积提交'].includes(key)))add(3,'请补充异常温度施工的现场原因','异常温度施工原因','section');
+    photoCheck(3,0,'中心定位及辅助线照片');
+    for(const label of ['是否使用美利肯胶水','是否加水或其他物质稀释'])if(![0,1].includes(options[label]))add(3,'请选择'+label,label);
+    if(!validDate(fields4['安装完成日期']))add(4,'请填写有效的安装完成日期','安装完成日期');
+    if(!numeric(fields4['完工时室内温度']))add(4,'请填写有效的完工时室内温度','完工时室内温度');
+    if(!(Number(fields4['实际完成面积'])>0))add(4,'请填写大于0的实际完成面积','实际完成面积');
+    if(!numeric(fields4['数量'])||Number(fields4['数量'])<0)add(4,'请填写有效的胶水实际用量（kg）','数量');
+    const deviation=Number(report.area)>0?Math.abs(Number(fields4['实际完成面积'])-Number(report.area))/Number(report.area):0;
+    if(deviation>.1&&!states[4]?.checkboxes?.['已核对，确认按当前面积提交'])add(4,'面积偏差超过10%，请核对并勾选确认','areaWarn','id');
+    photoCheck(4,0,'安装完成照片');
+    return issues;
+  }
+  function jumpToIssue(issue){
+    bindForm(issue.stage);const host=$one('#formView');
+    const target=issue.kind==='id'?host.querySelector('#'+issue.target):issue.kind==='photo'?[...host.querySelectorAll('.upload')].find(el=>el.textContent.includes(issue.target)):issue.kind==='section'?[...host.querySelectorAll('.formCard,.reasons')].find(el=>el.querySelector('h3,b')?.textContent.includes(issue.target)):fieldIn(host,issue.target);
+    if(target){target.scrollIntoView({block:'center',behavior:'smooth'});target.classList.add('checklistTarget');setTimeout(()=>target.classList.remove('checklistTarget'),3000);const control=target.matches('input')?target:target.querySelector('input:not([type="file"]),select,textarea');control?.focus({preventScroll:true})}
+  }
+  function openCompletionChecklist(){
+    if($one('#formView [data-loading]')){toast('照片正在保存，请稍后重试');return}
+    const p=mobileProject,issues=projectIssues(p),dialog=document.createElement('dialog');dialog.className='completionDialog';dialog.id='completionChecklist';dialog.setAttribute('aria-labelledby','completionChecklistTitle');
+    dialog.innerHTML='<header><h2 id="completionChecklistTitle">完工提交检查清单</h2><p>'+(issues.length?'发现 '+issues.length+' 项待补全信息，点击对应项前往填写。':'四个阶段信息已完整，请核对后确认提交。')+'</p></header><div class="completionBody">'+names.map((name,i)=>{const list=issues.filter(issue=>issue.stage===i+1);return '<section><h3>'+String(i+1).padStart(2,'0')+' '+name+'<span style="color:'+(list.length?'#ae772f':'#267863')+'">'+(list.length?list.length+' 项待补全':'✓ 已完整')+'</span></h3>'+list.map(issue=>'<button type="button" data-issue="'+issues.indexOf(issue)+'">'+esc(issue.label)+'<span>去补全 ›</span></button>').join('')+'</section>'}).join('')+'</div><footer><button data-cancel>返回检查</button><button class="solid" data-confirm '+(issues.length?'disabled':'')+'>确认提交</button></footer>';
+    document.body.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove());dialog.querySelector('[data-cancel]').onclick=()=>dialog.close();
+    dialog.querySelectorAll('[data-issue]').forEach(button=>button.onclick=()=>{const issue=issues[Number(button.dataset.issue)];dialog.close();jumpToIssue(issue)});
+    dialog.querySelector('[data-confirm]').onclick=()=>{
+      if(projectIssues(p).length||!canWriteProject(p)){dialog.close();toast('项目信息或修改期限已变化，请重新检查');return}
+      dialog.querySelector('header').innerHTML='<h2>确认提交完工</h2>';
+      dialog.querySelector('.completionBody').innerHTML='<p class="completionWarning">请检查申报信息是否正确，提交后仅有7日缓冲时间，超过7日将不给予修改。</p>'+(p.completedAt?'<p>本次修改沿用首次提交时间，修改期限不会延长。</p>':'');
+      const confirm=dialog.querySelector('[data-confirm]');confirm.textContent='确认无误，提交完工';
+      confirm.onclick=()=>{
+        if(!canWriteProject(p)||projectIssues(p).length){dialog.close();toast('请重新检查项目信息或修改期限');return}
+        const report=reportFor(p);p.name=report.name.trim();p.time=report.start.replaceAll('-','.')+'–'+report.end.replaceAll('-','.');p.area=Number(report.area).toLocaleString('en-US');p.count=Number(report.count);p.team=report.longTerm?report.team:'';
+        p.completedAt ||= new Date().toISOString();p.lastSubmittedAt=new Date().toISOString();p.status='已完工';p.stage=4;
+        persistMobileProjects();draftItems=draftItems.filter(item=>item.projectId!==p.id);try{localStorage.setItem('milliken-drafts-v2',JSON.stringify(draftItems))}catch{}
+        dialog.close();editingProjectId='';renderMobileHome();renderMobileList();showMobileDetail();toast('项目已提交完工，7日内可编辑');
+      };
+    };
+  }
+  function projectPdfPayload(p){
+    const stages=names.map((name,i)=>({name,rows:[],photos:[]})),report=reportFor(p);
+    stages[0].rows=Object.entries(reportFields).filter(([key])=>key!=='team'||report.longTerm).map(([key,label])=>[label,report[key]||'未填写']);stages[0].rows.push(['是否长期合作团队',report.longTerm?'是':'否']);
+    for(let i=2;i<=4;i++){
+      const state=p.stageData?.[i],section=stages[i-1];
+      if(!state){section.rows.push(['阶段记录','暂无已保存的现场记录']);continue}
+      section.rows.push(...Object.entries(state.fields||{}).map(([label,value])=>[i===4&&label==='数量'?'胶水实际用量（kg）':label.includes('温度')?label+'（℃）':label.includes('面积')?label+'（m²）':label,value||'未填写']));
+      section.rows.push(...Object.entries(state.options||{}).map(([label,index])=>[label,label==='安装环境温度'?['15–32℃','低于15或大于32度'][index]||'未选择':['是','否'][index]||'未选择']));
+      section.rows.push(...Object.entries(state.checkboxes||{}).filter(([key,value])=>value&&key!=='combinedLearning').map(([key])=>[key,'已确认']));
+      if(state.consent)section.rows.push(['已学习安装培训材料',state.consent.training?'是':'否'],['已学习安装手册',state.consent.manual?'是':'否'],['已学习两份材料（第三项）',state.consent.both?'是':'否']);
+      if(state.materialReadHistory)section.rows.push(...state.materialReadHistory.map(record=>['材料阅读记录',record.title+' · '+record.version+' · '+new Date(record.confirmedAt).toLocaleString('zh-CN',{hour12:false})]));
+      (state.uploads||[]).forEach(upload=>{if(upload)section.photos.push(...(upload.photos||[upload]))});
+    }
+    return {name:p.name,id:p.id,owner:p.owner,region:p.region,status:p.status,time:p.time,completedAt:p.completedAt,stages,history:histories.filter(record=>record.projectId===p.id)};
+  }
+  document.addEventListener('click',async event=>{
+    const button=event.target.closest('[data-project-pdf]');if(!button)return;
+    const p=findMobileProject(button.dataset.projectPdf)||findProject(button.dataset.projectPdf);if(!p)return;
+    button.disabled=true;const label=button.textContent;button.textContent='生成中…';
+    try{await window.MillikenProjectPdf.download(projectPdfPayload(p));toast('项目PDF已下载')}catch(error){console.error(error);toast('PDF生成失败，请重试')}finally{button.disabled=false;button.textContent=label}
+  });
+
   const fieldForm=bindForm;
   bindForm=function(stage){
     window.currentMobileProject=mobileProject;
+    const writable=canWriteProject(mobileProject);
     if(stage>mobileProject.stage){toast('该阶段尚未开始');return}
     loadStageConsent();
     if(stage===1)longTermState=reportFor(mobileProject).longTerm;
@@ -1688,35 +1866,39 @@
       });
       syncValue();
     });
-    host.querySelectorAll('.upload').forEach(button=>{
-      if(button.dataset.previewBound)return;
-      button.dataset.previewBound='1';
-      const input=document.createElement('input');input.type='file';input.accept='image/*';input.multiple=true;input.className='demoFileInput';input.setAttribute('aria-hidden','true');input.tabIndex=-1;
-      const preview=document.createElement('div');preview.className='uploadPreview';button.append(input,preview);
-      input.onchange=()=>{const file=input.files&&input.files[0];if(!file)return;const url=URL.createObjectURL(file);preview.innerHTML='<img src="'+url+'" alt="上传图片预览"><span>'+esc(file.name)+'</span>';preview.querySelector('img').onclick=event=>{event.preventDefault();event.stopPropagation();openPhotoPreview(url,file.name)};button.classList.add('done');const icon=button.querySelector(':scope > span');if(icon)icon.textContent='✓';const detail=button.querySelector('small');if(detail)detail.textContent='已显示上传图片 · '+esc(file.name);const uploadIndex=[...host.querySelectorAll('.upload')].indexOf(button);const reader=new FileReader();reader.onload=()=>{const state=stageStateFor(mobileProject,stage);state.uploads=state.uploads||[];state.uploads[uploadIndex]={name:file.name,data:String(reader.result||'')};persistMobileProjects()};reader.readAsDataURL(file)};
-      button.onclick=e=>{if(e.target===input)return;e.preventDefault();input.click()};
-    });
     host.querySelectorAll('.segment').forEach(group=>{
       const buttons=[...group.querySelectorAll('button')];
       buttons.forEach((b,i)=>{b.textContent=i===0?'是':'否';const previous=b.onclick;b.onclick=e=>{if(previous)previous.call(b,e);buttons.forEach((x,j)=>{x.classList.toggle('active',j===i);x.setAttribute('aria-pressed',String(j===i))})}});
     });
+    prepareStageFields(stage,host);
     restoreStageState(stage,host);restoreUploadState(stage,host);
+    bindTemperatureRule(stage,host);bindRealPhotoState(stage,host);bindAreaVariance(stage,host);
     host.querySelectorAll('input:not([type="file"]),select,textarea').forEach(control=>{control.addEventListener('input',()=>captureStageState(stage,host));control.addEventListener('change',()=>captureStageState(stage,host))});
     host.querySelectorAll('.segment,.temp').forEach(group=>group.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>setTimeout(()=>captureStageState(stage,host),0))));
     const submit=$one('#submitStage'),previousSubmit=submit?.onclick;
     if(submit)submit.onclick=()=>{
+      if(!canWriteProject(p)){toast('项目已超过7日修改期限');return}
       captureStageState(stage,host);captureUploads(stage,host);window.persistStageConsent?.();
+      if(stage===4){openCompletionChecklist();return}
+      if(p.status==='已完工'){persistMobileProjects();showMobileDetail();toast('修改已保存，首次提交时间不变');return}
+      const missing=projectIssues(p).filter(issue=>issue.stage===stage);
+      if(missing.length){toast(missing[0].label);jumpToIssue(missing[0]);return}
       previousSubmit?.();
       if($one('[data-view="detail"]').classList.contains('active')){
-        if(stage===p.stage){if(stage===4)p.status='已完工';else p.stage++}
-        persistMobileProjects();
-        renderMobileHome();showMobileDetail();
+        if(stage===p.stage&&stage<4)p.stage++;
+        persistMobileProjects();renderMobileHome();showMobileDetail();
       }
     };
+    if(!writable){
+      host.querySelectorAll('input,select,textarea,.segment button,.temp button,.qualificationLink,.stage3-context-action').forEach(control=>control.disabled=true);
+      host.querySelectorAll('.upload').forEach(label=>label.style.pointerEvents='none');
+      host.querySelectorAll('.formActions').forEach(el=>el.remove());
+      const notice=document.createElement('p');notice.className='projectLockNotice';notice.textContent=editDeadline(p)>Date.now()?'项目已完工，请返回项目详情点击“编辑项目”后修改。':'已超过7日修改期限，项目仅可查看。';host.append(notice);
+    }
     $one('#back').onclick=()=>{captureStageState(stage,host);captureUploads(stage,host);if(formMode==='new'){renderMobileHome();view('home')}else showMobileDetail()};
   };
   const priorView=view;
-  view=function(name){if(name!=='attachment')cleanupMaterialReader();priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').textContent='安装质量';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
+  view=function(name){if(name!=='attachment')cleanupMaterialReader();priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').innerHTML='<img class="millikenWordmark" src="assets/milliken-logo.png" alt="美利肯 Milliken">';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
   document.querySelectorAll('.steps [data-stage]').forEach(b=>b.onclick=()=>{const target=mobileProjects.find(p=>p.stage===Number(b.dataset.stage));if(target){mobileProject=target;formMode='existing';bindForm(Number(b.dataset.stage))}else toast('暂无该阶段项目，请先新建项目报备')});
     renderContacts();renderLauncher();renderDrafts();renderMobileHome();renderMobileList();bindForm(Math.min(3,mobileProject.stage||1));switchAdmin('projects');view('contacts');
     if(window.location.hash==='#quality-dashboard'){$one('.switch [data-mode="admin"]').click();switchAdmin('dashboard')}
