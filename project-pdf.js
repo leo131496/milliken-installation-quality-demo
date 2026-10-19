@@ -19,7 +19,12 @@
     const start=length;append(bytes('xref\n0 '+offsets.length+'\n0000000000 65535 f \n'+offsets.slice(1).map(offset=>String(offset).padStart(10,'0')+' 00000 n \n').join('')+'trailer\n<< /Size '+offsets.length+' /Root 1 0 R >>\nstartxref\n'+start+'\n%%EOF'));
     return new Blob(parts,{type:'application/pdf'});
   }
-  const loadImage=src=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src});
+  const loadImage=src=>new Promise((resolve,reject)=>{
+    const img=new Image(),timer=setTimeout(()=>finish(new Error('图片读取超时')),15000);
+    const finish=error=>{clearTimeout(timer);img.onload=img.onerror=null;error?reject(error):resolve(img)};
+    img.onload=()=>finish(img.naturalWidth&&img.naturalHeight?null:new Error('无效图片'));
+    img.onerror=()=>finish(new Error('图片读取失败'));img.src=src;
+  });
   async function create(payload){
     await document.fonts.ready;
     const pages=[];let canvas,context,y;
@@ -44,9 +49,10 @@
         if(!photo.data){row('照片',photo.name+'（图片内容未保存）');continue}
         try{
           const image=await loadImage(photo.data),width=WIDTH-2*MARGIN,height=Math.min(570,width*image.height/image.width),drawWidth=height*image.width/image.height;
-          room(height+125);text(photo.name||'现场照片',{size:23,bold:true,after:4});context.drawImage(image,MARGIN+(width-drawWidth)/2,y,drawWidth,height);y+=height+35;
+          const heading=(photo.label?photo.label+' · ':'')+(photo.name||'现场照片');
+          room(height+155+wrap(heading,width,23).length*37);text(heading,{size:23,bold:true,after:4});context.drawImage(image,MARGIN+(width-drawWidth)/2,y,drawWidth,height);y+=height+35;
           if(photo.uploadedBy||photo.uploadedAt)text('上传人：'+(photo.uploadedBy||'未记录')+'  上传时间：'+(photo.uploadedAt?new Date(photo.uploadedAt).toLocaleString('zh-CN',{hour12:false}):'未记录'),{size:19,color:'#7b8c99'});
-        }catch{row('照片',photo.name+'（图片读取失败）')}
+        }catch{throw new Error('无法导出照片：'+(photo.name||'现场照片')+'，请重新选择该照片后重试')}
       }
     }
     if(payload.history?.length){room(110);text('负责人交接记录',{size:31,bold:true});for(const item of payload.history)row(item.time,item.from+' → '+item.to+'  '+(item.note||''))}
