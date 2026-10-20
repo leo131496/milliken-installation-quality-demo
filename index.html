@@ -882,8 +882,8 @@
   @media(max-width:1300px){.qualityBoard .qbStages b{font-size:13px}.qualityBoard .qbMetricLabel{font-size:14px}.qualityBoard .qbManagerRisk{font-size:11px}}
   @media(max-width:600px){.qualityBoard .qbMetricLabel{font-size:12px}.qualityBoard .qbMetric p{font-size:12px;line-height:1.6}.qualityBoard .qbPanel h2{font-size:17px}.qualityBoard .qbPanel header p{font-size:12px}.qualityBoard .qbStages b{font-size:12px}.qualityBoard .qbStages p{font-size:11px}.qualityBoard .qbMonth>small{font-size:9px}.qualityBoard .qbRiskTable{display:block;min-width:0}.qualityBoard .qbRiskTable thead{display:none}.qualityBoard .qbRiskTable tbody{display:grid;padding:0 16px 16px;gap:12px}.qualityBoard .qbRiskTable tr{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e4ebf2;border-radius:7px;padding:12px;gap:8px}.qualityBoard .qbRiskTable td{display:block;border:0;padding:0;font-size:12px}.qualityBoard .qbRiskTable td:first-child{grid-column:1/-1}.qualityBoard .qbRiskTable td:nth-child(2){grid-row:2;grid-column:1}.qualityBoard .qbRiskTable td:nth-child(2)::before{content:"阶段 · ";color:#6c8093}.qualityBoard .qbRiskTable td:nth-child(3){grid-row:3;grid-column:1/-1}.qualityBoard .qbRiskTable td:nth-child(4){grid-row:2;grid-column:2}.qualityBoard .qbRiskTable td:nth-child(4)::before{content:"负责人 · ";color:#6c8093}.qualityBoard .qbRiskTable td:last-child{grid-row:4;grid-column:1/-1;text-align:right;border-top:1px solid #edf1f6;padding-top:9px;margin-top:3px}.qualityBoard .qbRiskTable .qbLink{font-size:13px;padding:6px 0}.qualityBoard .qbHeaderBadge{font-size:11px}.qualityBoard .qbManagerList small{font-size:11px}.qualityBoard .qbManagerRisk{font-size:10px;min-width:65px}.qualityBoard .qbManagerList strong{min-width:53px}.qualityBoard .qbFootnote{font-size:11px}}
 </style>
-<link rel="stylesheet" href="requirements.css">
-<script src="requirements.js"></script>
+<link rel="stylesheet" href="requirements.css?v=20261020-simple">
+<script src="requirements.js?v=20261020-simple"></script>
 <script src="project-pdf.js"></script>
 <script id="quality-demo-controller">
 (() => {
@@ -1333,7 +1333,7 @@
     admin.querySelectorAll('.apage').forEach(el=>el.classList.toggle('active',el.dataset.pageview===name));
     nav.forEach((b,i)=>b.classList.toggle('active',i===(name==='dashboard'?0:name==='teams'?2:name==='materials'?3:name==='requirements'?4:1)));
     $one('#adminTitle').textContent=name==='dashboard'?'数据看板':name==='transfers'?'交接明细':name==='teams'?'安装团队管理':name==='materials'?'材料管理':name==='requirements'?'需求说明':'项目档案';
-    $one('#adminDesc').textContent=name==='dashboard'?'项目进度、施工规模与质量关注的全局视图':name==='transfers'?'项目负责人交接记录':name==='teams'?'统一维护合作团队、师傅信息与服务地址':name==='materials'?'管理安装培训与安装手册，统一现场端使用的材料版本':name==='requirements'?'现场与总部的功能逻辑、界面规范及开发测试验收说明':'';
+    $one('#adminDesc').textContent=name==='dashboard'?'项目进度、施工规模与质量关注的全局视图':name==='transfers'?'项目负责人交接记录':name==='teams'?'统一维护合作团队、师傅信息与服务地址':name==='materials'?'管理安装培训与安装手册，统一现场端使用的材料版本':name==='requirements'?'企微工作台应用、管理后台的需求细节、操作逻辑与界面字号':'';
     if(name==='projects')renderProjects();
     else if(name==='transfers')renderHistory(historyProject);
     else if(name==='teams')renderTeamDirectory();
