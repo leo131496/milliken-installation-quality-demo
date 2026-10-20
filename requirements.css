@@ -41,13 +41,18 @@
 .requirementsPage .reqBody li{padding-left:2px;margin:0 0 9px;font-size:14px;line-height:1.8}
 .requirementsPage .reqBody li:last-child{margin-bottom:0}
 .requirementsPage .reqBody li::marker{color:#91a8bf}
+.requirementsPage .reqRules{padding:0 20px 22px}
+.requirementsPage .reqRules h4{font-size:13px;font-weight:600;color:#60758b;margin:0 0 9px}
+.requirementsPage .reqRules table{table-layout:fixed}
+.requirementsPage .reqRules th,.requirementsPage .reqRules td{white-space:normal;vertical-align:top;width:auto}
+.requirementsPage .reqRules th:first-child{width:25%}
 .requirementsPage .reqFonts{padding:0 20px 22px}
 .requirementsPage .reqFonts section+section{margin-top:24px}
 .requirementsPage .reqTableScroll{max-width:100%;overflow:auto;border:1px solid #dce5ef;border-radius:6px}
 .requirementsPage table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.7}
 .requirementsPage th,.requirementsPage td{text-align:left;padding:10px 14px;border-bottom:1px solid #e6edf5;overflow-wrap:anywhere}
 .requirementsPage th{font-weight:500;color:#60758b;background:#f5f8fc}
-.requirementsPage th:nth-child(n+2),.requirementsPage td:nth-child(n+2){width:120px;white-space:nowrap}
+.requirementsPage .reqFonts th:nth-child(n+2),.requirementsPage .reqFonts td:nth-child(n+2){width:120px;white-space:nowrap}
 .requirementsPage tr:last-child td{border-bottom:0}
 .requirementsPage .reqEmpty{padding:45px 20px;text-align:center;background:#fff;border:1px solid #dce5ef;border-radius:9px}
 .requirementsPage .reqEmpty h3{font-size:17px;margin:0 0 8px}
@@ -69,7 +74,7 @@
   .requirementsPage .reqItem h3{font-size:16px}
   .requirementsPage .reqEntry{padding:0 16px 13px}
   .requirementsPage .reqBody{padding:0 16px 18px}
-  .requirementsPage .reqFonts{padding:0 16px 18px}
+  .requirementsPage .reqFonts,.requirementsPage .reqRules{padding:0 16px 18px}
   .requirementsPage th,.requirementsPage td{padding:9px 10px;font-size:12px}
-  .requirementsPage th:nth-child(n+2),.requirementsPage td:nth-child(n+2){width:auto}
+  .requirementsPage .reqFonts th:nth-child(n+2),.requirementsPage .reqFonts td:nth-child(n+2){width:auto}
 }
