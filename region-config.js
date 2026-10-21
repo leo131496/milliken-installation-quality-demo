@@ -19,5 +19,5 @@
     const matches=values.map(regionForPlace);
     return values.length&&matches.every(Boolean)&&new Set(matches).size===1?matches[0]:String(value||'');
   };
-  window.MillikenRegions=Object.freeze({groups,names:groups.map(group=>group.name),regionForPlace,serviceRegion});
+  window.MillikenRegions=Object.freeze({groups,names:groups.map(group=>group.name),provinceCount:groups.reduce((count,group)=>count+group.provinces.length,0),regionForPlace,serviceRegion});
 })();
