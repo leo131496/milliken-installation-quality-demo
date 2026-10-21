@@ -1,4 +1,4 @@
-// 需求说明 V2.1 · 2026-10-20。
+// 需求说明 V2.2 · 2026-10-21。
 (() => {
   'use strict';
   const groups = [
@@ -355,7 +355,7 @@
       logic:['继承人不能为空，不能与转出人相同。','确认后更新项目负责人，保留原阶段资料和交接记录；当前演示操作人固定为李雯。']},
     {id:'A04',group:'admin',title:'安装团队与师傅名册',entry:'管理后台 → 安装团队管理',
       details:['团队可新增、编辑、搜索，按城市和合作状态筛选；维护名称、联系人、电话、地址、服务区域和备注。','师傅可新增、编辑、搜索，按团队和状态筛选；维护姓名、电话、团队、岗位、工种、年限、培训状态、地址和备注。'],
-      logic:['团队校验同名，师傅校验重复电话；保存前校验必填信息和联系电话。','暂停合作的团队不供新项目选择；点击师傅人数可查看该团队成员。','删除须确认；删除团队保留师傅档案，所属团队改为“未分配团队”，历史项目保留记录。']},
+      logic:['安装团队列表每行操作栏提供“新增”，点击后进入该团队的师傅名册并打开“新增师傅”表单，默认选中当前团队；保存后显示在师傅名册，并更新团队师傅人数。取消不会新增记录。','团队校验同名，师傅校验重复电话；保存前校验必填信息和联系电话。','暂停合作的团队不供新项目选择；点击师傅人数可查看该团队成员。','删除须确认；删除团队保留师傅档案，所属团队改为“未分配团队”，历史项目保留记录。']},
     {id:'A05',group:'admin',title:'材料新增、查询与编辑',entry:'管理后台 → 材料管理',
       details:['培训材料与安装手册分别管理，可按关键词、类别、状态查询或重置。','支持选择或拖入文件，填写类别、名称、版本和说明；可修改信息或替换单份文件。'],
       logic:['支持PDF、Word、PowerPoint、JPG、PNG；单个文件须大于0且不超过20MB，并校验文件内容与格式。','批量上传按文件名分别新增，默认全部停用；不替换文件时保留原内容。','PDF和图片支持预览，Word／PPT提供原文件打开或下载。']},
@@ -400,15 +400,15 @@
   function exportDocument(){
     const content=groups.map(group=>chapter(group,items.filter(item=>item.group===group.id),true)).join('');
     const css='*{box-sizing:border-box}body{margin:0;color:#183345;background:#f3f6fa;font:14px/1.75 "PingFang SC","Microsoft YaHei",Arial,sans-serif}main{max-width:1100px;margin:28px auto;padding:30px;background:#fff}h1{font-size:26px}h2{font-size:22px}h3{font-size:17px;margin:0}h4{font-size:14px;margin:0 0 8px}p{overflow-wrap:anywhere}.reqSectionTitle{margin:30px 0 18px}.reqSectionTitle p,.reqEntry{color:#60758b;font-size:13px}.reqItem{border:1px solid #dce5ef;border-radius:8px;margin:14px 0;overflow:hidden}.reqItem summary{cursor:pointer;padding:16px 20px;list-style:none}.reqEntry{padding:0 20px;margin:0 0 14px}.reqBody{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:0 20px 20px}.reqSingle{grid-template-columns:1fr}ul{padding-left:19px;margin:0}li{margin:7px 0;overflow-wrap:anywhere}.reqFonts{padding:0 20px 22px}.reqFonts section+section{margin-top:22px}.reqTableScroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #dce5ef;padding:9px 12px;text-align:left}th{background:#f5f8fc}.reqFonts td:nth-child(n+2){white-space:nowrap;width:100px}.reqRules{padding:0 20px 22px}.reqRules table{table-layout:fixed}.reqRules th,.reqRules td{overflow-wrap:anywhere;vertical-align:top}.reqRules th:first-child{width:25%}@media(max-width:650px){main{margin:0;padding:16px}.reqBody{grid-template-columns:1fr;gap:18px}.reqItem summary,.reqEntry{padding-left:16px;padding-right:16px}.reqFonts,.reqRules{padding-left:16px;padding-right:16px}}@media print{body{background:#fff}main{margin:0;padding:0}.reqChapter{break-before:page}.reqChapter:first-of-type{break-before:auto}.reqSectionTitle,summary,h4{break-after:avoid}li,tr{break-inside:avoid}.reqTableScroll{overflow:visible}}';
-    const html=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>美利肯安装质量中心 · 需求说明</title><style>${css}</style></head><body><main><h1>美利肯安装质量中心 · 需求说明</h1><p>2026-10-20 更新 · 需求细节、操作逻辑与界面字号。</p>${content}</main></body></html>`;
+    const html=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>美利肯安装质量中心 · 需求说明</title><style>${css}</style></head><body><main><h1>美利肯安装质量中心 · 需求说明</h1><p>2026-10-21 更新 · 需求细节、操作逻辑与界面字号。</p>${content}</main></body></html>`;
     const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-    const a=document.createElement('a');a.href=url;a.download='美利肯安装质量中心-需求说明-20261020.html';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+    const a=document.createElement('a');a.href=url;a.download='美利肯安装质量中心-需求说明-20261021.html';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
   }
   function mount(host){
     if(host.dataset.requirementsMounted)return;
     host.dataset.requirementsMounted='true';
     const state={group:'field',query:'',open:true};
-    host.innerHTML=`<header class="reqHero"><div><h2>功能细节与操作逻辑</h2><p>按两端功能和界面规范查阅，内容对应当前 Demo。</p></div><button type="button" class="reqDownload">下载需求说明</button></header><nav class="reqTabs" aria-label="需求说明栏目">${groups.map(group=>`<button type="button" data-req-group="${group.id}">${esc(group.label)}</button>`).join('')}</nav><form class="reqToolbar" role="search"><label><span class="reqSr">搜索需求</span><input type="search" id="reqSearch" placeholder="搜索功能、字段或字号，例如：温度、照片、16px" autocomplete="off"></label><button type="button" id="reqReset">清除搜索</button></form><div class="reqResultsBar"><p id="reqResultCount" role="status" aria-live="polite"></p><div><button type="button" id="reqExpand">全部展开</button><button type="button" id="reqCollapse">全部收起</button></div></div><div id="reqResults"></div><p class="reqFooter">说明更新：2026-10-20。未保存的信息以各阶段实际记录为准。</p>`;
+    host.innerHTML=`<header class="reqHero"><div><h2>功能细节与操作逻辑</h2><p>按两端功能和界面规范查阅，内容对应当前 Demo。</p></div><button type="button" class="reqDownload">下载需求说明</button></header><nav class="reqTabs" aria-label="需求说明栏目">${groups.map(group=>`<button type="button" data-req-group="${group.id}">${esc(group.label)}</button>`).join('')}</nav><form class="reqToolbar" role="search"><label><span class="reqSr">搜索需求</span><input type="search" id="reqSearch" placeholder="搜索功能、字段或字号，例如：温度、照片、16px" autocomplete="off"></label><button type="button" id="reqReset">清除搜索</button></form><div class="reqResultsBar"><p id="reqResultCount" role="status" aria-live="polite"></p><div><button type="button" id="reqExpand">全部展开</button><button type="button" id="reqCollapse">全部收起</button></div></div><div id="reqResults"></div><p class="reqFooter">说明更新：2026-10-21。未保存的信息以各阶段实际记录为准。</p>`;
     const results=host.querySelector('#reqResults');
     const render=()=>{
       const query=state.query.trim().toLocaleLowerCase().replace(/\s+/g,'');
