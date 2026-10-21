@@ -538,10 +538,11 @@
         if(select.value==='其他'&&!note){
           const field=document.createElement('label');
           field.className='fieldItem';
-          field.innerHTML='<span><b>其他情况说明 <em>*</em></b></span><textarea id="groundOtherNote" placeholder="请描述现场地面情况"></textarea>';
+          field.innerHTML='<span><b>其他情况说明 <em>*</em></b></span><textarea id="groundOtherNote" maxlength="255" aria-describedby="groundOtherCount" placeholder="请描述现场地面情况，最多255字"></textarea><small class="groundOtherCount" id="groundOtherCount" role="status">0/255</small>';
           select.closest('.fieldItem').after(field);
         }
         note=host.querySelector('#groundOtherNote');
+        if(note){const update=()=>{host.querySelector('#groundOtherCount').textContent=note.value.length+'/255'};note.addEventListener('input',update);update()}
         if(note&&select.value!=='其他')note.closest('.fieldItem').remove();
       };
       select.onchange=sync;
@@ -882,8 +883,16 @@
   @media(max-width:1300px){.qualityBoard .qbStages b{font-size:13px}.qualityBoard .qbMetricLabel{font-size:14px}.qualityBoard .qbManagerRisk{font-size:11px}}
   @media(max-width:600px){.qualityBoard .qbMetricLabel{font-size:12px}.qualityBoard .qbMetric p{font-size:12px;line-height:1.6}.qualityBoard .qbPanel h2{font-size:17px}.qualityBoard .qbPanel header p{font-size:12px}.qualityBoard .qbStages b{font-size:12px}.qualityBoard .qbStages p{font-size:11px}.qualityBoard .qbMonth>small{font-size:9px}.qualityBoard .qbRiskTable{display:block;min-width:0}.qualityBoard .qbRiskTable thead{display:none}.qualityBoard .qbRiskTable tbody{display:grid;padding:0 16px 16px;gap:12px}.qualityBoard .qbRiskTable tr{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e4ebf2;border-radius:7px;padding:12px;gap:8px}.qualityBoard .qbRiskTable td{display:block;border:0;padding:0;font-size:12px}.qualityBoard .qbRiskTable td:first-child{grid-column:1/-1}.qualityBoard .qbRiskTable td:nth-child(2){grid-row:2;grid-column:1}.qualityBoard .qbRiskTable td:nth-child(2)::before{content:"阶段 · ";color:#6c8093}.qualityBoard .qbRiskTable td:nth-child(3){grid-row:3;grid-column:1/-1}.qualityBoard .qbRiskTable td:nth-child(4){grid-row:2;grid-column:2}.qualityBoard .qbRiskTable td:nth-child(4)::before{content:"负责人 · ";color:#6c8093}.qualityBoard .qbRiskTable td:last-child{grid-row:4;grid-column:1/-1;text-align:right;border-top:1px solid #edf1f6;padding-top:9px;margin-top:3px}.qualityBoard .qbRiskTable .qbLink{font-size:13px;padding:6px 0}.qualityBoard .qbHeaderBadge{font-size:11px}.qualityBoard .qbManagerList small{font-size:11px}.qualityBoard .qbManagerRisk{font-size:10px;min-width:65px}.qualityBoard .qbManagerList strong{min-width:53px}.qualityBoard .qbFootnote{font-size:11px}}
 </style>
+<style id="admin-update-styles">
+.directoryContext{display:flex;align-items:center;gap:18px;min-width:0;flex-wrap:wrap;padding:18px 0}.directoryContext h2{font-size:18px;margin:0;overflow-wrap:anywhere}.directoryFixedTeam{min-height:42px;display:flex;align-items:center;padding:10px 12px;background:#f5f8fc;border:1px solid #dce5ef;border-radius:7px;color:#526a82;overflow-wrap:anywhere}.groundOtherCount{display:block;text-align:right;margin-top:6px;font-size:13px;color:#708693}
+.qualityBoard .qbFilters{flex-wrap:wrap;align-items:end}.qualityBoard .qbFilters label{display:grid;gap:7px;min-width:120px}.qualityBoard .qbFilters input,.qualityBoard .qbFilters select{box-sizing:border-box;width:100%;height:38px;border:1px solid #d3dfed;border-radius:6px;padding:0 10px;font:inherit;font-size:14px;background:#fff;color:#38556e;min-width:0}.qualityBoard .qbFilters .qbNameFilter{flex:1;min-width:200px}.qualityBoard .qbFilters .qbDateFilter{min-width:150px}.qualityBoard .qbFilters>span{align-self:center}.qualityBoard .qbFilterError{flex-basis:100%;color:#bd4e4e;font-size:13px;margin:0}.qualityBoard .qbFilterError:empty{display:none}.qualityBoard .qbFilters .qbQuery{border:1px solid #c2d5f4;background:#f0f5ff;color:#2163cf}
+@media(max-width:600px){.directoryContext{gap:8px}.directoryContext h2{font-size:15px}.qualityBoard .qbFilters label,.qualityBoard .qbFilters .qbNameFilter,.qualityBoard .qbFilters .qbDateFilter{min-width:0;grid-template-columns:minmax(0,1fr);grid-column:auto}.qualityBoard .qbFilters .qbNameFilter{grid-column:1/-1}.qualityBoard .qbFilters input,.qualityBoard .qbFilters select{font-size:16px}.qualityBoard .qbFilterError{grid-column:1/-1}}
+</style>
 <link rel="stylesheet" href="requirements.css?v=20261020-field-logic">
-<script src="requirements.js?v=20261021-team-member"></script>
+<script src="region-config.js?v=20261021"></script>
+<script src="requirements.js?v=20261021-admin-update"></script>
+<script src="vendor/exceljs.min.js"></script>
+<script src="project-excel.js?v=20261021"></script>
 <script src="project-pdf.js"></script>
 <script id="quality-demo-controller">
 (() => {
@@ -970,7 +979,7 @@
     if(report.longTerm===null){toast('请选择是否长期合作团队');return}
     if(!(Number(report.area)>0)||!Number.isInteger(Number(report.count))||Number(report.count)<1){toast('请填写有效的面积和安装人数');return}
     if(report.end<report.start){toast('结束日期不能早于开始日期');return}
-    const regionByProvince={上海市:'华东',江苏省:'华东',浙江省:'华东',北京市:'华北',广东省:'华南',四川省:'西南'};
+    const regionByProvince=Object.fromEntries(window.MillikenRegions.groups.flatMap(group=>group.provinces.map(province=>[province,group.name])));
     Object.assign(mobileProject,{name:report.name.trim(),region:(regionByProvince[report.province]||report.province)+' / '+report.city.replace(/市$/,''),area:Number(report.area).toLocaleString('en-US'),time:report.start.replace('-','.')+'–'+report.end.replace('-','.'),team:report.longTerm?report.team:'',count:Number(report.count)});
     if(formMode==='new'&&!findMobileProject(mobileProject.id))mobileProjects.unshift(mobileProject);
     formMode='existing';
@@ -1000,17 +1009,17 @@
   $one('.user b').textContent='李雯'; $one('.user small').textContent='运营人员 · 总部';
   const DIRECTORY_KEY='milliken-installation-directory-v1';
   const directorySeed={version:1,teams:[
-    {id:'team-huazhu',name:'上海华筑装饰',contact:'陈师傅',phone:'',city:'上海',address:'',serviceArea:'上海',status:'active',note:''},
-    {id:'team-gongzhuang',name:'上海工装地材',contact:'刘师傅',phone:'',city:'上海',address:'',serviceArea:'上海、嘉兴',status:'active',note:''},
-    {id:'team-xinchuang',name:'苏州新创空间',contact:'周师傅',phone:'',city:'苏州',address:'',serviceArea:'苏州、无锡',status:'active',note:''},
-    {id:'team-hengji',name:'北京恒基地材',contact:'刘志强',phone:'',city:'北京',address:'',serviceArea:'北京、天津',status:'active',note:''}
+    {id:'team-huazhu',name:'上海华筑装饰',contact:'陈师傅',phone:'',city:'上海',address:'',serviceArea:'华东',status:'active',note:''},
+    {id:'team-gongzhuang',name:'上海工装地材',contact:'刘师傅',phone:'',city:'上海',address:'',serviceArea:'华东',status:'active',note:''},
+    {id:'team-xinchuang',name:'苏州新创空间',contact:'周师傅',phone:'',city:'苏州',address:'',serviceArea:'华东',status:'active',note:''},
+    {id:'team-hengji',name:'北京恒基地材',contact:'刘志强',phone:'',city:'北京',address:'',serviceArea:'华北',status:'active',note:''}
   ],members:[]};
   directorySeed.members=directorySeed.teams.map((team,index)=>({id:'member-'+team.id,teamId:team.id,name:team.contact,phone:'',role:'安装负责人',skill:'地毯铺装',experience:'',training:index===1?'手册已读':'已培训',address:'',status:'active',note:''}));
   function readDirectory(raw){
     const saved=JSON.parse(raw);
     if(saved?.version!==1||!Array.isArray(saved.teams)||!Array.isArray(saved.members))throw new Error('Invalid directory');
     const records=(items,fields)=>items.filter(item=>item&&typeof item.id==='string'&&typeof item.name==='string').map(item=>Object.fromEntries(fields.map(key=>[key,typeof item[key]==='string'?item[key]:''])));
-    return {version:1,teams:records(saved.teams,['id','name','contact','phone','city','address','serviceArea','status','note']),members:records(saved.members,['id','teamId','name','phone','role','skill','experience','training','address','status','note'])};
+    return {version:1,teams:records(saved.teams,['id','name','contact','phone','city','address','serviceArea','status','note']).map(team=>({...team,serviceArea:window.MillikenRegions.serviceRegion(team.serviceArea)})),members:records(saved.members,['id','teamId','name','phone','role','skill','experience','training','address','status','note'])};
   }
   let directory=structuredClone(directorySeed),directoryTab='teams',directoryFilter={query:'',city:'',status:'',teamId:''};
   try{const saved=localStorage.getItem(DIRECTORY_KEY);if(saved)directory=readDirectory(saved)}catch{}
@@ -1048,15 +1057,15 @@
       <div><span>合作团队</span><strong>${directory.teams.length}<small> 支</small></strong><p>统一维护团队档案</p></div>
       <div><span>在册师傅</span><strong>${directory.members.length}<small> 位</small></strong><p>${directory.members.filter(member=>member.training==='已培训').length} 位已完成安装培训</p></div>
       <div><span>可选安装团队</span><strong>${directory.teams.filter(team=>team.status==='active').length}<small> 支</small></strong><p>合作中的团队可用于项目报备</p></div>
-    </div><section class="directoryCard"><header class="directoryToolbar"><div class="directoryTabs" role="tablist" aria-label="团队与师傅"><button role="tab" aria-selected="${isTeams}" data-directory-tab="teams" class="${isTeams?'active':''}">安装团队</button><button role="tab" aria-selected="${!isTeams}" data-directory-tab="members" class="${isTeams?'':'active'}">师傅名册</button></div><button class="directoryPrimary" data-directory-add>${isTeams?'＋ 新增安装团队':'＋ 新增师傅'}</button></header>
+    </div><section class="directoryCard"><header class="directoryToolbar"><div class="directoryContext">${isTeams?'<h2>安装团队</h2>':'<button type="button" class="directoryLink" data-directory-tab="teams">‹ 返回安装团队</button><h2>'+esc(directory.teams.find(team=>team.id===directoryFilter.teamId)?.name||'团队')+' · 师傅信息</h2>'}</div><button class="directoryPrimary" data-directory-add>${isTeams?'＋ 新增安装团队':'＋ 新增师傅'}</button></header>
     <form class="directoryFilters"><label class="directorySearch"><span aria-hidden="true">⌕</span><input name="query" aria-label="搜索团队或师傅" placeholder="${isTeams?'搜索团队、联系人、电话或地址':'搜索师傅、电话或工种'}" value="${esc(directoryFilter.query)}"></label>
-    ${isTeams?'<select name="city" aria-label="所在城市"><option value="">全部城市</option>'+cities.map(city=>'<option '+(directoryFilter.city===city?'selected':'')+'>'+esc(city)+'</option>').join('')+'</select>':'<select name="teamId" aria-label="所属团队"><option value="">全部团队</option><option value="unassigned" '+(directoryFilter.teamId==='unassigned'?'selected':'')+'>未分配团队</option>'+directory.teams.map(team=>'<option value="'+esc(team.id)+'" '+(directoryFilter.teamId===team.id?'selected':'')+'>'+esc(team.name)+'</option>').join('')+'</select>'}
+    ${isTeams?'<select name="city" aria-label="所在城市"><option value="">全部城市</option>'+cities.map(city=>'<option '+(directoryFilter.city===city?'selected':'')+'>'+esc(city)+'</option>').join('')+'</select>':''}
     <select name="status" aria-label="合作状态"><option value="">全部状态</option><option value="active" ${directoryFilter.status==='active'?'selected':''}>合作中</option><option value="paused" ${directoryFilter.status==='paused'?'selected':''}>暂停合作</option></select><button type="submit" class="directoryQuery">查询</button><button type="button" data-directory-reset>重置</button></form>
     <div class="directoryResults"></div></section>`;
     teamPage.querySelectorAll('[data-directory-tab]').forEach(button=>button.onclick=()=>{directoryTab=button.dataset.directoryTab;directoryFilter={query:'',city:'',status:'',teamId:''};renderTeamDirectory()});
     teamPage.querySelector('[data-directory-add]').onclick=()=>openDirectoryEditor(directoryTab);
-    teamPage.querySelector('.directoryFilters').onsubmit=event=>{event.preventDefault();const values=Object.fromEntries(new FormData(event.currentTarget));directoryFilter={query:'',city:'',status:'',teamId:'',...values};drawDirectoryRows()};
-    teamPage.querySelector('[data-directory-reset]').onclick=()=>{directoryFilter={query:'',city:'',status:'',teamId:''};renderTeamDirectory()};
+    teamPage.querySelector('.directoryFilters').onsubmit=event=>{event.preventDefault();const values=Object.fromEntries(new FormData(event.currentTarget));directoryFilter={query:'',city:'',status:'',teamId:directoryTab==='members'?directoryFilter.teamId:'',...values};drawDirectoryRows()};
+    teamPage.querySelector('[data-directory-reset]').onclick=()=>{directoryFilter={query:'',city:'',status:'',teamId:directoryTab==='members'?directoryFilter.teamId:''};renderTeamDirectory()};
     drawDirectoryRows();
   }
   function drawDirectoryRows(){
@@ -1073,7 +1082,7 @@
       '<td><div class="directoryName"><span class="directoryAvatar">'+esc(record.name.slice(0,1))+'</span><div><b>'+esc(record.name)+'</b><small>服务区域 · '+esc(record.serviceArea||record.city||'待补充')+'</small></div></div></td><td><b>'+esc(record.contact||'待补充')+'</b><small>'+esc(record.phone||'电话待补充')+'</small></td><td class="directoryAddress"><b>'+esc(record.city||'城市待补充')+'</b><small>'+esc(record.address||'详细地址待补充')+'</small></td><td><button class="directoryLink" data-directory-members="'+esc(record.id)+'">'+members.length+' 位师傅</button></td>':
       '<td><div class="directoryName"><span class="directoryAvatar person">'+esc(record.name.slice(0,1))+'</span><div><b>'+esc(record.name)+'</b><small>'+esc(record.phone||'电话待补充')+'</small></div></div></td><td>'+esc(team?.name||'未分配团队')+'</td><td><b>'+esc(record.role||'安装师傅')+'</b><small>'+esc(record.skill||'工种待补充')+'</small></td><td><span class="directoryTraining '+(record.training==='已培训'?'trained':'')+'">'+esc(record.training||'待培训')+'</span></td>')+
       '<td>'+directoryState(record)+'</td><td><div class="directoryActions"><button class="directoryLink" data-directory-edit="'+esc(record.id)+'">编辑</button><button class="directoryLink danger" data-directory-delete="'+esc(record.id)+'">删除</button>'+(isTeams?'<button type="button" class="directoryLink" data-directory-add-member="'+esc(record.id)+'">新增</button>':'')+'</div></td></tr>';
-    }).join('')+'</tbody></table></div>'+(!result.length?'<div class="directoryEmpty"><span>暂无'+(isTeams?'安装团队':'师傅记录')+'</span><p>'+(directoryFilter.query||directoryFilter.status||directoryFilter.city||directoryFilter.teamId?'试试调整筛选条件，或点击“重置”。':isTeams?'点击“新增安装团队”，建立第一份团队档案。':'点击“新增师傅”，完善团队人员信息。')+'</p></div>':'')+'<footer class="directoryCount">共 '+result.length+(isTeams?' 支团队':' 位师傅')+'<span>'+(isTeams?'点击师傅人数，可查看和维护团队成员':'师傅信息变更后，请及时更新所属团队与联系方式')+'</span></footer>';
+    }).join('')+'</tbody></table></div>'+(!result.length?'<div class="directoryEmpty"><span>暂无'+(isTeams?'安装团队':'师傅记录')+'</span><p>'+(directoryFilter.query||directoryFilter.status||directoryFilter.city||directoryFilter.teamId?'试试调整筛选条件，或点击“重置”。':isTeams?'点击“新增安装团队”，建立第一份团队档案。':'点击“新增师傅”，完善团队人员信息。')+'</p></div>':'')+'<footer class="directoryCount">共 '+result.length+(isTeams?' 支团队':' 位师傅')+'<span>'+(isTeams?'点击师傅人数，可查看和维护团队成员':'所属团队由当前团队自动关联；师傅信息变更后，请及时维护联系方式')+'</span></footer>';
     teamPage.querySelectorAll('[data-directory-edit]').forEach(button=>button.onclick=()=>openDirectoryEditor(directoryTab,button.dataset.directoryEdit));
     teamPage.querySelectorAll('[data-directory-delete]').forEach(button=>button.onclick=()=>confirmDirectoryDelete(directoryTab,button.dataset.directoryDelete));
     teamPage.querySelectorAll('[data-directory-add-member]').forEach(button=>button.onclick=()=>{directoryTab='members';directoryFilter={query:'',city:'',status:'',teamId:button.dataset.directoryAddMember};renderTeamDirectory();openDirectoryEditor('members')});
@@ -1081,14 +1090,16 @@
   }
   function openDirectoryEditor(kind,id=''){
     const isTeam=kind==='teams',existing=directory[kind].find(record=>record.id===id);
-    const record=existing||{status:'active',teamId:directoryFilter.teamId==='unassigned'?'':directoryFilter.teamId,role:'安装师傅',training:'待培训'};
+    const record=existing||{status:'active',teamId:directoryFilter.teamId,role:'安装师傅',training:'待培训'};
+    const assignedTeam=directory.teams.find(team=>team.id===record.teamId);
+    if(!isTeam&&!assignedTeam){toast('请从安装团队的新增入口添加师傅');return}
     const input=(key,label,options={})=>'<label class="directoryField '+(options.full?'full':'')+'"><span>'+label+(options.required?'<em> *</em>':'<small>选填</small>')+'</span><input name="'+key+'" value="'+esc(record[key]||'')+'" type="'+(options.type||'text')+'" '+(options.required?'required ':'')+(options.type==='number'?'min="0" max="60" step="1" ':'')+'maxlength="'+(options.max||100)+'" placeholder="'+esc(options.placeholder||'')+'" autocomplete="off"></label>';
-    const select=(key,label,values)=>'<label class="directoryField"><span>'+label+'</span><select name="'+key+'">'+values.map(([value,text])=>'<option value="'+esc(value)+'" '+(record[key]===value?'selected':'')+'>'+esc(text)+'</option>').join('')+'</select></label>';
+    const select=(key,label,values,required=false)=>'<label class="directoryField"><span>'+label+(required?'<em> *</em>':'')+'</span><select name="'+key+'" '+(required?'required':'')+'>'+values.map(([value,text])=>'<option value="'+esc(value)+'" '+(record[key]===value?'selected':'')+'>'+esc(text)+'</option>').join('')+'</select></label>';
     const note='<label class="directoryField full"><span>备注<small>选填</small></span><textarea name="note" maxlength="500" placeholder="补充合作事项或需要说明的信息">'+esc(record.note||'')+'</textarea></label>';
     const status=select('status','合作状态',[['active','合作中'],['paused','暂停合作']]);
-    directoryEditor.innerHTML='<form id="directoryEditForm"><header><div><small>安装团队管理 / '+(isTeam?'团队档案':'师傅名册')+'</small><h2 id="directoryEditorTitle">'+(existing?'编辑':'新增')+(isTeam?'安装团队':'师傅')+'</h2></div><button type="button" class="directoryClose" data-directory-cancel aria-label="关闭">×</button></header><div class="directoryFormBody">'+(isTeam?
-      '<section><h3><span>01</span>团队信息</h3><div class="directoryFieldGrid">'+input('name','团队 / 公司名称',{required:true,full:true,placeholder:'请输入安装团队或公司全称'})+input('city','所在城市',{required:true,placeholder:'例如：上海'})+input('serviceArea','服务区域',{placeholder:'例如：上海、苏州、嘉兴'})+status+'</div></section><section><h3><span>02</span>联系人与地址</h3><div class="directoryFieldGrid">'+input('contact','联系人 / 负责人',{required:true,placeholder:'请输入姓名',max:40})+input('phone','联系电话',{required:true,type:'tel',placeholder:'手机或固定电话号码',max:24})+input('address','详细地址',{required:true,full:true,placeholder:'省 / 市 / 区 + 街道、门牌号或楼宇',max:200})+note+'</div></section><p class="directoryFormHint">保存后，可在“师傅名册”中继续添加团队成员。</p>':
-      '<section><h3><span>01</span>师傅信息</h3><div class="directoryFieldGrid">'+input('name','师傅姓名',{required:true,placeholder:'请输入姓名',max:40})+input('phone','联系电话',{required:true,type:'tel',placeholder:'手机或固定电话号码',max:24})+select('teamId','所属团队',[['','未分配团队'],...directory.teams.map(team=>[team.id,team.name])])+select('role','岗位',[['安装负责人','安装负责人'],['安装师傅','安装师傅'],['施工辅助','施工辅助']])+input('skill','擅长工种',{placeholder:'例如：方块地毯、卷材地毯铺装'})+input('experience','从业年限（年）',{type:'number',max:2,placeholder:'例如：8'})+select('training','培训状态',[['待培训','待培训'],['手册已读','手册已读'],['已培训','已培训']])+status+'</div></section><section><h3><span>02</span>联系地址与备注</h3><div class="directoryFieldGrid">'+input('address','常驻 / 工作联系地址',{full:true,placeholder:'省 / 市 / 区 + 街道、门牌号或楼宇',max:200})+note+'</div></section>')+'<p class="directoryError" role="alert"></p></div><footer><button type="button" data-directory-cancel>取消</button><button type="submit" class="directoryPrimary">保存'+(isTeam?'团队':'师傅')+'</button></footer></form>';
+    directoryEditor.innerHTML='<form id="directoryEditForm"><header><div><small>安装团队管理 / '+(isTeam?'团队档案':esc(assignedTeam.name)+' / 师傅信息')+'</small><h2 id="directoryEditorTitle">'+(existing?'编辑':'新增')+(isTeam?'安装团队':'师傅')+'</h2></div><button type="button" class="directoryClose" data-directory-cancel aria-label="关闭">×</button></header><div class="directoryFormBody">'+(isTeam?
+      '<section><h3><span>01</span>团队信息</h3><div class="directoryFieldGrid">'+input('name','团队 / 公司名称',{required:true,full:true,placeholder:'请输入安装团队或公司全称'})+input('city','所在城市',{required:true,placeholder:'例如：上海'})+select('serviceArea','服务区域',[['','请选择服务区域'],...window.MillikenRegions.names.map(name=>[name,name]),...(record.serviceArea&&!window.MillikenRegions.names.includes(record.serviceArea)?[[record.serviceArea,record.serviceArea+'（历史值，请重新选择）']]:[])],true)+status+'</div></section><section><h3><span>02</span>联系人与地址</h3><div class="directoryFieldGrid">'+input('contact','联系人 / 负责人',{required:true,placeholder:'请输入姓名',max:40})+input('phone','联系电话',{required:true,type:'tel',placeholder:'手机或固定电话号码',max:24})+input('address','详细地址',{required:true,full:true,placeholder:'省 / 市 / 区 + 街道、门牌号或楼宇',max:200})+note+'</div></section><p class="directoryFormHint">保存后，可在该团队行点击“新增”添加师傅，点击人数查看团队成员。</p>':
+      '<section><h3><span>01</span>师傅信息</h3><div class="directoryFieldGrid">'+input('name','师傅姓名',{required:true,placeholder:'请输入姓名',max:40})+input('phone','联系电话',{required:true,type:'tel',placeholder:'手机或固定电话号码',max:24})+'<div class="directoryField"><span>所属团队</span><div class="directoryFixedTeam">'+esc(assignedTeam?.name||'')+'</div><input type="hidden" name="teamId" value="'+esc(record.teamId||'')+'"></div>'+select('role','岗位',[['安装负责人','安装负责人'],['安装师傅','安装师傅'],['施工辅助','施工辅助']])+input('skill','擅长工种',{placeholder:'例如：方块地毯、卷材地毯铺装'})+input('experience','从业年限（年）',{type:'number',max:2,placeholder:'例如：8'})+select('training','培训状态',[['待培训','待培训'],['手册已读','手册已读'],['已培训','已培训']])+status+'</div></section><section><h3><span>02</span>联系地址与备注</h3><div class="directoryFieldGrid">'+input('address','常驻 / 工作联系地址',{full:true,placeholder:'省 / 市 / 区 + 街道、门牌号或楼宇',max:200})+note+'</div></section>')+'<p class="directoryError" role="alert"></p></div><footer><button type="button" data-directory-cancel>取消</button><button type="submit" class="directoryPrimary">保存'+(isTeam?'团队':'师傅')+'</button></footer></form>';
     directoryEditor.querySelectorAll('[data-directory-cancel]').forEach(button=>button.onclick=()=>directoryEditor.close());
     directoryEditor.querySelector('form').onsubmit=event=>{
       event.preventDefault();const error=directoryEditor.querySelector('.directoryError');
@@ -1096,7 +1107,9 @@
       if(!values.name||!values.phone||(isTeam&&(!values.contact||!values.city||!values.address))){error.textContent='请完整填写标有 * 的必填信息。';return}
       if(!/^[+\d][\d\s()-]{5,23}$/.test(values.phone)){error.textContent='请填写有效的联系电话，支持手机或固定电话。';return}
       if(isTeam&&directory.teams.some(team=>team.id!==id&&team.name.toLowerCase()===values.name.toLowerCase())){error.textContent='已存在同名团队，请检查后修改。';return}
-      if(!isTeam&&directory.members.some(member=>member.id!==id&&member.phone===values.phone)){error.textContent='该联系电话已存在于师傅名册中，请检查是否重复添加。';return}
+      if(isTeam&&!window.MillikenRegions.names.includes(values.serviceArea)){error.textContent='请选择有效的服务区域。';return}
+      if(!isTeam)values.teamId=record.teamId;
+      if(!isTeam&&directory.members.some(member=>member.id!==id&&member.phone===values.phone)){error.textContent='该联系电话已存在于师傅信息中，请检查是否重复添加。';return}
       if(!isTeam&&values.teamId&&!directory.teams.some(team=>team.id===values.teamId)){error.textContent='所选团队已删除，请重新选择团队。';return}
       const next=structuredClone(directory),saved={...values,id:existing?.id||directoryId()};
       if(existing){const index=next[kind].findIndex(record=>record.id===id);if(index<0){error.textContent='该档案已删除，请关闭后刷新列表。';return}next[kind][index]=saved}else next[kind].unshift(saved);
@@ -1354,7 +1367,7 @@
   function renderProjects() {
     projectPage.innerHTML='<section class="tableCard final2Table"><form class="final2Filters" id="archiveFilters"><input id="archiveQuery" aria-label="项目名称" placeholder="请输入项目名称" value="'+esc(filters.query)+'"><select id="archiveStage" aria-label="阶段"><option value="">全部阶段</option>'+names.map((name,i)=>'<option value="'+(i+1)+'">'+name+'</option>').join('')+'</select><select id="archiveRegion" aria-label="区域"><option value="">全部区域</option>'+[...new Set(data.map(boardRegion))].map(region=>'<option>'+esc(region)+'</option>').join('')+'</select><select id="archiveStatus" aria-label="状态"><option value="">全部状态</option><option>进行中</option><option>已完工</option></select><button type="submit" class="query">查询</button><button type="button" class="reset" id="archiveReset">重置</button></form><div id="archiveResults"></div></section>';
     if(filters.fromBoard){
-      const scope=[filters.owner?'负责人：'+filters.owner:'',filters.risk?'关注事项：'+(filters.risk==='all'?'全部关注项目':boardRiskNames[filters.risk]):'',filters.planMonth?'计划'+(filters.planKind==='end'?'结束':'开始')+'：'+filters.planMonth:''].filter(Boolean);
+      const scope=[filters.owner?'负责人：'+filters.owner:'',filters.risk?'关注事项：'+(filters.risk==='all'?'全部关注项目':boardRiskNames[filters.risk]):'',filters.planMonth?'计划'+(filters.planKind==='end'?'结束':'开始')+'：'+filters.planMonth:'',filters.dateFrom||filters.dateTo?({start:'计划开始日期',end:'计划结束日期',actual:'实际完成日期'}[filters.dateKind||'start']+'：'+(filters.dateFrom||'不限')+' 至 '+(filters.dateTo||'不限')):''].filter(Boolean);
       projectPage.querySelector('.final2Table').insertAdjacentHTML('afterbegin','<div class="qbArchiveScope"><b>看板项目清单</b>'+scope.map(text=>'<span>'+esc(text)+'</span>').join('')+'<button id="returnDashboard">返回看板</button></div>');
       $one('#returnDashboard').onclick=()=>switchAdmin('dashboard');
     }
@@ -1368,7 +1381,7 @@
     drawRows();
   }
   function drawRows() {
-    const filtered=data.filter(p=>p.name.toLowerCase().includes(filters.query.toLowerCase())&&(!filters.owner||p.owner===filters.owner)&&(!filters.stage||p.stage===Number(filters.stage))&&(!filters.region||p.region.includes(filters.region))&&(!filters.status||p.status===filters.status)&&(!filters.risk||(filters.risk==='all'?Boolean(p.risk):boardRisk(p)===filters.risk))&&(!filters.planMonth||boardMonth(p,filters.planKind)===filters.planMonth));
+    const filtered=data.filter(p=>p.name.toLowerCase().includes(filters.query.toLowerCase())&&(!filters.owner||p.owner===filters.owner)&&(!filters.stage||p.stage===Number(filters.stage))&&(!filters.region||p.region.includes(filters.region))&&(!filters.status||p.status===filters.status)&&(!filters.risk||(filters.risk==='all'?Boolean(p.risk):boardRisk(p)===filters.risk))&&(!filters.planMonth||boardMonth(p,filters.planKind)===filters.planMonth)&&matchesDateScope(p,filters));
     const count=Math.max(1,Math.ceil(filtered.length/pageSize));pageNumber=Math.max(1,Math.min(pageNumber,count));
     $one('#archiveResults').innerHTML='<div class="archiveTableScroll"><table><thead><tr>'+['项目名称','区域','阶段','项目经理','状态','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+filtered.slice((pageNumber-1)*pageSize,pageNumber*pageSize).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.region)+'</td><td>'+names[p.stage-1]+'</td><td>'+esc(p.owner)+'</td><td><span class="stateTag '+(p.status==='已完工'?'complete':'')+'">'+p.status+'</span></td><td><div class="tableActions"><button class="link" data-detail="'+p.id+'">详情</button><button class="link" data-handover="'+p.id+'">交接</button><button class="link" data-history="'+p.id+'">交接明细</button><button class="link" data-project-pdf="'+p.id+'">下载</button></div></td></tr>').join('')+'</tbody></table></div>'+(!filtered.length?'<div class="emptyState">没有符合条件的项目</div>':'')+'<div class="final2Pager"><span>共 '+filtered.length+' 条</span><select id="archiveSize" aria-label="每页条数"><option value="10">10 条 / 页</option><option value="3">3 条 / 页</option><option value="20">20 条 / 页</option></select><div><button aria-label="上一页" data-turn="'+(pageNumber-1)+'" '+(pageNumber===1?'disabled':'')+'>‹</button>'+Array.from({length:count},(_,i)=>'<button data-turn="'+(i+1)+'" class="'+(pageNumber===i+1?'active':'')+'" aria-current="'+(pageNumber===i+1?'page':'false')+'">'+(i+1)+'</button>').join('')+'<button aria-label="下一页" data-turn="'+(pageNumber+1)+'" '+(pageNumber===count?'disabled':'')+'>›</button></div></div>';
     $one('#archiveSize').value=String(pageSize);
@@ -1419,7 +1432,8 @@
     historyPage.innerHTML='<div class="historyHeading"><div><h2>'+esc(p.name)+'</h2><p>项目负责人交接记录</p></div><span>'+records.length+' 条交接记录</span></div><section class="tableCard final2Table"><div class="archiveTableScroll"><table><thead><tr>'+['项目名称','转出人','继承人','操作时间','备注信息','操作人'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+records.map(r=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(r.from)+'</td><td>'+esc(r.to)+'</td><td>'+esc(r.time)+'</td><td class="historyNote">'+esc(r.note)+'</td><td>李雯</td></tr>').join('')+'</tbody></table></div>'+(!records.length?'<div class="emptyState">该项目暂无交接记录</div>':'')+'</section>';
   }
   const BOARD_SCOPE_KEY='milliken-dashboard-scope-v1';
-  let boardScope={region:'',owner:'',status:''};
+  const emptyBoardScope=()=>({region:'',owner:'',status:'',query:'',dateKind:'start',dateFrom:'',dateTo:''});
+  let boardScope=emptyBoardScope();
   try{const saved=JSON.parse(localStorage.getItem(BOARD_SCOPE_KEY)||'null');if(saved)for(const key of Object.keys(boardScope))if(typeof saved[key]==='string')boardScope[key]=saved[key]}catch{}
   function saveBoardScope(){try{localStorage.setItem(BOARD_SCOPE_KEY,JSON.stringify(boardScope))}catch{}}
 
@@ -1430,20 +1444,38 @@
   const boardMonth=(p,kind)=>(p.time.split('–')[kind==='end'?1:0]||'').slice(0,7);
   const boardNumber=value=>value.toLocaleString('zh-CN');
   function boardFilter(next){filters={query:'',stage:'',region:'',status:'',fromBoard:true,...boardScope,...next};pageNumber=1;switchAdmin('projects')}
-  function exportBoardProjects(rows){
-    const cell=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
-    const csv=[['项目名称','区域','项目经理','阶段','状态','计划开始日期','计划结束日期','报备面积（m²）','计划安装人数','安装团队','关注事项'],...rows.map(p=>[p.name,p.region,p.owner,names[p.stage-1],p.status,boardMonth(p,'start'),boardMonth(p,'end'),boardArea(p),p.count,p.team,p.risk])].map(row=>row.map(cell).join(',')).join('\r\n');
-    const url=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'})),link=document.createElement('a');
-    link.href=url;link.download='美利肯项目看板-'+new Date().toISOString().slice(0,10)+'.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  function projectDatePeriod(p,kind){
+    const value=kind==='actual'?(p.stageData?.[4]?.fields?.['安装完成日期']||''):(p.report?.[kind==='end'?'end':'start']||p.time.split('–')[kind==='end'?1:0]||'');
+    const normalized=String(value).replaceAll('.','-');
+    if(/^\d{4}-\d{2}-\d{2}$/.test(normalized))return {from:normalized,to:normalized};
+    if(/^\d{4}-\d{2}$/.test(normalized)){
+      const [year,month]=normalized.split('-').map(Number);
+      return {from:normalized+'-01',to:normalized+'-'+new Date(year,month,0).getDate()};
+    }
+    return null;
+  }
+  function matchesDateScope(p,scope){
+    if(!scope.dateFrom&&!scope.dateTo)return true;
+    const period=projectDatePeriod(p,scope.dateKind||'start');
+    return !!period&&(!scope.dateFrom||period.to>=scope.dateFrom)&&(!scope.dateTo||period.from<=scope.dateTo);
+  }
+  async function exportBoardProjects(rows){
+    const button=$one('#boardExport');button.disabled=true;const label=button.innerHTML;button.textContent='正在生成Excel…';
+    try{
+      if(!rows.length){toast('当前筛选范围没有可导出的项目');return}
+      await window.MillikenProjectExcel.download({projects:rows.map(p=>({...projectPdfPayload(p),report:{...reportFor(p)},stage:p.stage,stageName:names[p.stage-1],area:boardArea(p),count:p.count,team:p.team,risk:p.risk,lastSubmittedAt:p.lastSubmittedAt,stageData:p.stageData||{},deadline:editDeadline(p)||null})),scope:{...boardScope}});
+      toast('Excel项目数据已下载');
+    }catch(error){console.error(error);toast(error.message||'Excel生成失败，请重试')}finally{button.disabled=false;button.innerHTML=label}
   }
   function renderDashboard() {
     if(boardScope.region&&!data.some(p=>boardRegion(p)===boardScope.region))boardScope.region='';
     if(boardScope.owner&&!data.some(p=>p.owner===boardScope.owner))boardScope.owner='';
     if(!['','进行中','已完工'].includes(boardScope.status))boardScope.status='';
-    const rows=data.filter(p=>(!boardScope.region||boardRegion(p)===boardScope.region)&&(!boardScope.owner||p.owner===boardScope.owner)&&(!boardScope.status||p.status===boardScope.status));
+    const rows=data.filter(p=>p.name.toLowerCase().includes(boardScope.query.trim().toLowerCase())&&matchesDateScope(p,boardScope)&&(!boardScope.region||boardRegion(p)===boardScope.region)&&(!boardScope.owner||p.owner===boardScope.owner)&&(!boardScope.status||p.status===boardScope.status));
     const total=rows.length,active=rows.filter(p=>p.status==='进行中').length,done=rows.filter(p=>p.status==='已完工').length,risks=rows.filter(p=>p.risk).sort((a,b)=>(boardRisk(a)==='low'?0:1)-(boardRisk(b)==='low'?0:1)),area=rows.reduce((n,p)=>n+boardArea(p),0),people=rows.reduce((n,p)=>n+(Number(p.count)||0),0);
     const percent=n=>total?Math.round(n/total*1000)/10:0,colors=['#bed5fb','#759ff2','#2468ed','#2ba58b'];
     const regions=[...new Set(data.map(boardRegion))],owners=[...new Set(data.map(p=>p.owner))];
+    if(!['start','end','actual'].includes(boardScope.dateKind))boardScope.dateKind='start';
     const select=(name,label,values)=>`<label><span>${label}</span><select name="${name}" aria-label="看板${label}"><option value="">全部${label}</option>${values.map(value=>`<option value="${esc(value)}" ${boardScope[name]===value?'selected':''}>${esc(value)}</option>`).join('')}</select></label>`;
     const panelHead=(title,desc,extra='')=>`<header><div><h2>${title}</h2><p>${desc}</p></div>${extra}</header>`;
     const icon=(path)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
@@ -1465,13 +1497,15 @@
       const projects=rows.filter(p=>p.owner===owner),ongoing=projects.filter(p=>p.status==='进行中');
       return {owner,projects,active:ongoing.length,attention:ongoing.filter(p=>p.risk).length,area:ongoing.reduce((n,p)=>n+boardArea(p),0)};
     }).sort((a,b)=>b.active-a.active||b.attention-a.attention||b.area-a.area||b.projects.length-a.projects.length);
-    const scopeLabels={region:'区域',owner:'负责人',status:'状态'};
+    const scopeLabels={region:'区域',owner:'负责人',status:'状态',query:'项目名称',dateFrom:'起始日期',dateTo:'截止日期'};
+    const activeScope=Object.entries(boardScope).filter(([key,value])=>key!=='dateKind'&&value);
+    const dateKinds={start:'计划开始日期',end:'计划结束日期',actual:'实际完成日期'};
     const handovers=histories.filter(r=>rows.some(p=>p.id===r.projectId)).slice().sort((a,b)=>b.time.localeCompare(a.time)).slice(0,3);
     dashboard.classList.add('qualityBoard');
     dashboard.innerHTML=`
       <div class="qbToolbar"><div class="qbContext"><span class="qbDot"></span><b>项目运营总览</b><span>演示项目档案 · ${data.length} 个项目</span></div><button class="qbExport" id="boardExport">${icon('<path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/>')}导出项目数据</button></div>
-      <form class="qbFilters" id="boardScope">${select('region','区域',regions)}${select('owner','负责人',owners)}${select('status','状态',['进行中','已完工'])}<button type="button" id="boardReset">重置筛选</button><span role="status">当前展示 <b>${total}</b> 个项目</span></form>
-      ${Object.entries(boardScope).some(([,value])=>value)?`<div class="qbScopeChips"><span>筛选范围</span>${Object.entries(boardScope).filter(([,value])=>value).map(([key,value])=>`<button type="button" data-board-clear="${key}" aria-label="清除${scopeLabels[key]}筛选：${esc(value)}">${scopeLabels[key]}：${esc(value)} <span aria-hidden="true">×</span></button>`).join('')}</div>`:''}
+      <form class="qbFilters" id="boardScope"><label class="qbNameFilter"><span>项目名称</span><input name="query" aria-label="看板项目名称" placeholder="输入项目名称关键词" value="${esc(boardScope.query)}"></label>${select('region','区域',regions)}${select('owner','负责人',owners)}${select('status','状态',['进行中','已完工'])}<label><span>时间类型</span><select name="dateKind" aria-label="看板时间类型">${Object.entries(dateKinds).map(([value,label])=>`<option value="${value}" ${boardScope.dateKind===value?'selected':''}>${label}</option>`).join('')}</select></label><label class="qbDateFilter"><span>起始日期</span><input type="date" name="dateFrom" aria-label="看板起始日期" value="${esc(boardScope.dateFrom)}"></label><label class="qbDateFilter"><span>截止日期</span><input type="date" name="dateTo" aria-label="看板截止日期" value="${esc(boardScope.dateTo)}"></label><button type="submit" class="qbQuery">查询</button><button type="button" id="boardReset">重置筛选</button><span role="status">当前展示 <b>${total}</b> 个项目</span><p class="qbFilterError" role="alert" id="boardFilterError"></p></form>
+      ${activeScope.length?`<div class="qbScopeChips"><span>筛选范围${boardScope.dateFrom||boardScope.dateTo?' · '+dateKinds[boardScope.dateKind]:''}</span>${activeScope.map(([key,value])=>`<button type="button" data-board-clear="${key}" aria-label="清除${scopeLabels[key]}筛选：${esc(value)}">${scopeLabels[key]}：${esc(value)} <span aria-hidden="true">×</span></button>`).join('')}</div>`:''}
       <div class="qbMetrics">${metrics.map(([label,value,unit,desc,key,svg])=>`<button class="qbMetric ${key==='risk'?'qbAlert':key==='done'?'qbSuccess':''}" data-board-metric="${key}" ${!total||(key==='active'&&!active)||(key==='done'&&!done)||(key==='risk'&&!risks.length)?'disabled':''}><div class="qbMetricLabel"><span>${label}</span>${svg}</div><div class="qbValue">${value}<small>${unit}</small></div><p>${desc}</p></button>`).join('')}</div>
       ${!total?'<div class="qbEmpty" role="status">当前筛选范围内暂无项目，调整条件或重置筛选后查看。</div>':''}
       <section class="qbPanel qbAttention">${panelHead('优先关注项目','优先核查低温施工，再补齐照片与温度记录',`<span class="qbHeaderBadge amber">${risks.length} 个需关注</span>`)}<div class="qbTableScroll"><table class="qbRiskTable"><thead><tr><th>项目 / 区域</th><th>当前阶段</th><th>关注事项</th><th>项目经理</th><th>操作</th></tr></thead><tbody>${risks.map(p=>`<tr><td><b>${esc(p.name)}</b><small>${esc(p.region)}</small></td><td>${names[p.stage-1]}</td><td><span class="qbRiskTag ${boardRisk(p)}">${boardRiskNames[boardRisk(p)]}</span><small>${esc(p.risk)}</small></td><td>${esc(p.owner)}</td><td><button class="qbLink" data-board-detail="${esc(p.id)}">查看档案 ›</button><button class="qbLink" data-project-pdf="${esc(p.id)}">下载</button></td></tr>`).join('')}</tbody></table>${!risks.length?'<div class="qbPanelEmpty">当前范围暂无已记录的关注事项</div>':''}</div></section>
@@ -1487,9 +1521,14 @@
       <section class="qbPanel">${panelHead('最近负责人交接','按交接时间倒序，保留项目责任链')}<div class="qbHandovers">${handovers.map(r=>`<button data-board-history="${esc(r.projectId)}"><span class="qbTimelineDot"></span><div><b>${esc(findProject(r.projectId).name)}</b><p>${esc(r.from)} <span>→</span> ${esc(r.to)}</p><time>${esc(r.time)}</time></div><em>明细 ›</em></button>`).join('')||'<div class="qbPanelEmpty">当前范围暂无交接记录</div>'}</div></section></div></div>
       <section class="qbPanel qbDownloads">${panelHead('项目下载','下载当前筛选范围内各项目的完整 PDF 档案')}<div class="qbTableScroll"><table class="qbRiskTable"><thead><tr><th>项目 / 区域</th><th>当前阶段</th><th>状态</th><th>项目经理</th><th>操作</th></tr></thead><tbody>${rows.map(p=>`<tr><td><b>${esc(p.name)}</b><small>${esc(p.region)}</small></td><td>${names[p.stage-1]}</td><td>${esc(p.status)}</td><td>${esc(p.owner)}</td><td><button class="qbLink" data-board-detail="${esc(p.id)}">查看档案 ›</button><button class="qbLink" data-project-pdf="${esc(p.id)}">下载</button></td></tr>`).join('')}</tbody></table>${!rows.length?'<div class="qbPanelEmpty">当前筛选暂无项目</div>':''}</div></section>
       <footer class="qbFootnote"><b>统计口径</b><span>项目指标来源于当前演示项目档案；人数为计划人次，面积为报备面积。尚未接入审核耗时、实际工期、胶水用量与验收结果，暂不展示相关绩效指标。</span></footer>`;
-    $one('#boardScope').onsubmit=e=>e.preventDefault();
-    $one('#boardScope').onchange=e=>{if(e.target.matches('select')){const name=e.target.name;boardScope=Object.fromEntries(new FormData(e.currentTarget));saveBoardScope();renderDashboard();$one('#boardScope [name="'+name+'"]')?.focus({preventScroll:true})}};
-    $one('#boardReset').onclick=()=>{boardScope={region:'',owner:'',status:''};saveBoardScope();renderDashboard();$one('#boardReset').focus({preventScroll:true})};
+    const applyBoardScope=()=>{
+      const next=Object.fromEntries(new FormData($one('#boardScope')));next.query=next.query.trim();
+      if(next.dateFrom&&next.dateTo&&next.dateFrom>next.dateTo){$one('#boardFilterError').textContent='截止日期不能早于起始日期';return false}
+      boardScope=next;saveBoardScope();renderDashboard();return true;
+    };
+    $one('#boardScope').onsubmit=event=>{event.preventDefault();applyBoardScope()};
+    $one('#boardScope').onchange=event=>{if(event.target.matches('select')){const name=event.target.name;if(applyBoardScope())$one('#boardScope [name="'+name+'"]')?.focus({preventScroll:true})}};
+    $one('#boardReset').onclick=()=>{boardScope=emptyBoardScope();saveBoardScope();renderDashboard();$one('#boardReset').focus({preventScroll:true})};
     dashboard.querySelectorAll('[data-board-clear]').forEach(button=>button.onclick=()=>{boardScope[button.dataset.boardClear]='';saveBoardScope();renderDashboard();$one('#boardReset').focus({preventScroll:true})});
     $one('#boardExport').onclick=()=>exportBoardProjects(rows);
     dashboard.querySelectorAll('[data-board-metric]').forEach(b=>b.onclick=()=>{const key=b.dataset.boardMetric;boardFilter(key==='active'?{status:'进行中'}:key==='done'?{status:'已完工'}:key==='risk'?{risk:'all'}:{})});
@@ -1747,6 +1786,7 @@
     if(!nonempty(fields2['地面平整度情况']))add(2,'请选择地面平整度情况','地面平整度情况');
     if(fields2['地面平整度情况']==='其他'&&!nonempty(fields2['其他情况说明']))add(2,'请填写其他地面情况说明','其他情况说明');
     const photoCheck=(stage,index,title)=>{const saved=states[stage]?.uploads?.[index];if(!saved?.data&&!saved?.photos?.some(photo=>photo.data))add(stage,'请上传'+title,title,'photo')};
+    if(fields2['地面平整度情况']==='其他'&&String(fields2['其他情况说明']||'').length>255)add(2,'其他情况说明不能超过255字','其他情况说明');
     photoCheck(2,0,'地面状态照片');
     const consent=states[3]?.consent||{};
     const learned=Object.keys(MATERIAL_TYPES).filter(kind=>consent[kind]&&consent[kind+'Confirmed']&&materialsReady&&activeMaterial(kind)&&consent.materialRefs?.[kind]===materialRef(activeMaterial(kind)));
@@ -1892,6 +1932,7 @@
     });
     prepareStageFields(stage,host);
     restoreStageState(stage,host);restoreUploadState(stage,host);
+    const groundOther=host.querySelector('#groundOtherNote');if(groundOther)host.querySelector('#groundOtherCount').textContent=groundOther.value.length+'/255';
     bindTemperatureRule(stage,host);bindRealPhotoState(stage,host);bindAreaVariance(stage,host);
     if(stage===2||stage===3)host.querySelectorAll('.upload small').forEach(note=>{if(!note.textContent.includes('已保存照片'))note.textContent='本阶段可暂不上传，提交完工前至少补充1张。'});
     host.querySelectorAll('input:not([type="file"]),select,textarea').forEach(control=>{control.addEventListener('input',()=>captureStageState(stage,host));control.addEventListener('change',()=>captureStageState(stage,host))});
