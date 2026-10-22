@@ -1,14 +1,17 @@
 #archiveResults .tableActions{flex-wrap:wrap;min-width:330px;column-gap:16px;row-gap:6px}
-.auditToolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin:24px 0}
+.auditHeading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 24px}
+.auditHeading h2{font-size:24px;line-height:1.5;margin:0;overflow-wrap:anywhere}.auditHeading p{font-size:15px;color:#687e8d;margin:8px 0 0}
+.auditHeading button,.auditPager button{border:1px solid #cbd8e3;border-radius:6px;background:#fff;color:#285379;font:inherit;font-size:15px;padding:10px 16px;white-space:nowrap;cursor:pointer}
+.tableCard.auditLedger{background:#fff;border:1px solid #dce5ed;border-radius:6px;overflow:hidden;min-width:0}
+.auditToolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:20px;border-bottom:1px solid #dce5ed}
 .auditToolbar label{display:flex;align-items:center;gap:12px;font-size:16px}
-.drawer .auditToolbar select{width:auto;min-width:160px;height:42px;border:1px solid #cbd8e3;border-radius:6px;background:#fff;padding:0 12px;font:inherit;color:#243f50}
+.auditToolbar select,.auditPager select{width:auto;height:42px;border:1px solid #cbd8e3;border-radius:6px;background:#fff;padding:0 12px;font:inherit;color:#243f50}
 .auditToolbar>span{font-size:14px;color:#687e8d}
-.auditRecord{border:1px solid #dce5ed;border-radius:8px;margin-bottom:20px;overflow:hidden}
-.auditRecord>header{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:16px 18px;background:#f4f7fb;border-bottom:1px solid #dce5ed}
-.auditRecord>header b{font-size:18px}.auditRecord time{font-size:14px;color:#526a7c}.auditRecord>header small{flex-basis:100%;font-size:14px;color:#687e8d}
-.auditChange{padding:18px;border-bottom:1px solid #e5ebf0}.auditChange:last-child{border-bottom:0}
-.auditChange h4{margin:0 0 14px;font-size:16px;line-height:1.6;overflow-wrap:anywhere}.auditChange h4 span{display:block;font-size:13px;font-weight:400;color:#526f8e;margin-bottom:4px}
-.auditComparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.auditComparison>div{min-width:0;padding:12px;background:#f8f9fb;border-radius:5px}.auditComparison>div:last-child{background:#edf5ff}
-.auditComparison small{font-size:13px;color:#687e8d}.auditComparison p{font-size:16px;line-height:1.7;color:#263e4d;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}
-.auditEmpty{text-align:center;padding:48px 16px;color:#687e8d}.auditEmpty b{font-size:18px;color:#304e64}.auditEmpty p{font-size:14px;line-height:1.8}
-@media(max-width:600px){.auditComparison{grid-template-columns:minmax(0,1fr)}.auditRecord>header,.auditChange{padding:14px}.auditToolbar{align-items:flex-start}.auditToolbar label{flex-wrap:wrap}.auditRecord time{line-height:1.6}}
+.auditTableScroll{max-width:100%;overflow:auto}.auditLedger table{width:100%;min-width:1180px;table-layout:fixed;border-collapse:collapse}
+.auditNumber{width:8%}.auditTime{width:14%}.auditActor{width:12%}.auditPhase{width:10%}.auditField{width:16%}.auditValue{width:20%}
+.auditLedger th{background:#f5f8f9;color:#6b808b;text-align:left;font-size:16px;font-weight:600;padding:16px 14px;border-bottom:1px solid #dce5ed}
+.auditLedger td{padding:18px 14px;vertical-align:top;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;line-height:1.7;border-bottom:1px solid #e5ebf0}
+.auditLedger tbody tr:hover{background:#f8fbff}.auditLedger time,.auditLedger .auditSerial{font-size:14px;font-variant-numeric:tabular-nums}.auditLedger td small{display:block;font-size:13px;color:#7b8d98;margin-top:4px}.auditLedger td b{font-size:16px;font-weight:500}
+.auditBefore{color:#71828d}.auditAfter{color:#174e83}.auditLedger td.auditEmpty{text-align:center;color:#7b8d98;padding:64px 20px;font-size:15px}
+.auditPager{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;padding:16px 20px;font-size:14px;color:#687e8d}.auditPager>span:first-child{margin-right:auto}.auditPager label{display:flex;gap:8px;align-items:center}.auditPager select{height:36px}.auditPager button{padding:7px 12px;font-size:14px}.auditPager button:disabled{color:#9faeb8;cursor:not-allowed;background:#f5f7fa}
+@media(max-width:600px){.auditHeading{align-items:flex-start;flex-direction:column;gap:12px;margin-bottom:16px}.auditHeading h2{font-size:20px}.auditToolbar{padding:14px}.auditToolbar label{flex-wrap:wrap}.auditPager{justify-content:flex-start;padding:14px;gap:10px}.auditPager>span:first-child{flex-basis:100%}.auditTableScroll table{min-width:1180px}}

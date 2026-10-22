@@ -887,8 +887,8 @@
 <script src="region-config.js?v=20261021-attention"></script>
 <script src="attention-rules.js?v=20261021"></script>
 <script src="learning-reader.js?v=20261022-no-download"></script>
-<script src="requirements.js?v=20261022-project-audit"></script>
-<link rel="stylesheet" href="project-audit.css?v=20261022">
+<script src="requirements.js?v=20261022-audit-ledger"></script>
+<link rel="stylesheet" href="project-audit.css?v=20261022-ledger">
 <script src="project-audit.js?v=20261022"></script>
 <script src="vendor/exceljs.min.js"></script>
 <script src="project-excel.js?v=20261021"></script>
@@ -940,6 +940,8 @@
   const admin = $one('#admin');
   const projectPage = $one('[data-pageview="projects"]');
   const historyPage = $one('[data-pageview="transfers"]');
+  const modificationPage=document.createElement('div');modificationPage.className='apage';modificationPage.dataset.pageview='modifications';historyPage.after(modificationPage);
+  let modificationProject=null;
   const dashboard = $one('[data-pageview="dashboard"]');
   const body = $one('#drawerBody'), footer = $one('#drawerFooter'), mask = $one('#drawerMask');
   let adminPage='projects', historyProject=data[2], mobileProject=mobileProjects[0]||blankMobileProject(), mobileFilter='全部', mobileQuery='', formMode='existing';
@@ -1359,9 +1361,10 @@
     adminPage=name;
     admin.querySelectorAll('.apage').forEach(el=>el.classList.toggle('active',el.dataset.pageview===name));
     nav.forEach((b,i)=>b.classList.toggle('active',i===(name==='dashboard'?0:name==='teams'?2:name==='materials'?3:name==='requirements'?4:1)));
-    $one('#adminTitle').textContent=name==='dashboard'?'数据看板':name==='transfers'?'交接明细':name==='teams'?'安装团队管理':name==='materials'?'材料管理':name==='requirements'?'需求说明':'项目档案';
+    $one('#adminTitle').textContent=name==='modifications'?'修改明细':name==='dashboard'?'数据看板':name==='transfers'?'交接明细':name==='teams'?'安装团队管理':name==='materials'?'材料管理':name==='requirements'?'需求说明':'项目档案';
     $one('#adminDesc').textContent=name==='dashboard'?'项目进度、施工规模与质量关注的全局视图':name==='transfers'?'项目负责人交接记录':name==='teams'?'统一维护合作团队、师傅信息与服务地址':name==='materials'?'管理安装培训与安装手册，统一现场端使用的材料版本':name==='requirements'?'企微工作台应用、管理后台的需求细节、操作逻辑与界面字号':'';
     if(name==='projects')renderProjects();
+    else if(name==='modifications')renderModifications(modificationProject);
     else if(name==='transfers')renderHistory(historyProject);
     else if(name==='teams')renderTeamDirectory();
     else if(name==='materials')renderMaterialLibrary();
@@ -1413,17 +1416,26 @@
   $one('#closeDrawer').onclick=closeDrawer;mask.onclick=e=>{if(e.target===mask)closeDrawer()};
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
   function showModifications(p){
-    body.onclick=null;
-    $one('#drawerKicker').textContent='项目档案';$one('#drawerTitle').textContent='修改明细';
-    body.innerHTML='<div class="archiveSummary"><h3>'+esc(p.name)+'</h3><p>查看现场端已保存信息的修改记录</p></div><div class="auditToolbar"><label>所属阶段<select id="auditStage"><option value="">全部阶段</option>'+names.map((name,i)=>'<option value="'+(i+1)+'">'+name+'</option>').join('')+'</select></label><span id="auditCount" role="status"></span></div><div id="auditRecords"></div>';
+    closeDrawer();modificationProject=p;switchAdmin('modifications');
+  }
+  function renderModifications(p){
+    let currentPage=1,size=10;
+    modificationPage.innerHTML='<header class="auditHeading"><div><h2>'+esc(p.name)+'</h2><p>项目修改流水 · 按修改时间倒序</p></div><button type="button" id="auditBack">返回项目档案</button></header><section class="tableCard auditLedger"><div class="auditToolbar"><label>所属阶段<select id="auditStage"><option value="">全部阶段</option>'+names.map((name,i)=>'<option value="'+(i+1)+'">'+name+'</option>').join('')+'</select></label><span id="auditCount" role="status"></span></div><div class="auditTableScroll" tabindex="0" role="region" aria-label="项目修改流水"><table><colgroup><col class="auditNumber"><col class="auditTime"><col class="auditActor"><col class="auditPhase"><col class="auditField"><col class="auditValue"><col class="auditValue"></colgroup><thead><tr>'+['流水号','修改时间','操作人','所属阶段','修改字段','修改前','修改后'].map(label=>'<th scope="col">'+label+'</th>').join('')+'</tr></thead><tbody id="auditRecords"></tbody></table></div><div class="auditPager"><span id="auditRange" role="status"></span><label>每页<select id="auditSize" aria-label="修改流水每页条数"><option value="10">10条</option><option value="20">20条</option><option value="50">50条</option></select></label><button id="auditPrevious" aria-label="修改流水上一页">上一页</button><span id="auditPageNumber"></span><button id="auditNext" aria-label="修改流水下一页">下一页</button></div></section>';
     const render=()=>{
       const stage=Number($one('#auditStage').value);
-      const records=(p.modificationHistory||[]).slice().reverse().map(entry=>({...entry,changes:entry.changes.filter(change=>!stage||change.stage===stage)})).filter(entry=>entry.changes.length);
-      $one('#auditCount').textContent=records.length+' 次修改 · '+records.reduce((sum,entry)=>sum+entry.changes.length,0)+' 项';
-      $one('#auditRecords').innerHTML=records.length?records.map(entry=>'<article class="auditRecord"><header><b>'+esc(entry.actor)+'</b><time datetime="'+esc(entry.time)+'">'+esc(new Date(entry.time).toLocaleString('zh-CN',{hour12:false}))+'</time><small>'+esc(entry.source)+' · '+entry.changes.length+' 项修改</small></header>'+entry.changes.map(change=>'<section class="auditChange"><h4><span>'+esc(names[change.stage-1])+'</span>'+esc(change.label)+'</h4><div class="auditComparison"><div><small>修改前</small><p>'+esc(change.before)+'</p></div><div><small>修改后</small><p>'+esc(change.after)+'</p></div></div></section>').join('')+'</article>').join(''):'<div class="auditEmpty"><b>'+(stage?'该阶段暂无修改记录':'暂无修改记录')+'</b><p>启用修改明细后，现场端对已报备项目保存的内容变更会显示在这里。</p></div>';
+      const entries=(p.modificationHistory||[]).map((entry,index)=>({...entry,order:index+1})).sort((a,b)=>b.time.localeCompare(a.time)||b.order-a.order);
+      const rows=entries.flatMap(entry=>entry.changes.filter(change=>!stage||change.stage===stage).map(change=>({entry,change})));
+      const pages=Math.max(1,Math.ceil(rows.length/size));currentPage=Math.min(currentPage,pages);
+      $one('#auditCount').textContent='共 '+rows.length+' 条流水 · '+new Set(rows.map(row=>row.entry.order)).size+' 次修改';
+      $one('#auditRecords').innerHTML=rows.length?rows.slice((currentPage-1)*size,currentPage*size).map(({entry,change})=>'<tr class="auditRow"><td class="auditSerial">'+String(entry.order).padStart(6,'0')+'</td><td><time datetime="'+esc(entry.time)+'">'+esc(new Date(entry.time).toLocaleString('zh-CN',{hour12:false}))+'</time></td><td><b>'+esc(entry.actor)+'</b><small>'+esc(entry.source)+'</small></td><td>'+esc(names[change.stage-1])+'</td><td>'+esc(change.label)+'</td><td class="auditBefore">'+esc(change.before)+'</td><td class="auditAfter">'+esc(change.after)+'</td></tr>').join(''):'<tr><td colspan="7" class="auditEmpty">'+(stage?'该阶段暂无修改流水':'暂无修改流水，现场端保存修改后将自动记录。')+'</td></tr>';
+      $one('#auditRange').textContent=rows.length?'第 '+((currentPage-1)*size+1)+'–'+Math.min(currentPage*size,rows.length)+' 条，共 '+rows.length+' 条':'共 0 条';
+      $one('#auditPageNumber').textContent=currentPage+' / '+pages;
+      $one('#auditPrevious').disabled=currentPage===1;$one('#auditNext').disabled=currentPage===pages;
     };
-    $one('#auditStage').onchange=render;render();
-    footer.innerHTML='<button id="auditClose">关闭</button>';$one('#auditClose').onclick=closeDrawer;mask.classList.add('show');
+    $one('#auditStage').onchange=()=>{currentPage=1;render()};
+    $one('#auditSize').onchange=e=>{size=Number(e.target.value);currentPage=1;render()};
+    $one('#auditPrevious').onclick=()=>{currentPage--;render()};$one('#auditNext').onclick=()=>{currentPage++;render()};
+    $one('#auditBack').onclick=()=>switchAdmin('projects');render();
   }
   function showDetail(p) {
     let selected=p.stage;
