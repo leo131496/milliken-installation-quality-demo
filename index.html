@@ -887,7 +887,7 @@
 <script src="region-config.js?v=20261021-attention"></script>
 <script src="attention-rules.js?v=20261021"></script>
 <script src="learning-reader.js?v=20261022-no-download"></script>
-<script src="requirements.js?v=20261022-no-download"></script>
+<script src="requirements.js?v=20261022-training-back"></script>
 <script src="vendor/exceljs.min.js"></script>
 <script src="project-excel.js?v=20261021"></script>
 <script src="project-pdf.js"></script>
@@ -1329,8 +1329,8 @@
     const ref=materialReader.ref,host=$one('#attachmentView');
     const back=()=>{cleanupMaterialReader();bindForm(stage)};$one('#back').onclick=back;
     if(kind==='training'){
-      host.innerHTML='<div class="learningScreen"><header class="learningHeading"><h2>安装培训视频</h2><small>四节完整培训 · 可直接点击观看</small></header><div class="trainingVideoList"></div>'+(!record.builtin?'<section class="learningSupplement"><h3>当前启用的补充材料</h3>'+materialPreviewBody(record,url)+'<a class="materialOpenFile" href="'+url+'" target="_blank" rel="noopener">打开补充材料</a></section>':'')+'<footer class="attachmentActions reading"><button id="attachmentCancel">返回施工流程</button></footer></div>';
-      materialReader.session=MillikenLearning.mountTraining(host.querySelector('.trainingVideoList'));$one('#attachmentCancel').onclick=back;return;
+      host.innerHTML='<div class="learningScreen"><header class="learningHeading"><h2>安装培训视频</h2><small>四节完整培训 · 可直接点击观看</small></header><div class="trainingVideoList"></div>'+(!record.builtin?'<section class="learningSupplement"><h3>当前启用的补充材料</h3>'+materialPreviewBody(record,url)+'<a class="materialOpenFile" href="'+url+'" target="_blank" rel="noopener">打开补充材料</a></section>':'')+'</div>';
+      materialReader.session=MillikenLearning.mountTraining(host.querySelector('.trainingVideoList'));return;
     }
     const isPdf=record.builtin||materialExtension(record.fileName)==='pdf';
     host.innerHTML='<div class="learningScreen"><header class="learningHeading"><h2>'+esc(record.title)+'</h2><small>'+esc(record.version)+' · PDF翻书阅读</small></header><div class="bookReader"></div><p id="materialReadingNotice" role="status"></p><footer class="attachmentActions reading"><button id="attachmentCancel">返回</button><button id="attachmentConfirm" class="solid" disabled>确认（5s）</button></footer></div>';
