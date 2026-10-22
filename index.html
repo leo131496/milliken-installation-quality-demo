@@ -894,7 +894,7 @@
 <link rel="stylesheet" href="requirements.css?v=20261020-field-logic">
 <script src="region-config.js?v=20261021-attention"></script>
 <script src="attention-rules.js?v=20261021"></script>
-<script src="requirements.js?v=20261021-attention"></script>
+<script src="requirements.js?v=20261022-audit"></script>
 <script src="vendor/exceljs.min.js"></script>
 <script src="project-excel.js?v=20261021"></script>
 <script src="project-pdf.js"></script>
@@ -1561,7 +1561,7 @@
     const stage=Math.max(1,names.indexOf($('#phoneTitle').textContent)+1);
     const project=mobileProject;
     if(!project||!canWriteProject(project)){toast('项目已锁定，不能保存修改');return}
-    if(stage===1)captureReport();
+    captureStageState(stage,$one('#formView'));
     draftItems=[{id:project.id+'-'+stage,projectId:project.id,project:project.report?.name||project.name||'未命名项目',stage,stageName:names[stage-1],savedAt:'刚刚',isNew:formMode==='new',report:project.report,projectSnapshot:formMode==='new'?project:undefined},...draftItems.filter(item=>item.id!==project.id+'-'+stage)];
     try{localStorage.setItem('milliken-drafts-v2',JSON.stringify(draftItems))}catch{}
     renderMobileHome();renderDrafts();view('drafts');toast('已保存至草稿箱');
@@ -1880,7 +1880,12 @@
   });
 
   const fieldForm=bindForm;
+  let activeFormStage=0;
+  $one('#formView').addEventListener('input',event=>{
+    if(activeFormStage===2&&event.target.id==='groundOtherNote')captureStageState(2,$one('#formView'));
+  });
   bindForm=function(stage){
+    activeFormStage=0;
     window.currentMobileProject=mobileProject;
     const writable=canWriteProject(mobileProject);
     if(stage>mobileProject.stage){toast('该阶段尚未开始');return}
@@ -1962,6 +1967,7 @@
       const notice=document.createElement('p');notice.className='projectLockNotice';notice.textContent=editDeadline(p)>Date.now()?'项目已完工，请返回项目详情点击“编辑项目”后修改。':'已超过7日修改期限，项目仅可查看。';host.append(notice);
     }
     $one('#back').onclick=()=>{captureStageState(stage,host);captureUploads(stage,host);if(formMode==='new'){renderMobileHome();view('home')}else showMobileDetail()};
+    activeFormStage=stage;
   };
   const priorView=view;
   view=function(name){if(name!=='attachment')cleanupMaterialReader();priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').innerHTML='<img class="millikenWordmark" src="assets/milliken-logo.png" alt="美利肯 Milliken">';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
