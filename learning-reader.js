@@ -64,7 +64,7 @@
         loading=false;q('.bookLoading').hidden=true;controls();
         if(turned){void sheet.offsetWidth;sheet.classList.add('bookTurn');if(eligible())credit()}
       }catch(error){
-        if(disposed)return;loading=true;controls();q('.bookLoading').textContent='手册加载失败，请返回后重新打开。原PDF可通过下方链接下载。';status('加载失败 · 未计时');onError(error);
+        if(disposed)return;loading=true;controls();q('.bookLoading').textContent='手册加载失败，请返回后重新打开；如仍无法加载，请联系管理员。';status('加载失败 · 未计时');onError(error);
       }
     };
     const turn=delta=>{if(disposed||loading)return;const next=index+delta;if(total===1&&delta===1){render(0,true);return}if(next<0||next>=total)return;render(next,true)};
