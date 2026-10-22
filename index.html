@@ -887,7 +887,9 @@
 <script src="region-config.js?v=20261021-attention"></script>
 <script src="attention-rules.js?v=20261021"></script>
 <script src="learning-reader.js?v=20261022-no-download"></script>
-<script src="requirements.js?v=20261022-training-back"></script>
+<script src="requirements.js?v=20261022-project-audit"></script>
+<link rel="stylesheet" href="project-audit.css?v=20261022">
+<script src="project-audit.js?v=20261022"></script>
 <script src="vendor/exceljs.min.js"></script>
 <script src="project-excel.js?v=20261021"></script>
 <script src="project-pdf.js"></script>
@@ -929,7 +931,8 @@
   } catch {}
   mobileProjects.forEach(project=>{const index=data.findIndex(item=>item.id===project.id);if(index<0)data.push(project);else data[index]=project});
   const findMobileProject=id=>mobileProjects.find(p=>p.id===id);
-  const persistMobileProjects=()=>{mobileProjects.forEach(project=>{const index=data.findIndex(item=>item.id===project.id);if(index<0)data.push(project);else data[index]=project});try{localStorage.setItem(MOBILE_STATE_KEY,JSON.stringify(mobileProjects))}catch{}};
+  let auditRendering=false;
+  const persistMobileProjects=({auditGroup=''}={})=>{mobileProjects.forEach(project=>{if(!auditRendering)MillikenProjectAudit.record(project,{group:auditGroup});const index=data.findIndex(item=>item.id===project.id);if(index<0)data.push(project);else data[index]=project});try{localStorage.setItem(MOBILE_STATE_KEY,JSON.stringify(mobileProjects));return true}catch{toast('项目保存失败，浏览器存储空间不足，请检查后重试');return false}};
   const blankMobileProject=()=>({id:'empty-session',name:'',region:'',owner:'王建国',stage:1,status:'进行中',time:'',area:'',team:'',count:0,risk:'',report:{name:'',province:'',city:'',area:'',start:'',end:'',team:'',count:'',longTerm:false}});
   const stageState = (p,stage) => stage > p.stage ? '未开始' : stage < p.stage || p.status==='已完工' ? '已完成' : '进行中';
   const $one = selector => document.querySelector(selector);
@@ -1393,13 +1396,14 @@
   function drawRows() {
     const filtered=data.filter(p=>p.name.toLowerCase().includes(filters.query.toLowerCase())&&(!filters.owner||p.owner===filters.owner)&&(!filters.stage||p.stage===Number(filters.stage))&&(!filters.region||p.region.includes(filters.region))&&(!filters.status||p.status===filters.status)&&(!filters.risk||(filters.risk==='all'?Boolean(boardRisk(p)):boardRisk(p)===filters.risk))&&(!filters.planMonth||boardMonth(p,filters.planKind)===filters.planMonth)&&matchesDateScope(p,filters));
     const count=Math.max(1,Math.ceil(filtered.length/pageSize));pageNumber=Math.max(1,Math.min(pageNumber,count));
-    $one('#archiveResults').innerHTML='<div class="archiveTableScroll"><table><thead><tr>'+['项目名称','区域','阶段','项目经理','状态','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+filtered.slice((pageNumber-1)*pageSize,pageNumber*pageSize).map(p=>'<tr><td><b>'+esc(p.name)+'</b>'+(filters.risk?'<small class="archiveConcern">'+esc(boardRiskNames[boardRisk(p)])+' · '+esc(window.MillikenAttention.text(p))+'</small>':'')+'</td><td>'+esc(p.region)+'</td><td>'+names[p.stage-1]+'</td><td>'+esc(p.owner)+'</td><td><span class="stateTag '+(p.status==='已完工'?'complete':'')+'">'+p.status+'</span></td><td><div class="tableActions"><button class="link" data-detail="'+p.id+'">详情</button><button class="link" data-handover="'+p.id+'">交接</button><button class="link" data-history="'+p.id+'">交接明细</button><button class="link" data-project-pdf="'+p.id+'">下载</button></div></td></tr>').join('')+'</tbody></table></div>'+(!filtered.length?'<div class="emptyState">没有符合条件的项目</div>':'')+'<div class="final2Pager"><span>共 '+filtered.length+' 条</span><select id="archiveSize" aria-label="每页条数"><option value="10">10 条 / 页</option><option value="3">3 条 / 页</option><option value="20">20 条 / 页</option></select><div><button aria-label="上一页" data-turn="'+(pageNumber-1)+'" '+(pageNumber===1?'disabled':'')+'>‹</button>'+Array.from({length:count},(_,i)=>'<button data-turn="'+(i+1)+'" class="'+(pageNumber===i+1?'active':'')+'" aria-current="'+(pageNumber===i+1?'page':'false')+'">'+(i+1)+'</button>').join('')+'<button aria-label="下一页" data-turn="'+(pageNumber+1)+'" '+(pageNumber===count?'disabled':'')+'>›</button></div></div>';
+    $one('#archiveResults').innerHTML='<div class="archiveTableScroll"><table><thead><tr>'+['项目名称','区域','阶段','项目经理','状态','操作'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+filtered.slice((pageNumber-1)*pageSize,pageNumber*pageSize).map(p=>'<tr><td><b>'+esc(p.name)+'</b>'+(filters.risk?'<small class="archiveConcern">'+esc(boardRiskNames[boardRisk(p)])+' · '+esc(window.MillikenAttention.text(p))+'</small>':'')+'</td><td>'+esc(p.region)+'</td><td>'+names[p.stage-1]+'</td><td>'+esc(p.owner)+'</td><td><span class="stateTag '+(p.status==='已完工'?'complete':'')+'">'+p.status+'</span></td><td><div class="tableActions"><button class="link" data-detail="'+p.id+'">详情</button><button class="link" data-handover="'+p.id+'">交接</button><button class="link" data-history="'+p.id+'">交接明细</button><button class="link" data-project-pdf="'+p.id+'">下载</button><button class="link" data-modifications="'+p.id+'">修改明细</button></div></td></tr>').join('')+'</tbody></table></div>'+(!filtered.length?'<div class="emptyState">没有符合条件的项目</div>':'')+'<div class="final2Pager"><span>共 '+filtered.length+' 条</span><select id="archiveSize" aria-label="每页条数"><option value="10">10 条 / 页</option><option value="3">3 条 / 页</option><option value="20">20 条 / 页</option></select><div><button aria-label="上一页" data-turn="'+(pageNumber-1)+'" '+(pageNumber===1?'disabled':'')+'>‹</button>'+Array.from({length:count},(_,i)=>'<button data-turn="'+(i+1)+'" class="'+(pageNumber===i+1?'active':'')+'" aria-current="'+(pageNumber===i+1?'page':'false')+'">'+(i+1)+'</button>').join('')+'<button aria-label="下一页" data-turn="'+(pageNumber+1)+'" '+(pageNumber===count?'disabled':'')+'>›</button></div></div>';
     $one('#archiveSize').value=String(pageSize);
     $one('#archiveSize').onchange=e=>{pageSize=Number(e.target.value);pageNumber=1;drawRows()};
     projectPage.querySelectorAll('[data-turn]').forEach(b=>b.onclick=()=>{pageNumber=Number(b.dataset.turn);drawRows()});
     projectPage.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>showDetail(findProject(b.dataset.detail)));
     projectPage.querySelectorAll('[data-handover]').forEach(b=>b.onclick=()=>showHandover(findProject(b.dataset.handover)));
     projectPage.querySelectorAll('[data-history]').forEach(b=>b.onclick=()=>{historyProject=findProject(b.dataset.history);switchAdmin('transfers')});
+    projectPage.querySelectorAll('[data-modifications]').forEach(b=>b.onclick=()=>showModifications(findProject(b.dataset.modifications)));
   }
   function evidence(stage,p) {
     const section=projectStageEvidence(p,stage);
@@ -1408,6 +1412,19 @@
   function closeDrawer(){mask.classList.remove('show');body.onclick=null}
   $one('#closeDrawer').onclick=closeDrawer;mask.onclick=e=>{if(e.target===mask)closeDrawer()};
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+  function showModifications(p){
+    body.onclick=null;
+    $one('#drawerKicker').textContent='项目档案';$one('#drawerTitle').textContent='修改明细';
+    body.innerHTML='<div class="archiveSummary"><h3>'+esc(p.name)+'</h3><p>查看现场端已保存信息的修改记录</p></div><div class="auditToolbar"><label>所属阶段<select id="auditStage"><option value="">全部阶段</option>'+names.map((name,i)=>'<option value="'+(i+1)+'">'+name+'</option>').join('')+'</select></label><span id="auditCount" role="status"></span></div><div id="auditRecords"></div>';
+    const render=()=>{
+      const stage=Number($one('#auditStage').value);
+      const records=(p.modificationHistory||[]).slice().reverse().map(entry=>({...entry,changes:entry.changes.filter(change=>!stage||change.stage===stage)})).filter(entry=>entry.changes.length);
+      $one('#auditCount').textContent=records.length+' 次修改 · '+records.reduce((sum,entry)=>sum+entry.changes.length,0)+' 项';
+      $one('#auditRecords').innerHTML=records.length?records.map(entry=>'<article class="auditRecord"><header><b>'+esc(entry.actor)+'</b><time datetime="'+esc(entry.time)+'">'+esc(new Date(entry.time).toLocaleString('zh-CN',{hour12:false}))+'</time><small>'+esc(entry.source)+' · '+entry.changes.length+' 项修改</small></header>'+entry.changes.map(change=>'<section class="auditChange"><h4><span>'+esc(names[change.stage-1])+'</span>'+esc(change.label)+'</h4><div class="auditComparison"><div><small>修改前</small><p>'+esc(change.before)+'</p></div><div><small>修改后</small><p>'+esc(change.after)+'</p></div></div></section>').join('')+'</article>').join(''):'<div class="auditEmpty"><b>'+(stage?'该阶段暂无修改记录':'暂无修改记录')+'</b><p>启用修改明细后，现场端对已报备项目保存的内容变更会显示在这里。</p></div>';
+    };
+    $one('#auditStage').onchange=render;render();
+    footer.innerHTML='<button id="auditClose">关闭</button>';$one('#auditClose').onclick=closeDrawer;mask.classList.add('show');
+  }
   function showDetail(p) {
     let selected=p.stage;
     $one('#drawerKicker').textContent='项目档案';$one('#drawerTitle').textContent='项目详情';
@@ -1627,7 +1644,14 @@
   }
   const stageLabel=control=>control.closest('.fieldItem')?.querySelector('b')?.textContent.replace(/\*/g,'').trim()||'';
   const stageStateFor=(project,stage)=>{project.stageData ||= {};project.stageData[stage] ||= {fields:{},options:{},uploads:[],updatedAt:''};return project.stageData[stage]};
-  function captureStageState(stage,host){
+  let auditGroupSequence=0;
+  const auditInputGroups=new WeakMap();
+  function auditInputGroup(control){
+    if(!control||control.tagName==='SELECT'||['checkbox','radio','file'].includes(control.type))return '';
+    if(!auditInputGroups.has(control))auditInputGroups.set(control,'input-'+(++auditGroupSequence));
+    return auditInputGroups.get(control);
+  }
+  function captureStageState(stage,host,auditGroup=''){
     if(!mobileProject||!host||!canWriteProject(mobileProject))return;
     if(stage===1)captureReport();
     const state=stageStateFor(mobileProject,stage),fields={},options={};
@@ -1646,7 +1670,7 @@
     if(stage===3){state.temperatureReason=host.querySelector('.reasons input[type="radio"]:checked')?.value||'';delete checkboxes.combinedLearning;for(const reason of TEMPERATURE_REASONS)delete checkboxes[reason];delete checkboxes['其他现场原因']}
     state.fields={...state.fields,...fields};state.options={...state.options,...options};state.checkboxes=checkboxes;
     state.updatedAt=new Date().toISOString();
-    persistMobileProjects();
+    persistMobileProjects({auditGroup});
   }
   function restoreStageState(stage,host){
     const state=mobileProject?.stageData?.[stage];
@@ -1765,7 +1789,7 @@
     const hint=host.querySelector('.fieldHint');if(hint)hint.textContent='报备 '+(reported||'未填写')+' m²';
     const update=()=>{const actual=Number(input.value),deviation=reported>0?Math.abs(actual-reported)/reported:0;warning.style.display=actual>0&&deviation>.1?'block':'none';
       if(warning.firstChild?.nodeType===Node.TEXT_NODE)warning.firstChild.textContent='面积偏差 '+(deviation*100).toFixed(1)+'%，超过10%。';};
-    input.addEventListener('input',()=>{checkbox.checked=false;update();captureStageState(stage,host)});update();
+    input.addEventListener('input',()=>{checkbox.checked=false;update();captureStageState(stage,host,auditInputGroup(input))});update();
   }
   function bindRealPhotoState(stage,host){
     host.querySelectorAll('.upload').forEach((label,index)=>{
@@ -1780,7 +1804,7 @@
           if(!canWriteProject(project)){toast('项目已超过7日修改期限');return}
           stageStateFor(project,stage).uploads[index]={...photos[0],photos};
           persistMobileProjects();if(project===mobileProject){restoreUploadState(stage,host);toast('照片已保存')}
-        }catch{toast('照片保存失败，请重试')}finally{delete label.dataset.loading}
+        }catch{toast('照片保存失败，请重试')}finally{input.value='';delete label.dataset.loading}
       };
     });
   }
@@ -1896,13 +1920,16 @@
   const fieldForm=bindForm;
   let activeFormStage=0;
   $one('#formView').addEventListener('input',event=>{
-    if(activeFormStage===2&&event.target.id==='groundOtherNote')captureStageState(2,$one('#formView'));
+    if(activeFormStage===2&&event.target.id==='groundOtherNote')captureStageState(2,$one('#formView'),auditInputGroup(event.target));
   });
   bindForm=function(stage){
+    if(activeFormStage)persistMobileProjects();
     activeFormStage=0;
     window.currentMobileProject=mobileProject;
     const writable=canWriteProject(mobileProject);
     if(stage>mobileProject.stage){toast('该阶段尚未开始');return}
+    auditRendering=true;
+    try{
     loadStageConsent();
     if(stage===1)longTermState=reportFor(mobileProject).longTerm;
     fieldForm(stage);
@@ -1958,7 +1985,7 @@
     const groundOther=host.querySelector('#groundOtherNote');if(groundOther)host.querySelector('#groundOtherCount').textContent=groundOther.value.length+'/255';
     bindTemperatureRule(stage,host);bindRealPhotoState(stage,host);bindAreaVariance(stage,host);
     if(stage===2||stage===3)host.querySelectorAll('.upload small').forEach(note=>{if(!note.textContent.includes('已保存照片'))note.textContent='本阶段可暂不上传，提交完工前至少补充1张。'});
-    host.querySelectorAll('input:not([type="file"]),select,textarea').forEach(control=>{control.addEventListener('input',()=>captureStageState(stage,host));control.addEventListener('change',()=>captureStageState(stage,host))});
+    host.querySelectorAll('input:not([type="file"]),select,textarea').forEach(control=>{control.addEventListener('input',()=>captureStageState(stage,host,auditInputGroup(control)));control.addEventListener('change',()=>{captureStageState(stage,host,auditInputGroup(control));auditInputGroups.delete(control)});control.addEventListener('blur',()=>auditInputGroups.delete(control))});
     host.querySelectorAll('.segment,.temp').forEach(group=>group.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>setTimeout(()=>captureStageState(stage,host),0))));
     const submit=$one('#submitStage'),previousSubmit=submit?.onclick;
     if(submit)submit.onclick=()=>{
@@ -1982,10 +2009,12 @@
     }
     $one('#back').onclick=()=>{captureStageState(stage,host);captureUploads(stage,host);if(formMode==='new'){renderMobileHome();view('home')}else showMobileDetail()};
     activeFormStage=stage;
+    }finally{auditRendering=false}
   };
   const priorView=view;
   view=function(name){if(name!=='attachment')cleanupMaterialReader();priorView(name);phoneBody.scrollTop=0;const backButton=$one('#back');if(backButton)backButton.classList.toggle('hidden',name==='home'||name==='contacts');if(name==='contacts'){$one('#phoneTitle').textContent='通讯录';backButton.onclick=()=>view('contacts')}if(name==='launcher'){$one('#phoneTitle').textContent='美利肯公司';backButton.onclick=()=>view('contacts')}if(name==='home')$one('#phoneTitle').innerHTML='<img class="millikenWordmark" src="assets/milliken-logo-blue.png" alt="美利肯 Milliken">';if(name==='detail')$one('#back').onclick=()=>{renderMobileHome();view('home')};else if(name==='projects')$one('#back').onclick=()=>view('home')};
   document.querySelectorAll('.steps [data-stage]').forEach(b=>b.onclick=()=>{const target=mobileProjects.find(p=>p.stage===Number(b.dataset.stage));if(target){mobileProject=target;formMode='existing';bindForm(Number(b.dataset.stage))}else toast('暂无该阶段项目，请先新建项目报备')});
+    data.forEach(project=>{reportFor(project);MillikenProjectAudit.initialize(project)});
     renderContacts();renderLauncher();renderDrafts();renderMobileHome();renderMobileList();bindForm(Math.min(3,mobileProject.stage||1));switchAdmin('projects');view('contacts');
     if(window.location.hash==='#quality-dashboard'){$one('.switch [data-mode="admin"]').click();switchAdmin('dashboard')}
     if(window.location.hash==='#installation-teams'){$one('.switch [data-mode="admin"]').click();switchAdmin('teams')}
