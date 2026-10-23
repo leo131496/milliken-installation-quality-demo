@@ -1,4 +1,4 @@
-// 需求说明 V2.11 · 2026-10-22。
+// 需求说明 V2.12 · 2026-10-23。
 (() => {
   'use strict';
   const groups = [
@@ -115,7 +115,7 @@
       "两项为“参加过美利肯安装培训”“已完整阅读美利肯安装手册”，分别附“安装培训材料”“安装手册材料”入口；两项的勾选条件不同。",
       "安装培训材料进入四节视频列表，来源为现有《2025 Installation Training-CN》完整培训，按原顺序分段，未删减内容。列表显示节次、原片时间段和约26分钟的单节时长；点击直接播放，支持暂停、拖动和全屏，可返回列表选择其他节。视频列表通过页面顶部返回按钮回到施工流程，底部不设置“返回施工流程”按钮。",
       "安装手册采用提供的installation-instructions-ap-cn.pdf，共7页，包含原文件全部文字及示意图，原版日期07/2018。现场阅读页提供上一页／下一页、左右滑动、方向键翻页、放大／适应页面和阅读确认，不提供原文件下载入口。",
-      "表单说明为“请根据实际情况至少确认一项。参加过安装培训可直接勾选；安装手册须完成翻页阅读后确认，两项可同时勾选。”"
+      "表单说明为“请根据实际情况至少确认一项。如您已参加过线下产品培训可直接勾选；安装手册须完成阅读确认后，才能进行勾选。”"
     ],
     "logic": [
       "培训项按实际参训情况直接勾选，不要求先打开材料或观看视频；无需视频倒计时，不校验播放完成度。培训确认不依赖后台是否启用补充材料，也不会生成手册阅读历史。",
@@ -937,15 +937,15 @@
   function exportDocument(){
     const content=groups.map(group=>chapter(group,items.filter(item=>item.group===group.id),true)).join('');
     const css='*{box-sizing:border-box}body{margin:0;color:#183345;background:#f3f6fa;font:14px/1.75 "PingFang SC","Microsoft YaHei",Arial,sans-serif}main{max-width:1100px;margin:28px auto;padding:30px;background:#fff}h1{font-size:26px}h2{font-size:22px}h3{font-size:17px;margin:0}h4{font-size:14px;margin:0 0 8px}p{overflow-wrap:anywhere}.reqSectionTitle{margin:30px 0 18px}.reqSectionTitle p,.reqEntry{color:#60758b;font-size:13px}.reqItem{border:1px solid #dce5ef;border-radius:8px;margin:14px 0;overflow:hidden}.reqItem summary{cursor:pointer;padding:16px 20px;list-style:none}.reqEntry{padding:0 20px;margin:0 0 14px}.reqBody{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:0 20px 20px}.reqSingle{grid-template-columns:1fr}ul{padding-left:19px;margin:0}li{margin:7px 0;overflow-wrap:anywhere}.reqFonts{padding:0 20px 22px}.reqFonts section+section{margin-top:22px}.reqTableScroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #dce5ef;padding:9px 12px;text-align:left}th{background:#f5f8fc}.reqFonts td:nth-child(n+2){white-space:nowrap;width:100px}.reqRules{padding:0 20px 22px}.reqRules table{table-layout:fixed}.reqRules th,.reqRules td{overflow-wrap:anywhere;vertical-align:top}.reqRules th:first-child{width:25%}@media(max-width:650px){main{margin:0;padding:16px}.reqBody{grid-template-columns:1fr;gap:18px}.reqItem summary,.reqEntry{padding-left:16px;padding-right:16px}.reqFonts,.reqRules{padding-left:16px;padding-right:16px}}@media print{body{background:#fff}main{margin:0;padding:0}.reqChapter{break-before:page}.reqChapter:first-of-type{break-before:auto}.reqSectionTitle,summary,h4{break-after:avoid}li,tr{break-inside:avoid}.reqTableScroll{overflow:visible}}';
-    const html=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>美利肯安装质量中心 · 需求说明</title><style>${css}</style></head><body><main><h1>美利肯安装质量中心 · 需求说明</h1><p>2026-10-22 更新 · 需求细节、操作逻辑与界面字号。</p>${content}</main></body></html>`;
+    const html=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>美利肯安装质量中心 · 需求说明</title><style>${css}</style></head><body><main><h1>美利肯安装质量中心 · 需求说明</h1><p>2026-10-23 更新 · 需求细节、操作逻辑与界面字号。</p>${content}</main></body></html>`;
     const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-    const a=document.createElement('a');a.href=url;a.download='美利肯安装质量中心-需求说明-20261022.html';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+    const a=document.createElement('a');a.href=url;a.download='美利肯安装质量中心-需求说明-20261023.html';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
   }
   function mount(host){
     if(host.dataset.requirementsMounted)return;
     host.dataset.requirementsMounted='true';
     const state={group:'field',query:'',open:true};
-    host.innerHTML=`<header class="reqHero"><div><h2>功能细节与操作逻辑</h2><p>按两端功能和界面规范查阅，内容对应当前 Demo。</p></div><button type="button" class="reqDownload">下载需求说明</button></header><nav class="reqTabs" aria-label="需求说明栏目">${groups.map(group=>`<button type="button" data-req-group="${group.id}">${esc(group.label)}</button>`).join('')}</nav><form class="reqToolbar" role="search"><label><span class="reqSr">搜索需求</span><input type="search" id="reqSearch" placeholder="搜索功能、字段或字号，例如：温度、照片、16px" autocomplete="off"></label><button type="button" id="reqReset">清除搜索</button></form><div class="reqResultsBar"><p id="reqResultCount" role="status" aria-live="polite"></p><div><button type="button" id="reqExpand">全部展开</button><button type="button" id="reqCollapse">全部收起</button></div></div><div id="reqResults"></div><p class="reqFooter">说明更新：2026-10-22。未保存的信息以各阶段实际记录为准。</p>`;
+    host.innerHTML=`<header class="reqHero"><div><h2>功能细节与操作逻辑</h2><p>按两端功能和界面规范查阅，内容对应当前 Demo。</p></div><button type="button" class="reqDownload">下载需求说明</button></header><nav class="reqTabs" aria-label="需求说明栏目">${groups.map(group=>`<button type="button" data-req-group="${group.id}">${esc(group.label)}</button>`).join('')}</nav><form class="reqToolbar" role="search"><label><span class="reqSr">搜索需求</span><input type="search" id="reqSearch" placeholder="搜索功能、字段或字号，例如：温度、照片、16px" autocomplete="off"></label><button type="button" id="reqReset">清除搜索</button></form><div class="reqResultsBar"><p id="reqResultCount" role="status" aria-live="polite"></p><div><button type="button" id="reqExpand">全部展开</button><button type="button" id="reqCollapse">全部收起</button></div></div><div id="reqResults"></div><p class="reqFooter">说明更新：2026-10-23。未保存的信息以各阶段实际记录为准。</p>`;
     const results=host.querySelector('#reqResults');
     const render=()=>{
       const query=state.query.trim().toLocaleLowerCase().replace(/\s+/g,'');

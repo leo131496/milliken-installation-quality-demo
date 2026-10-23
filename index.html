@@ -188,7 +188,7 @@
     function renderAgreementConsent(host){
       const card=host.querySelector('.formCard');
       if(!card)return;
-      card.querySelector('header p').textContent='请根据实际情况至少确认一项。参加过安装培训可直接勾选；安装手册须完成翻页阅读后确认，两项可同时勾选。';
+      card.querySelector('header p').textContent='请根据实际情况至少确认一项。如您已参加过线下产品培训可直接勾选；安装手册须完成阅读确认后，才能进行勾选。';
       const fields=card.querySelector('.fields');
       fields.innerHTML=[['training','参加过美利肯安装培训','安装培训材料'],['manual','已完整阅读美利肯安装手册','安装手册材料']].map(([kind,label,material])=>`<div class="qualificationBlock"><div class="qualificationRow ${attachmentConfirmed[kind]?'ready':''} ${checkState[kind]?'checked':''}"><div class="qualificationMain"><div class="qualificationLabel"><input type="checkbox" aria-label="${label}" ${attachmentConfirmed[kind]?'':'disabled'} ${checkState[kind]?'checked':''}><span><b>${label}</b>${checkState[kind]?'<small>已确认，满足施工结束条件</small>':attachmentConfirmed[kind]?'<small>已读完附件，可确认</small>':'<small>先打开附件并完成 5 秒阅读</small>'}</span></div><button type="button" class="qualificationLink" data-agreement="${kind}">${material}<em>›</em></button></div></div></div>`).join('');
       $$('.qualificationBlock',fields).forEach((block,index)=>{
@@ -887,7 +887,7 @@
 <script src="region-config.js?v=20261021-attention"></script>
 <script src="attention-rules.js?v=20261021"></script>
 <script src="learning-reader.js?v=20261022-no-download"></script>
-<script src="requirements.js?v=20261022-audit-ledger"></script>
+<script src="requirements.js?v=20261023-training-hint"></script>
 <link rel="stylesheet" href="project-audit.css?v=20261022-ledger">
 <script src="project-audit.js?v=20261022"></script>
 <script src="vendor/exceljs.min.js"></script>
